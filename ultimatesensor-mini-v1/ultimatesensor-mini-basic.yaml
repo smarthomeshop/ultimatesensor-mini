@@ -6,8 +6,8 @@
 substitutions:
   device_name: ultimatesensor-mini
   friendly_name: "UltimateSensor Mini"
-  ultimatesensor_mini_software_version: "2024.05"
-  ultimatesensor_mini_hardware_version: "V1"
+  ultimatesensor_mini_software_version: "1.0"
+  ultimatesensor_mini_hardware_version: "V1-Basic"
 
 # Esphome start
 esphome:
@@ -45,7 +45,7 @@ script:
       # Play boot sound
       - media_player.play_media:
           id: speaker
-          media_url: "https://smarthomeshop.io/products/audio/ultimatesensor-mini/boot1.mp3"
+          media_url: "https://smarthomeshop.io/products/ultimatesensor-mini/v1/audio/boot1.mp3"
       # Wait 3 seconds to load media
       - delay: 3s
       # Turn front and back light on white
@@ -79,7 +79,7 @@ api:
 ota:
 
 dashboard_import:
-  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini.yaml@main
+  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml@main
 
 wifi:
   # remove leading '#' and fill in your wifi details
