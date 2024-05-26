@@ -1,6 +1,6 @@
 # UltimateSensor Mini for Home Assistant
 
-![UltimateSensor Mini Logo](images/ultimatesensormini-logo.png)
+![UltimateSensor Mini](images/ultimatesensor-mini-inaction-shop.png)
 
 Explore the UltimateSensor Mini, a compact and comprehensive sensor designed to enhance your living environment by providing real-time monitoring of various indoor conditions. Integrated seamlessly with Home Assistant and ESPHome, the UltimateSensor Mini empowers your smart home with precise data and voice-controlled actions, all without the need for cloud connectivity.
 
