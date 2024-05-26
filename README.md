@@ -45,7 +45,7 @@ Need help or have questions? Join our [Discord community](https://smarthomeshop.
 
 ## License
 
-This project is released under the [CC BY-NC 4.0](LICENSE).
+This project is released under the [CC BY-NC 4.0](license).
 
 ## Stay Updated
 
