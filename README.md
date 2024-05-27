@@ -4,7 +4,7 @@
 
 Explore the UltimateSensor Mini, a compact and comprehensive sensor designed to enhance your living environment by providing real-time monitoring of various indoor conditions. Integrated seamlessly with Home Assistant and ESPHome, the UltimateSensor Mini empowers your smart home with precise data and voice-controlled actions, all without the need for cloud connectivity.
 
-For compatibility details, visit our website: [UltimateSensor Mini Compatibility](https://ultimatesensormini.nl/en)
+For more details, visit our website: [UltimateSensor Mini](https://ultimatesensor.nl/en/mini)
 
 **Important Information:** The UltimateSensor Mini supports Wi-Fi connectivity. It does not include an Ethernet connection, emphasizing its streamlined, wireless setup. Are you looking for a ultimatesensor with Ethernet and PoE connection then please check out our normal UltimateSensor, read more on our website [SmartHomeShop.io](https://smarthomeshop.io)
 
