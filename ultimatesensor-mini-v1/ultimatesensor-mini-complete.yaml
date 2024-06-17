@@ -720,7 +720,7 @@ button:
     on_press:
       then:
         - scd4x.perform_forced_calibration:
-            value: 419
+            value: 420
             id: my_scd41
 
 binary_sensor:
