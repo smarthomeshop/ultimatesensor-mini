@@ -77,7 +77,8 @@ api:
 
 #Enable Over the Air updates
 ota:
-
+  - platform: esphome
+  
 dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml@main
 
