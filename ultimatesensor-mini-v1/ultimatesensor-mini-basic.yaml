@@ -6,7 +6,7 @@
 substitutions:
   device_name: ultimatesensor-mini
   friendly_name: "UltimateSensor Mini"
-  ultimatesensor_mini_software_version: "1.0"
+  ultimatesensor_mini_software_version: "1.1"
   ultimatesensor_mini_hardware_version: "V1-Basic"
 
 # Esphome start
