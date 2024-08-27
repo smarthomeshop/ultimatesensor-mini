@@ -678,7 +678,16 @@ switch:
   - platform: restart
     id: switch_restart
     name: "Restart"
-
+button:
+  - platform: template
+    name: "CO2 manual calibration (only in fresh air for at least 10min)"
+    entity_category: "config"
+    on_press:
+      then:
+        - scd4x.perform_forced_calibration:
+            value: 420
+            id: my_scd41
+            
 binary_sensor:
   # Start wake word on HA connection
   - platform: status
