@@ -84,8 +84,8 @@ dashboard_import:
 
 wifi:
   # remove leading '#' and fill in your wifi details
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  ssid: ultimatesensor_default
+  password: ultimatesensor_default
   fast_connect: True #If enabled, directly connects to WiFi network without doing a full scan first. This is required for hidden networks and can significantly improve connection times.
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
