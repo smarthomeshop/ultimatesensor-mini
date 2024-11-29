@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml'
-      - 'ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml'  # Trigger only on changes to these YAML files
+      - 'ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml'
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
@@ -21,11 +21,17 @@ jobs:
       with:
         yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
 
+    - name: Move and Rename Firmware (Basic)
+      run: |
+        # Move the firmware to the desired directory and rename it
+        mkdir -p ultimatesensor-mini-v1/bin
+        mv .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-basic/.pioenvs/ultimatesensor-mini-basic/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
+
     - name: Upload Firmware Binary (Basic)
       uses: actions/upload-artifact@v3
       with:
         name: firmware-basic
-        path: .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-basic/.pioenvs/ultimatesensor-mini-basic/firmware.bin
+        path: ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
 
   build-complete:
     name: Build Complete Configuration
@@ -40,8 +46,14 @@ jobs:
       with:
         yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
 
+    - name: Move and Rename Firmware (Complete)
+      run: |
+        # Move the firmware to the desired directory and rename it
+        mkdir -p ultimatesensor-mini-v1/bin
+        mv .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-complete/.pioenvs/ultimatesensor-mini-complete/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-complete-v1.1.bin
+
     - name: Upload Firmware Binary (Complete)
       uses: actions/upload-artifact@v3
       with:
         name: firmware-complete
-        path: .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-complete/.pioenvs/ultimatesensor-mini-complete/firmware.bin
+        path: ultimatesensor-mini-v1/bin/ultimatesensor-mini-complete-v1.1.bin
