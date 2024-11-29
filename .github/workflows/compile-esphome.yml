@@ -21,10 +21,15 @@ jobs:
       with:
         yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
 
+    - name: Verify Built Firmware Location (Basic)
+      run: |
+        echo "Checking the directory where the firmware is built..."
+        ls -la .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-basic/
+
     - name: Move and Rename Firmware (Basic)
       run: |
-        # Move the firmware to the desired directory and rename it
         mkdir -p ultimatesensor-mini-v1/bin
+        # Move and rename the firmware binary to the desired directory
         mv .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-basic/.pioenvs/ultimatesensor-mini-basic/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
 
     - name: Upload Firmware Binary (Basic)
@@ -46,10 +51,15 @@ jobs:
       with:
         yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
 
+    - name: Verify Built Firmware Location (Complete)
+      run: |
+        echo "Checking the directory where the firmware is built..."
+        ls -la .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-complete/
+
     - name: Move and Rename Firmware (Complete)
       run: |
-        # Move the firmware to the desired directory and rename it
         mkdir -p ultimatesensor-mini-v1/bin
+        # Move and rename the firmware binary to the desired directory
         mv .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-complete/.pioenvs/ultimatesensor-mini-complete/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-complete-v1.1.bin
 
     - name: Upload Firmware Binary (Complete)
