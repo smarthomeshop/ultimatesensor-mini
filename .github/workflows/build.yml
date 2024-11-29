@@ -33,14 +33,6 @@ jobs:
         uses: actions/download-artifact@v4.1.8
         with:
           path: firmwares
-      - name: Remove intermediate version folder
-        run: |-
-          for d in firmwares/*/*; do
-            if [ -d "$d" ]; then
-              mv $d/* $d/../
-              rm -rf $d
-            fi
-          done
       - name: Copy files
         run: |-
           mkdir output
