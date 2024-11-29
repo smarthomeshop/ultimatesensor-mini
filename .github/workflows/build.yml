@@ -33,11 +33,15 @@ jobs:
         uses: actions/download-artifact@v4.1.8
         with:
           path: firmwares
+      - name: Debug artifact location
+        run: |
+          echo "Listing all files in the current directory:"
+          ls -R
       - name: Copy files
         run: |-
           mkdir output
-          cp -R ultimatesensor-mini/ultimatesensor-mini/static/* output/
-          cp -R ultimatesensor-mini/ultimatesensor-mini/firmwares/* output/
+          cp -R static/* output/
+          cp -R firmwares/* output/
       - name: Copy manifest files to root and modify paths # This is required so that older firmwares can update to newer firmwares with new manifest paths
         run: |-
           for device in firmwares/*; do
