@@ -27,8 +27,9 @@ For more details, visit our website: [UltimateSensor Mini](https://ultimatesenso
 
 ## Kit Contents
 
-- UltimateSensor Mini
+- UltimateSensor
 - USB-C power cable
+- USB-C Power Adapter (European)
 - Quick Start Guide
 
 ## Installation and Setup
