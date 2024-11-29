@@ -1,0 +1,23 @@
+{
+  "name": "UltimateSensor Mini Complete",
+  "version": "1.1",
+  "home_assistant_domain": "esphome",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "ota": {
+        "path": "ultimatesensor-mini-complete-esp32s3.ota.bin",
+        "md5": "fb46dad1ed290a50999653699328bacd",
+        "summary": "** Check the release notes for more information. **",
+        "release_url": "https://github.com/Diondk/HomeAssistant-Config/releases"
+      },
+      "parts": [
+        {
+          "path": "ultimatesensor-mini-complete-esp32s3.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
