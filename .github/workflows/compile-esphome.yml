@@ -1,69 +1,57 @@
-name: Compile ESPHome Binaries
+name: Compile ESPHome Binary
 
 on:
   push:
     paths:
-      - 'ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml'
-      - 'ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml'
-  workflow_dispatch:  # Allows manual triggering of the workflow
+      - 'ultimatesensor-mini-v1/**.yaml'  # Trigger only on changes to YAML files
+  workflow_dispatch:      # Allows manual triggering of the workflow
 
 jobs:
-  build-basic:
-    name: Build Basic Configuration
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name: Build ESPHome Firmware (Basic)
-      uses: esphome/build-action@v2
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
+        python-version: 3.10
 
-    - name: Verify Build Directory
+    - name: Install ESPHome
       run: |
-        echo "Checking the directory where the firmware is built..."
-        ls -la .esphome/build/
+        python -m pip install --upgrade pip
+        pip install esphome
+
+    - name: Compile ESPHome Binary (Basic)
+      uses: esphome/build-action@v1
+      with:
+        yaml_file: 'ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml'
+
+    - name: Compile ESPHome Binary (Complete)
+      uses: esphome/build-action@v1
+      with:
+        yaml_file: 'ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml'
 
     - name: Move and Rename Firmware (Basic)
       run: |
         mkdir -p ultimatesensor-mini-v1/bin
-        # Move and rename the firmware binary to the desired directory
-        mv .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-basic/.pioenvs/ultimatesensor-mini-basic/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
-
-    - name: Upload Firmware Binary (Basic)
-      uses: actions/upload-artifact@v3
-      with:
-        name: firmware-basic
-        path: ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
-
-  build-complete:
-    name: Build Complete Configuration
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
-
-    - name: Build ESPHome Firmware (Complete)
-      uses: esphome/build-action@v2
-      with:
-        yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
-
-    - name: Verify Build Directory
-      run: |
-        echo "Checking the directory where the firmware is built..."
-        ls -la .esphome/build/
+        mv .esphome/build/ultimatesensor-mini-v1/.pioenvs/ultimatesensor-mini/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
 
     - name: Move and Rename Firmware (Complete)
       run: |
         mkdir -p ultimatesensor-mini-v1/bin
-        # Move and rename the firmware binary to the desired directory
-        mv .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-complete/.pioenvs/ultimatesensor-mini-complete/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-complete-v1.1.bin
+        mv .esphome/build/ultimatesensor-mini-v1/.pioenvs/ultimatesensor-mini/firmware.bin ultimatesensor-mini-v1/bin/ultimatesensor-mini-complete-v1.1.bin
 
-    - name: Upload Firmware Binary (Complete)
+    - name: Upload Artifact (Basic)
       uses: actions/upload-artifact@v3
       with:
-        name: firmware-complete
+        name: esphome-basic-firmware
+        path: ultimatesensor-mini-v1/bin/ultimatesensor-mini-basic-v1.1.bin
+
+    - name: Upload Artifact (Complete)
+      uses: actions/upload-artifact@v3
+      with:
+        name: esphome-complete-firmware
         path: ultimatesensor-mini-v1/bin/ultimatesensor-mini-complete-v1.1.bin
