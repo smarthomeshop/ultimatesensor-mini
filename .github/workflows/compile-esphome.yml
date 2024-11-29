@@ -3,7 +3,7 @@ name: Compile ESPHome Binary
 on:
   push:
     paths:
-      - 'ultimatesensor-mini-v1/**.yaml'  # Trigger only on changes to YAML files in the 'esphome' folder
+      - 'ultimatesensor-mini-v1/**.yaml'  # Trigger only on changes to YAML files
   workflow_dispatch:      # Allows manual triggering of the workflow
 
 jobs:
@@ -19,19 +19,23 @@ jobs:
       with:
         python-version: 3.10
 
-    - name: Install ESPHome
+    - name: Verify Python Version
+      run: python --version
+
+    - name: Clean Python Environment
       run: |
-        python -m pip install --upgrade pip
-        pip install esphome
+        python -m pip uninstall -y pip
+        python -m ensurepip
+        python -m pip install --upgrade pip setuptools
+
+    - name: Install ESPHome
+      run: pip install esphome==2024.2.1  # Use specific ESPHome version
 
     - name: Compile ESPHome Binary
-      run: |
-        esphome compile esphome/my_device.yaml
-      env:
-        ESPHOME_DASHBOARD_PASSWORD: ${{ secrets.ESPHOME_DASHBOARD_PASSWORD }} # Optional if password is needed
+      run: esphome compile ultimatesensor-mini-v1/my_device.yaml
 
     - name: Upload Binary
       uses: actions/upload-artifact@v3
       with:
         name: esphome-my_device
-        path: esphome/build/my_device/.pioenvs/my_device/firmware.bin
+        path: ultimatesensor-mini-v1/build/my_device/.pioenvs/my_device/firmware.bin
