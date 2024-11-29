@@ -37,19 +37,26 @@ jobs:
         run: |
           echo "Listing all files in the current directory:"
           ls -R
-      - name: Copy files
+      - name: Copy firmware files
         run: |-
-          mkdir output
-          cp -R static/ultimatesensor-mini*/* output/
-          cp -R firmwares/ultimatesensor-mini*/* output/
-      - name: Copy manifest files to root and modify paths # This is required so that older firmwares can update to newer firmwares with new manifest paths
-        run: |-
-          for device in firmwares/*; do
-            device=$(basename $device)
-            jq --arg device "$device" \
-                '.builds[].ota.path |= $device + "/" + . | (.builds[].parts // [])[].path |= $device + "/" + .' \
-                firmwares/$device/manifest.json > output/$device-manifest.json
+          mkdir -p output
+          for firmware_dir in firmwares/*/*; do
+            cp -R "$firmware_dir"/* output/
           done
+      - name: Copy and modify manifest files
+        run: |-
+          for device_dir in firmwares/*; do
+            device=$(basename "$device_dir")
+            manifest_file=$(find "$device_dir" -name "manifest.json")
+            if [ -f "$manifest_file" ]; then
+              jq --arg device "$device" \
+                '.builds[].ota.path |= $device + "/" + . | (.builds[].parts // [])[].path |= $device + "/" + .' \
+                "$manifest_file" > output/$device-manifest.json
+            else
+              echo "No manifest.json found for $device"
+            fi
+          done
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3.0.1
         with:
