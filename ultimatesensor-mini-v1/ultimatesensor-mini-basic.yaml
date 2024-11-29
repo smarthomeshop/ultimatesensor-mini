@@ -4,8 +4,8 @@
 
 # Name of device
 substitutions:
-  device_name: ultimatesensor-mini
-  friendly_name: "UltimateSensor Mini"
+  device_name: ultimatesensor-mini-basic
+  friendly_name: "UltimateSensor Mini Basic"
   ultimatesensor_mini_software_version: "1.1"
   ultimatesensor_mini_hardware_version: "V1-Basic"
 
