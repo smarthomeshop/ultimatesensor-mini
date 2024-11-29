@@ -13,8 +13,8 @@ jobs:
     uses: esphome/workflows/.github/workflows/build.yml@main
     with:
       files: |
-        esphome/ultimatesensor-mini-basic.yaml
-        esphome/ultimatesensor-mini-complete.yaml
+        ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
+        ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
       esphome-version: 2024.10.0
       release-url: "https://github.com/Diondk/HomeAssistant-Config/releases"
       release-summary: "** Check the release notes for more information. **"
