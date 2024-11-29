@@ -21,10 +21,10 @@ jobs:
       with:
         yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
 
-    - name: Verify Built Firmware Location (Basic)
+    - name: Verify Build Directory
       run: |
         echo "Checking the directory where the firmware is built..."
-        ls -la .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-basic/
+        ls -la .esphome/build/
 
     - name: Move and Rename Firmware (Basic)
       run: |
@@ -51,10 +51,10 @@ jobs:
       with:
         yaml_file: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
 
-    - name: Verify Built Firmware Location (Complete)
+    - name: Verify Build Directory
       run: |
         echo "Checking the directory where the firmware is built..."
-        ls -la .esphome/build/ultimatesensor-mini-v1/ultimatesensor-mini-complete/
+        ls -la .esphome/build/
 
     - name: Move and Rename Firmware (Complete)
       run: |
