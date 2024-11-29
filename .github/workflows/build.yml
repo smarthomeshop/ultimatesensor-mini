@@ -3,8 +3,8 @@ name: Build and Push Firmware
 on:
   push:
     paths:
-      - esphome/ultimatesensor-mini-basic.yaml
-      - esphome/ultimatesensor-mini-complete.yaml
+      - ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
+      - ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
   workflow_dispatch:
 
 jobs:
