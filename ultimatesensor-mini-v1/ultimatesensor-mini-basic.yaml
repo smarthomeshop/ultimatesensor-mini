@@ -233,12 +233,16 @@ sensor:
     address: 0x23
     update_interval: 60s
 
-  # SGP40
+  # SGP41
   - platform: sgp4x
+    id: sgp41
     voc:
       name: "VOC Index"
     nox:
       name: "NOx Index"
+    compensation:
+      humidity_source: scd41_humidity
+      temperature_source: scd41_temperature
 
   # LD2450
   - platform: template
