@@ -191,6 +191,7 @@ light:
     chipset: ws2812
     name: "Back light"
     id: rgb_back_light
+    rmt_symbols: 96
   #WS2812 LED at the front
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
@@ -199,6 +200,7 @@ light:
     chipset: ws2812
     name: "Front light"
     id: rgb_front_light
+    rmt_symbols: 96
 
 
 # Status LED of ESP
