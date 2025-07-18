@@ -188,19 +188,19 @@ light:
     rgb_order: GRB
     pin: GPIO20
     num_leds: 1
-    rmt_channel: 0
     chipset: ws2812
     name: "Back light"
     id: rgb_back_light
+    rmt_symbols: 96
   #WS2812 LED at the front
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
     pin: GPIO05
     num_leds: 1
-    rmt_channel: 1
     chipset: ws2812
     name: "Front light"
     id: rgb_front_light
+    rmt_symbols: 96
 
 
 # Status LED of ESP
