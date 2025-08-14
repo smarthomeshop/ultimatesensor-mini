@@ -98,6 +98,7 @@ ota:
 
 http_request:
   useragent: ultimatesensor-mini-esphome
+  verify_ssl: false
 
 update:
   - platform: http_request
