@@ -1,53 +1,63 @@
-# UltimateSensor Mini for Home Assistant
+## UltimateSensor Mini for Home Assistant / ESPHome
 
 ![UltimateSensor Mini](images/ultimatesensor-mini-inaction-shop.png)
 
-Explore the UltimateSensor Mini, a compact and comprehensive sensor designed to enhance your living environment by providing real-time monitoring of various indoor conditions. Integrated seamlessly with Home Assistant and ESPHome, the UltimateSensor Mini empowers your smart home with precise data and voice-controlled actions, all without the need for cloud connectivity.
+[![CI – Build & Publish](https://github.com/smarthomeshop/ultimatesensor-mini/actions/workflows/publish.yml/badge.svg)](https://github.com/smarthomeshop/ultimatesensor-mini/actions/workflows/publish.yml)
 
-For more details, visit our website: [UltimateSensor Mini](https://ultimatesensor.nl/en/mini)
+UltimateSensor Mini is a compact, all‑in‑one room sensor powered by ESPHome. It runs fully local (no cloud) and integrates seamlessly with Home Assistant.
 
-**Important Information:** The UltimateSensor Mini supports Wi-Fi connectivity. It does not include an Ethernet connection, emphasizing its streamlined, wireless setup. Are you looking for a ultimatesensor with Ethernet and PoE connection then please check out our normal UltimateSensor, read more on our website [SmartHomeShop.io](https://smarthomeshop.io)
+- **Connectivity**: Wi‑Fi (no Ethernet/PoE)
+- **Sensors**: CO₂ (SCD41), temperature, humidity, light (BH1750), VOC/NOx (SGP41), particulate matter (SPS30, Complete variant)
+- **Audio & VA**: microphone and speaker with Voice Assistant
+- **Provisioning**: Improv over BLE/Serial and captive portal
 
-## Key Features
+More info: `https://ultimatesensor.nl/en/mini`
 
-- **Diverse Environmental Monitoring**: Measures CO2, humidity, temperature, light intensity, VOCs, particulate matter, and more.
-- **Advanced Motion Detection**: Utilizes mmWave technology to accurately detect the position and number of people in the room.
-- **Voice Control and Audio Functionalities**: Built-in microphone and speaker support voice commands and provide audio features like music playback and alarms.
+### Variants
 
-## Getting Started
+- **Basic**: core features without the SPS30 particulate sensor
+  - YAML: `ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml`
+  - Dashboard import: `github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml@main`
+  - OTA manifest: `https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-basic-manifest.json`
 
-1. **Installation**: Designed for easy installation, the UltimateSensor Mini can be placed anywhere within your home. Whether you choose wall mounting or a freestanding setup, integration is straightforward and user-friendly.
-2. **Configuration**: Seamlessly integrates with Home Assistant, allowing you to start monitoring and controlling your environment right away.
+- **Complete**: everything in Basic + SPS30 particulate sensor
+  - YAML: `ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml`
+  - Dashboard import: `github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml@main`
+  - OTA manifest: `https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-manifest.json`
 
-## Features
+### Quick start
 
-- **Real-Time Data**: Monitor your environment in real-time with detailed measurements.
-- **Home Assistant Integration**: Fully compatible with Home Assistant for comprehensive smart home automation.
-- **No Cloud Required**: Operates locally without the need for external cloud services.
+1. Mount/place the device and power it via USB‑C.
+2. Flash firmware:
+   - Via GitHub Pages manifest (OTA or your own Web Tools page), or
+   - Locally with ESPHome CLI: `esphome run ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml`
+3. Provisioning: use Improv (BLE/Serial) or the captive portal to set up Wi‑Fi.
 
-## Kit Contents
+### OTA updates in ESPHome
 
-- UltimateSensor
-- USB-C power cable
-- USB-C Power Adapter (European)
-- Quick Start Guide
+Both variants expose an `update` entity (HTTP manifest). The YAML uses substitutions similar to:
 
-## Installation and Setup
+- `wifi_fast_connect: "true"`
+- `name_add_mac_suffix: true`
+- `update_manifest_url: <variant‑specific manifest URL>`
 
-Detailed installation instructions and the integration guide for Home Assistant can be found on our website [SmartHomeShop.io](https://smarthomeshop.io/en).
+### Repository layout
 
-## Contributing
+- `ultimatesensor-mini-v1/` — ESPHome configurations (common + Basic/Complete variants)
+- `.github/workflows/` — CI that builds and publishes binaries and manifests to `gh-pages`
+- `ceilsense/` — reference project with a similar setup (Wi‑Fi/Ethernet variants)
+- `gh-pages` branch — public firmware and manifests (for OTA/ESP Web Tools)
 
-Interested in contributing to the UltimateSensor Mini project? Your contributions are welcome! Please submit a pull request or open an issue on this repository.
+### CI / version injection
 
-## Support
+- GitHub Actions build on each commit/tag and publish to `gh-pages`.
+- Version injection: during CI `ultimatesensor_mini_software_version` is set to the tag version (`vX.Y.Z` → `X.Y.Z`) or `dev-<shortsha>`.
 
-Need help or have questions? Join our [Discord community](https://smarthomeshop.io/discord) for support and to connect with other users.
+### Contributing & support
 
-## License
+- PRs and issues are welcome.
+- Community & support (Discord): `https://smarthomeshop.io/discord`
 
-This project is released under the [CC BY-NC 4.0](license).
+### License
 
-## Stay Updated
-
-Check back for updates, new features, and community insights!
+This project is released under [CC BY‑NC 4.0](license).

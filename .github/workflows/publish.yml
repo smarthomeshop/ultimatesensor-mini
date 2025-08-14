@@ -1,0 +1,39 @@
+name: Build and Publish UltimateSensor Mini firmware and website
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.yaml'
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish-ultimatesensor-mini-basic:
+    name: Publish UltimateSensor Mini Basic
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
+      name: UltimateSensor Mini Basic
+      manifest_filename: ultimatesensor-mini-basic-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-basic
+  publish-ultimatesensor-mini-complete:
+    name: Publish UltimateSensor Mini Complete
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
+      name: UltimateSensor Mini Complete
+      manifest_filename: ultimatesensor-mini-complete-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-complete
+
+
