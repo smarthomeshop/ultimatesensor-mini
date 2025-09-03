@@ -69,9 +69,12 @@ jobs:
             VERSION="dev-${SHORTSHA}"
           fi
           echo "Using VERSION=$VERSION"
-          # Update substitutions in the variant YAML (ultimatesensor specific)
-          sed -i "s/^\s*ultimatesensor_mini_software_version: \".*\"/  ultimatesensor_mini_software_version: \"${VERSION}\"/" "${{ matrix.file }}"
-          sed -i "s/^\\s*project_version: \\\".*\\\"/  project_version: \\\"${VERSION}\\\"/" "${{ matrix.file }}"
+          # Extract main version and create full version with build number
+          MAIN_VERSION=$(grep "project_main_version:" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml | sed 's/.*: *"\([^"]*\)".*/\1/')
+          FULL_VERSION="${MAIN_VERSION}.${{ github.run_number }}"
+          echo "Using FULL_VERSION=$FULL_VERSION"
+          # Update project_version in common.yaml
+          sed -i "s/^\s*project_version: \".*\"/  project_version: \"${FULL_VERSION}\"/" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
       - name: Create dummy secrets for build
         shell: bash
         run: |

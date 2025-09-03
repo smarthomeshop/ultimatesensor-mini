@@ -1,6 +1,10 @@
 # UltimateSensor Common Configuration
 # This file contains all shared configuration between Basic and Complete versions
 
+substitutions:
+  project_main_version: "2"
+  project_version: "2.0"
+
 # Esphome start
 esphome:
   name: ${device_name}
@@ -8,7 +12,7 @@ esphome:
   name_add_mac_suffix: true
   project:
     name: "smarthomeshop.ultimatesensor_mini"
-    version: ${ultimatesensor_mini_software_version}
+    version: ${project_version}
     on_update:
       then:
         - logger.log: "UltimateSensor Mini firmware updated successfully!"
@@ -1095,7 +1099,7 @@ text_sensor:
     name: "Software Version"
     update_interval: 5h
     lambda: |-
-      return {"${ultimatesensor_mini_software_version}"};
+      return {"${project_version}"};
     entity_category: "diagnostic"
   - platform: template
     id: text_sensor_ultimatesensor_mini_hardware_version

@@ -6,7 +6,6 @@
 substitutions:
   device_name: ultimatesensor-mini
   friendly_name: "UltimateSensor Mini"
-  ultimatesensor_mini_software_version: "1.3"
   ultimatesensor_mini_hardware_version: "V1-Complete"
   wifi_fast_connect: "true"
   update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-manifest.json"
