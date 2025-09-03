@@ -15,8 +15,54 @@ permissions:
   contents: write
 
 jobs:
+  update-versions:
+    name: Update version numbers in YAML files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update version numbers
+        shell: bash
+        run: |
+          # Determine VERSION from tag or fallback to dev-<sha>
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            SHORTSHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+            VERSION="dev-${SHORTSHA}"
+          fi
+          echo "Using VERSION=$VERSION"
+          
+          # Extract main version and create full version with build number
+          MAIN_VERSION=$(grep "project_main_version:" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml | sed 's/.*: *"\([^"]*\)".*/\1/')
+          FULL_VERSION="${MAIN_VERSION}.${{ github.run_number }}"
+          echo "Using FULL_VERSION=$FULL_VERSION"
+          
+          # Update project_version in common.yaml
+          sed -i "s/^\s*project_version: \".*\"/  project_version: \"${FULL_VERSION}\"/" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
+          
+          # Check if files were actually modified
+          if git diff --quiet ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml; then
+            echo "No version changes needed"
+            exit 0
+          fi
+          
+          echo "Version updated to ${FULL_VERSION}"
+      - name: Commit version updates
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
+          git commit -m "chore: update version to $(grep 'project_version:' ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml | sed 's/.*: *"\([^"]*\)".*/\1/') [skip ci]" || exit 0
+          git push || echo "Nothing to push"
+
   publish-ultimatesensor-mini-basic:
     name: Publish UltimateSensor Mini Basic
+    needs: [update-versions]
+    if: always() && (needs.update-versions.result == 'success' || needs.update-versions.result == 'skipped')
     uses: ./.github/workflows/esphome-build.yml
     with:
       files: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
@@ -27,6 +73,8 @@ jobs:
       directory_name: ultimatesensor-mini-basic
   publish-ultimatesensor-mini-complete:
     name: Publish UltimateSensor Mini Complete
+    needs: [update-versions]
+    if: always() && (needs.update-versions.result == 'success' || needs.update-versions.result == 'skipped')
     uses: ./.github/workflows/esphome-build.yml
     with:
       files: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
