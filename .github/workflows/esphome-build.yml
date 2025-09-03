@@ -71,6 +71,7 @@ jobs:
           echo "Using VERSION=$VERSION"
           # Update substitutions in the variant YAML (ultimatesensor specific)
           sed -i "s/^\s*ultimatesensor_mini_software_version: \".*\"/  ultimatesensor_mini_software_version: \"${VERSION}\"/" "${{ matrix.file }}"
+          sed -i "s/^\\s*project_version: \\\".*\\\"/  project_version: \\\"${VERSION}\\\"/" "${{ matrix.file }}"
       - name: Create dummy secrets for build
         shell: bash
         run: |
