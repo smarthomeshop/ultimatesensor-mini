@@ -95,8 +95,7 @@ script:
 # Enable logging
 logger:
   level: ${log_level}
-  baud_rate: 115200
-  hardware_uart: UART0
+  baud_rate: 0  # Disable hardware UART logging to allow improv_serial to work
 
 # Enable Home Assistant API
 api:
