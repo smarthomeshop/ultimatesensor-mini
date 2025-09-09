@@ -2,7 +2,7 @@
 # This configuration excludes the Particulate Matter (PM) sensor.
 # Use this file if your device does not include the PM/fine dust sensor.
 
-# Name of device.
+# Name of device
 substitutions:
   device_name: ultimatesensor-mini
   friendly_name: "UltimateSensor Mini"
