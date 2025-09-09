@@ -1,6 +1,6 @@
 {
   "name": "UltimateSensor Mini Basic",
-  "version": "2.6",
+  "version": "2.8",
   "home_assistant_domain": "esphome",
   "new_install_skip_erase": false,
   "builds": [
@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-S3",
       "ota": {
         "path": "ultimatesensor-mini-basic/ultimatesensor-mini-esp32s3.ota.bin",
-        "md5": "1fa2ca5f72dee63e315e568219a20065"
+        "md5": "612fd817976fd4ee9135704bce63b469"
       },
       "parts": [
         {
