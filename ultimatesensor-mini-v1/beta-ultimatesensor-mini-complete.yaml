@@ -1,7 +1,14 @@
-# UltimateSensor Common Configuration
-# This file contains all shared configuration between Basic and Complete versions
+# UltimateSensor Complete Configuration
+# This configuration includes settings for all sensors, including the Particulate Matter (PM) sensor.
+# Use this file if your device includes the PM/fine dust measurement capability.
 
+# Name of device
 substitutions:
+  device_name: ultimatesensor-mini
+  friendly_name: "UltimateSensor Mini"
+  ultimatesensor_mini_hardware_version: "V1-Complete"
+  wifi_fast_connect: "true"
+  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-manifest.json"
   project_main_version: "2"
   project_version: "2.8"
   log_level: "INFO"
@@ -241,6 +248,41 @@ status_led:
   pin: GPIO19
 
 sensor:
+  - platform: sps30
+    id: sps30_sensor
+    pm_1_0:
+      id: "PM_1_0"
+      name: "PM <1µm Weight concentration"
+    pm_2_5:
+      id: "PM_2_5"
+      name: "PM <2.5µm Weight concentration"
+    pm_4_0:
+      id: "PM_4_0"
+      name: "PM <4µm Weight concentration"
+    pm_10_0:
+      id: "PM_10_0"
+      name: "PM <10µm Weight concentration"
+    pmc_0_5:
+      id: "PMC_0_5"
+      name: "PM <0.5µm Number concentration"
+    pmc_1_0:
+      id: "PMC_1_0"
+      name: "PM <1µm Number concentration"
+    pmc_2_5:
+      id: "PMC_2_5"
+      name: "PM <2.5µm Number concentration"
+    pmc_4_0:
+      id: "PMC_4_0"
+      name: "PM <4µm Number concentration"
+    pmc_10_0:
+      id: "PMC_10_0"
+      name: "PM <10µm Number concentration"
+    pm_size:
+      id: "pm_size"
+      name: "Typical Particle size"
+    address: 0x69
+    update_interval: 60s
+    idle_interval: 5min  # Nieuwe functionaliteit uit PR #6828 - sensor gaat in idle mode tussen metingen
   # SCD41
   - platform: scd4x
     id: my_scd41
@@ -749,6 +791,16 @@ switch:
   # (removed) restart switch – replaced by restart button below
 
 button:
+  - platform: template
+    name: "SPS30 Start Measurement"
+    on_press:
+      - sps30.start_measurement: sps30_sensor
+  
+  - platform: template
+    name: "SPS30 Stop Measurement (Idle Mode)"
+    on_press:
+      - sps30.stop_measurement: sps30_sensor
+
   - platform: restart
     id: btn_restart
     name: "Restart"
@@ -1113,3 +1165,13 @@ text_sensor:
     lambda: |-
       return {"${ultimatesensor_mini_hardware_version}"};
     entity_category: "diagnostic" 
+
+dashboard_import:
+  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml@main
+  import_full_config: false
+
+# External components voor SPS30 idle mode functionaliteit (PR #6828)
+external_components:
+  - source: github://c0mputerguru/esphome@dev
+    components: [ sps30 ]
+    refresh: 1d
