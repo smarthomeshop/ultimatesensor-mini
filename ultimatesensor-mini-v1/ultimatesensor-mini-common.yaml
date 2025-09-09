@@ -118,12 +118,13 @@ update:
     disabled_by_default: true
 
 wifi:
-  # remove leading '#' and fill in your wifi details
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  fast_connect: ${wifi_fast_connect}
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  # No WiFi credentials - device starts in AP mode for initial setup
+  # Users can configure WiFi via:
+  # - Captive Portal (connect to hotspot)
+  # - Improv Serial (via WebTools)
+  # - Improv BLE
+  # - ESPHome dashboard (after adoption)
+  
   ap:
     ssid: ${device_name}
     password: ${device_name}
