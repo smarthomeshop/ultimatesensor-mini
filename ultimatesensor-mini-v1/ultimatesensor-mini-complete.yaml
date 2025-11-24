@@ -62,13 +62,13 @@ sensor:
     #idle_interval: 5min  # Nieuwe functionaliteit uit PR #6828 - sensor gaat in idle mode tussen metingen
 
 # Acties voor handmatige controle over SPS30 idle mode
-button:
-  - platform: template
-    name: "SPS30 Start Measurement"
-    on_press:
-      - sps30.start_measurement: sps30_sensor
+# button:
+#   - platform: template
+#     name: "SPS30 Start Measurement"
+#     on_press:
+#       - sps30.start_measurement: sps30_sensor
   
-  - platform: template
-    name: "SPS30 Stop Measurement (Idle Mode)"
-    on_press:
-      - sps30.stop_measurement: sps30_sensor
+#   - platform: template
+#     name: "SPS30 Stop Measurement (Idle Mode)"
+#     on_press:
+#       - sps30.stop_measurement: sps30_sensor
