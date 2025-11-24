@@ -18,10 +18,10 @@ dashboard_import:
   import_full_config: false
 
 # External components voor SPS30 idle mode functionaliteit (PR #6828)
-external_components:
-  - source: github://c0mputerguru/esphome@dev
-    components: [ sps30 ]
-    refresh: 1d
+# external_components:
+#   - source: github://c0mputerguru/esphome@dev
+#     components: [ sps30 ]
+#     refresh: 1d
 
 # SPS30 (For complete version) with idle mode functionality
 sensor:
@@ -59,7 +59,7 @@ sensor:
       name: "Typical Particle size"
     address: 0x69
     update_interval: 60s
-    idle_interval: 5min  # Nieuwe functionaliteit uit PR #6828 - sensor gaat in idle mode tussen metingen
+    #idle_interval: 5min  # Nieuwe functionaliteit uit PR #6828 - sensor gaat in idle mode tussen metingen
 
 # Acties voor handmatige controle over SPS30 idle mode
 button:
