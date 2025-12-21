@@ -562,7 +562,7 @@ uart:
             id(target1_speed).publish_state(0);
             id(target1_resolution).publish_state(0);
             id(target1_distance).publish_state(0);
-            id(target1_angle).publish_state(0);
+            id(target1_angle).publish_state(0 - 90);
           }
 
           if (p2_distance < max_distance) {
