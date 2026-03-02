@@ -226,7 +226,6 @@ light:
     pin: GPIO20
     num_leds: 1
     rgb_order: GRB
-    rmt_channel: 0
     name: "Back light"
     id: rgb_back_light
 
@@ -235,7 +234,6 @@ light:
     pin: GPIO5
     num_leds: 1
     rgb_order: GRB
-    rmt_channel: 1
     name: "Front light"
     id: rgb_front_light
 
