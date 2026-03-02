@@ -221,16 +221,16 @@ i2c:
     frequency: 100kHz  # Lower frequency for stability
 
 light:
-  - platform: fastled_clockless
-    chipset: WS2812B
+  - platform: esp32_rmt_led_strip
+    chipset: WS2812
     pin: GPIO20
     num_leds: 1
     rgb_order: GRB
     name: "Back light"
     id: rgb_back_light
 
-  - platform: fastled_clockless
-    chipset: WS2812B
+  - platform: esp32_rmt_led_strip
+    chipset: WS2812
     pin: GPIO5
     num_leds: 1
     rgb_order: GRB
@@ -444,11 +444,7 @@ globals:
 
 uart:
   id: uart_bus
-  tx_pin: 
-    number: GPIO13
-    mode:
-      input: true
-      pullup: true
+  tx_pin: GPIO13
   rx_pin: 
     number: GPIO14
     mode:
@@ -460,7 +456,6 @@ uart:
   data_bits: 8
   debug:
     direction: BOTH
-    dummy_receiver: True
     after:
      delimiter: [0X55, 0XCC]
     sequence:
@@ -708,6 +703,11 @@ uart:
               id(zone4_target_count).publish_state(0);
           }
 
+# LD2450 component for Bluetooth control and restart
+ld2450:
+  id: ld2450_radar
+  uart_id: uart_bus
+
 # Enable wake word switch
 switch:
   - platform: template
@@ -728,26 +728,13 @@ switch:
     on_turn_off:
       - voice_assistant.stop
       - lambda: id(va).set_use_wake_word(false);
-  # LD2450 Bluetooth control switch (based on ESPHome LD2410 component)
-  # - platform: template
-  #   id: ld2450_bluetooth
-  #   name: "LD2450 Bluetooth"
-  #   entity_category: "config"
-  #   optimistic: true
-  #   turn_on_action:
-  #     - uart.write:
-  #         id: uart_bus
-  #         data: [0xFD, 0xFC, 0xFB, 0xFA, 0x04, 0x00, 0xA4, 0x00, 0x01, 0x00, 0x04, 0x03, 0x02, 0x01]
-  #     - logger.log: "LD2450 Bluetooth turned ON"
-  #     - delay: 200ms
-  #   turn_off_action:
-  #     - uart.write:
-  #         id: uart_bus
-  #         data: [0xFD, 0xFC, 0xFB, 0xFA, 0x04, 0x00, 0xA4, 0x00, 0x00, 0x00, 0x04, 0x03, 0x02, 0x01]
-  #     - logger.log: "LD2450 Bluetooth turned OFF" 
-  #     - delay: 200ms
-
-  # (removed) restart switch – replaced by restart button below
+  # LD2450 Bluetooth control (via native ld2450 component)
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    bluetooth:
+      name: "LD2450 Bluetooth"
+      id: ld2450_bluetooth
+      entity_category: config
 
 button:
   - platform: restart
@@ -763,26 +750,21 @@ button:
             value: 420
             id: my_scd41
 
-  # # LD2450 factory reset button (based on ESPHome LD2410 component)
-  # - platform: template
-  #   id: ld2450_factory_reset
-  #   name: "LD2450 Factory Reset"
-  #   entity_category: "config"
-  #   disabled_by_default: true
-  #   on_press:
-  #     then:
-  #       # Enable configuration mode first
-  #       - uart.write:
-  #           id: uart_bus
-  #           data: [0xFD, 0xFC, 0xFB, 0xFA, 0x04, 0x00, 0xFF, 0x00, 0x01, 0x00, 0x04, 0x03, 0x02, 0x01]
-  #       - delay: 50ms
-  #       # Send factory reset command
-  #       - uart.write:
-  #           id: uart_bus
-  #           data: [0xFD, 0xFC, 0xFB, 0xFA, 0x02, 0x00, 0xA2, 0x00, 0x04, 0x03, 0x02, 0x01]
-  #       - delay: 200ms
-  #       - logger.log: "LD2450 Factory Reset executed"
-            
+  # LD2450 buttons (via native ld2450 component)
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    factory_reset:
+      name: "LD2450 Factory Reset"
+      id: ld2450_factory_reset
+      entity_category: diagnostic
+      icon: mdi:backup-restore
+      disabled_by_default: true
+    restart:
+      name: "LD2450 Restart"
+      id: ld2450_restart
+      entity_category: diagnostic
+      icon: mdi:restart
+
   - platform: factory_reset
     id: factory_reset_button
     name: "Factory Reset"
