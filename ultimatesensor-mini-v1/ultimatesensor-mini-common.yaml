@@ -593,21 +593,21 @@ uart:
           }
 
           int zone1_count = 0;      
-          if (id(target1_active).state == true ) {
+          if (id(target1_distance).state != 0 ) {
               if ((id(target1_x).state >= id(zone1_begin_x).state && id(target1_x).state <= id(zone1_end_x).state) &&
                   (id(target1_y).state >= id(zone1_begin_y).state && id(target1_y).state <= id(zone1_end_y).state)) {
                   zone1_count++;
               }
           }
 
-          if (id(target2_active).state == true ) {
+          if (id(target2_distance).state != 0 ) {
               if ((id(target2_x).state >= id(zone1_begin_x).state && id(target2_x).state <= id(zone1_end_x).state) &&
                   (id(target2_y).state >= id(zone1_begin_y).state && id(target2_y).state <= id(zone1_end_y).state)) {
                   zone1_count++;
               }
           }
 
-          if (id(target3_active).state == true ) {
+          if (id(target3_distance).state != 0 ) {
               if ((id(target3_x).state >= id(zone1_begin_x).state && id(target3_x).state <= id(zone1_end_x).state) &&
                   (id(target3_y).state >= id(zone1_begin_y).state && id(target3_y).state <= id(zone1_end_y).state)) {
                   zone1_count++;
@@ -623,19 +623,19 @@ uart:
           }
 
           int zone2_count = 0;
-          if (id(target1_active).state == true ) {
+          if (id(target1_distance).state != 0 ) {
               if ((id(target1_x).state >= id(zone2_begin_x).state && id(target1_x).state <= id(zone2_end_x).state) &&
                   (id(target1_y).state >= id(zone2_begin_y).state && id(target1_y).state <= id(zone2_end_y).state)) {
                   zone2_count++;
               }
           }
-          if (id(target2_active).state == true ) {
+          if (id(target2_distance).state != 0 ) {
               if ((id(target2_x).state >= id(zone2_begin_x).state && id(target2_x).state <= id(zone2_end_x).state) &&
                   (id(target2_y).state >= id(zone2_begin_y).state && id(target2_y).state <= id(zone2_end_y).state)) {
                   zone2_count++;
               }
           }
-          if (id(target3_active).state == true ) {
+          if (id(target3_distance).state != 0 ) {
               if ((id(target3_x).state >= id(zone2_begin_x).state && id(target3_x).state <= id(zone2_end_x).state) &&
                   (id(target3_y).state >= id(zone2_begin_y).state && id(target3_y).state <= id(zone2_end_y).state)) {
                   zone2_count++;
@@ -650,19 +650,19 @@ uart:
           }
 
           int zone3_count = 0;
-          if (id(target1_active).state == true ) {
+          if (id(target1_distance).state != 0 ) {
               if ((id(target1_x).state >= id(zone3_begin_x).state && id(target1_x).state <= id(zone3_end_x).state) &&
                   (id(target1_y).state >= id(zone3_begin_y).state && id(target1_y).state <= id(zone3_end_y).state)) {
                   zone3_count++;
               }
           }
-          if (id(target2_active).state == true ) {
+          if (id(target2_distance).state != 0 ) {
               if ((id(target2_x).state >= id(zone3_begin_x).state && id(target2_x).state <= id(zone3_end_x).state) &&
                   (id(target2_y).state >= id(zone3_begin_y).state && id(target2_y).state <= id(zone3_end_y).state)) {
                   zone3_count++;
               }
           }
-          if (id(target3_active).state == true ) {
+          if (id(target3_distance).state != 0 ) {
               if ((id(target3_x).state >= id(zone3_begin_x).state && id(target3_x).state <= id(zone3_end_x).state) &&
                   (id(target3_y).state >= id(zone3_begin_y).state && id(target3_y).state <= id(zone3_end_y).state)) {
                   zone3_count++;
@@ -677,19 +677,19 @@ uart:
           }
 
           int zone4_count = 0;
-          if (id(target1_active).state == true ) {
+          if (id(target1_distance).state != 0 ) {
               if ((id(target1_x).state >= id(zone4_begin_x).state && id(target1_x).state <= id(zone4_end_x).state) &&
                   (id(target1_y).state >= id(zone4_begin_y).state && id(target1_y).state <= id(zone4_end_y).state)) {
                   zone4_count++;
               }
           }
-          if (id(target2_active).state == true ) {
+          if (id(target2_distance).state != 0 ) {
               if ((id(target2_x).state >= id(zone4_begin_x).state && id(target2_x).state <= id(zone4_end_x).state) &&
                   (id(target2_y).state >= id(zone4_begin_y).state && id(target2_y).state <= id(zone4_end_y).state)) {
                   zone4_count++;
               }
           }
-          if (id(target3_active).state == true ) {
+          if (id(target3_distance).state != 0 ) {
               if ((id(target3_x).state >= id(zone4_begin_x).state && id(target3_x).state <= id(zone4_end_x).state) &&
                   (id(target3_y).state >= id(zone4_begin_y).state && id(target3_y).state <= id(zone4_end_y).state)) {
                   zone4_count++;
