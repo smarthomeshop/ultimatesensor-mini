@@ -25,14 +25,14 @@ esphome:
             blue: 0%
             flash_length: 500ms
   on_boot:
-    then:
-      - wait_until: 
-          condition:
-            wifi.connected
-          timeout: 30s
-      - script.execute: play_stream
-      # Disable Bluetooth after WiFi is connected to save memory
-      - ble.disable:
+    - then:
+        - wait_until:
+            condition:
+              wifi.connected
+            timeout: 30s
+        - script.execute: play_stream
+        # Disable Bluetooth after WiFi is connected to save memory
+        - ble.disable:
 
 # External components (removed LD2450)
 esp32:
