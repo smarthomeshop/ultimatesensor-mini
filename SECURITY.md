@@ -14,7 +14,7 @@ We recommend always running the latest firmware version via OTA update.
 Please **do not** open a public GitHub issue for security vulnerabilities.
 
 Instead, use GitHub's private vulnerability reporting:
-**[Report a vulnerability](https://github.com/Diondk/ultimatesensor-mini/security/advisories/new)**
+**[Report a vulnerability](https://github.com/smarthomeshop/ultimatesensor-mini/security)**
 
 We aim to respond within **7 days** and will keep you updated on the fix progress.
 
