@@ -17,13 +17,25 @@ dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml@main
   import_full_config: false
 
-# External components voor SPS30 idle mode functionaliteit (PR #6828)
-# external_components:
-#   - source: github://c0mputerguru/esphome@dev
-#     components: [ sps30 ]
-#     refresh: 1d
+# ═══════════════════════════════════════════════════════════════════════
+# SPS30 Particulate Matter Sensor (Complete version only)
+#
+# The SPS30 supports idle mode to extend sensor lifetime by turning off
+# the fan and laser between measurement cycles.
+#
+# Two configurable sliders appear under Configuration entities in Home Assistant:
+#
+#   SPS30 Update Interval (default: 60s, range: 10-300s)
+#     How often the sensor reads data when active.
+#
+#   SPS30 Idle Interval (default: 5 min, range: 0-30 min)
+#     How long the sensor sleeps between measurement cycles.
+#     Set to 0 to keep the sensor always on (no idle mode).
+#
+# With default settings (60s update, 5min idle), the sensor runs at ~33%
+# duty cycle, roughly tripling the SPS30's operational lifetime.
+# ═══════════════════════════════════════════════════════════════════════
 
-# SPS30 (For complete version) with idle mode functionality
 sensor:
   - platform: sps30
     id: sps30_sensor
@@ -59,16 +71,62 @@ sensor:
       name: "Typical Particle size"
     address: 0x69
     update_interval: 60s
-    #idle_interval: 5min  # Nieuwe functionaliteit uit PR #6828 - sensor gaat in idle mode tussen metingen
 
-# Acties voor handmatige controle over SPS30 idle mode
-# button:
-#   - platform: template
-#     name: "SPS30 Start Measurement"
-#     on_press:
-#       - sps30.start_measurement: sps30_sensor
-  
-#   - platform: template
-#     name: "SPS30 Stop Measurement (Idle Mode)"
-#     on_press:
-#       - sps30.stop_measurement: sps30_sensor
+# SPS30 idle cycle management script
+script:
+  - id: sps30_idle_cycle
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: 'return id(sps30_idle_interval).state <= 0;'
+          then:
+            - sps30.start_measurement: sps30_sensor
+          else:
+            - while:
+                condition:
+                  lambda: 'return id(sps30_idle_interval).state > 0;'
+                then:
+                  - sps30.start_measurement: sps30_sensor
+                  # Warmup (30s) + 2x update_interval for reliable readings
+                  - delay: !lambda |-
+                      return (uint32_t)(30000 + id(sps30_update_interval).state * 2000);
+                  - sps30.stop_measurement: sps30_sensor
+                  - delay: !lambda |-
+                      return (uint32_t)(id(sps30_idle_interval).state * 60000);
+
+# SPS30 configurable interval sliders (visible under Configuration in HA)
+number:
+  # How often the SPS30 reads when active (default: 60 seconds)
+  - platform: template
+    name: "SPS30 Update Interval"
+    id: sps30_update_interval
+    min_value: 10
+    max_value: 300
+    step: 10
+    initial_value: 60
+    unit_of_measurement: "s"
+    icon: mdi:update
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: |-
+            id(sps30_sensor).set_update_interval((uint32_t)(x * 1000));
+  # How long the SPS30 sleeps between measurements (default: 5 minutes, 0 = always on)
+  - platform: template
+    name: "SPS30 Idle Interval"
+    id: sps30_idle_interval
+    min_value: 0
+    max_value: 30
+    step: 1
+    initial_value: 5
+    unit_of_measurement: "min"
+    icon: mdi:sleep
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - script.execute: sps30_idle_cycle
