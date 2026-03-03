@@ -3,7 +3,7 @@
 
 substitutions:
   project_main_version: "2"
-  project_version: "2.22"
+  project_version: "2.26"
   log_level: "INFO"
   
 # Esphome start
