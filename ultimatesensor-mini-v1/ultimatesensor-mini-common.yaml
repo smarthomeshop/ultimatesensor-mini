@@ -222,18 +222,20 @@ i2c:
 
 light:
   - platform: esp32_rmt_led_strip
-    chipset: WS2812
+    rgb_order: GRB
     pin: GPIO20
     num_leds: 1
-    rgb_order: GRB
+    chipset: WS2812
+    rmt_symbols: 48
     name: "Back light"
     id: rgb_back_light
 
   - platform: esp32_rmt_led_strip
-    chipset: WS2812
+    rgb_order: GRB
     pin: GPIO5
     num_leds: 1
-    rgb_order: GRB
+    chipset: WS2812
+    rmt_symbols: 48
     name: "Front light"
     id: rgb_front_light
 
