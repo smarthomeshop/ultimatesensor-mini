@@ -155,9 +155,13 @@ speaker:
 
 media_player:
   - platform: speaker
-    id: speaker
+    id: media_player_main
     name: US Mini Media Player
-    speaker: i2s_speaker_output
+    announcement_pipeline:
+      speaker: i2s_speaker_output
+      num_channels: 1
+      sample_rate: 16000
+      format: FLAC
 
 #Microphone part
 microphone:
@@ -179,7 +183,7 @@ voice_assistant:
   auto_gain: 31dBFS
   #volume_multiplier: 4.0
   use_wake_word: false
-  media_player: speaker
+  media_player: media_player_main
   on_error: 
    - if:
         condition:
