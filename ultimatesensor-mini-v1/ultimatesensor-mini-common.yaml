@@ -145,14 +145,23 @@ i2s_audio:
     i2s_lrclk_pin: GPIO7
     i2s_bclk_pin: GPIO16
 
-media_player:
+speaker:
   - platform: i2s_audio
-    id: speaker
-    name: US Mini Media Player
+    id: i2s_speaker_output
     dac_type: external
     i2s_dout_pin: GPIO17
     i2s_audio_id: i2s_speaker
-    mode: mono
+    i2s_mode: primary
+
+media_player:
+  - platform: speaker
+    id: media_player_main
+    name: US Mini Media Player
+    announcement_pipeline:
+      speaker: i2s_speaker_output
+      num_channels: 1
+      sample_rate: 16000
+      format: FLAC
 
 #Microphone part
 microphone:
@@ -174,7 +183,7 @@ voice_assistant:
   auto_gain: 31dBFS
   #volume_multiplier: 4.0
   use_wake_word: false
-  media_player: speaker
+  media_player: media_player_main
   on_error: 
    - if:
         condition:
