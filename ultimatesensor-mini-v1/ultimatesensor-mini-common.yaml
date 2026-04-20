@@ -63,11 +63,11 @@ script:
   - id: play_stream
     then:
       - media_player.volume_set:  
-          id: speaker
+          id: media_player_main
           volume: 50%
       # Play boot sound
       - media_player.play_media:
-          id: speaker
+          id: media_player_main
           media_url: "https://smarthomeshop.io/products/ultimatesensor-mini/v1/audio/boot1.mp3"
       # Wait 3 seconds to load media
       - delay: 3s
