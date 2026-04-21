@@ -39,6 +39,8 @@ We publish two customer-facing firmware variants for the V1 hardware.
 |----------|---------|-------------|
 | V1 (ESP32-S3) | Basic | Standard firmware without the SPS30 particulate matter sensor |
 | V1 (ESP32-S3) | Complete | Full firmware with SPS30 particulate matter sensing |
+| V1 (ESP32-S3) | Beta Basic | Experimental local wake word firmware without the SPS30 particulate matter sensor |
+| V1 (ESP32-S3) | Beta Complete | Experimental local wake word firmware with SPS30 particulate matter sensing |
 
 ## Sensors
 
@@ -79,6 +81,9 @@ ultimatesensor-mini/
 │   ├── ultimatesensor-mini-common.yaml
 │   ├── ultimatesensor-mini-basic.yaml
 │   ├── ultimatesensor-mini-complete.yaml
+│   ├── beta-ultimatesensor-mini-common.yaml
+│   ├── beta-ultimatesensor-mini-basic.yaml
+│   ├── beta-ultimatesensor-mini-complete.yaml
 │   └── default_16MB.csv
 ├── .github/workflows/               # Build and release automation
 ├── CHANGELOG.md                     # Customer-facing firmware notes
@@ -92,6 +97,8 @@ Pre-built firmware manifests are published on the `gh-pages` branch.
 
 - V1 Basic: `ultimatesensor-mini-basic-manifest.json`
 - V1 Complete: `ultimatesensor-mini-complete-manifest.json`
+- V1 Beta Basic: `beta-ultimatesensor-mini-basic-manifest.json`
+- V1 Beta Complete: `beta-ultimatesensor-mini-complete-manifest.json`
 
 ## Contributing
 

@@ -7,6 +7,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+- Added experimental UltimateSensor Mini Basic and Complete beta firmware tracks with on-device Micro Wake Word support.
 
 ## [UltimateSensor Mini V1 2.34] - 2026-04-21
 

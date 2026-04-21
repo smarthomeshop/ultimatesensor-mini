@@ -1,0 +1,16 @@
+# UltimateSensor Mini Basic Beta Configuration
+# Experimental local wake word beta without the SPS30 particulate matter sensor.
+
+substitutions:
+  device_name: ultimatesensor-mini-beta
+  friendly_name: "UltimateSensor Mini Beta"
+  ultimatesensor_mini_hardware_version: "V1-Beta-Basic"
+  wifi_fast_connect: "true"
+  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/beta-ultimatesensor-mini-basic-manifest.json"
+
+packages:
+  common: !include beta-ultimatesensor-mini-common.yaml
+
+dashboard_import:
+  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/beta-ultimatesensor-mini-basic.yaml@main
+  import_full_config: false

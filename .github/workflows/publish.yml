@@ -85,7 +85,10 @@ jobs:
     outputs:
       v1_changed: ${{ steps.changes.outputs.v1 }}
       v1_build: ${{ steps.changes.outputs.v1_build }}
+      beta_changed: ${{ steps.changes.outputs.beta }}
+      beta_build: ${{ steps.changes.outputs.beta_build }}
       v1_version: ${{ steps.versions.outputs.v1_version }}
+      beta_version: ${{ steps.versions.outputs.beta_version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,6 +105,8 @@ jobs:
             echo "Force building all variants"
             echo "v1=true" >> "$GITHUB_OUTPUT"
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            echo "beta=true" >> "$GITHUB_OUTPUT"
+            echo "beta_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -109,6 +114,8 @@ jobs:
             echo "Scheduled build - rebuilding all variants with latest ESPHome"
             echo "v1=true" >> "$GITHUB_OUTPUT"
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            echo "beta=true" >> "$GITHUB_OUTPUT"
+            echo "beta_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -116,6 +123,8 @@ jobs:
             echo "Tag detected, building all variants"
             echo "v1=true" >> "$GITHUB_OUTPUT"
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            echo "beta=true" >> "$GITHUB_OUTPUT"
+            echo "beta_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -131,6 +140,8 @@ jobs:
             echo "First push detected, building all variants"
             echo "v1=true" >> "$GITHUB_OUTPUT"
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            echo "beta=true" >> "$GITHUB_OUTPUT"
+            echo "beta_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -138,18 +149,25 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
-          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/.*\.ya?ml$' && echo "true" || echo "false")
+          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/(ultimatesensor-mini-basic|ultimatesensor-mini-complete|ultimatesensor-mini-common)\.ya?ml$' && echo "true" || echo "false")
+          BETA_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/beta-ultimatesensor-mini-(basic|complete|common)\.ya?ml$' && echo "true" || echo "false")
+          WORKFLOW_CHANGED=$(echo "$CHANGED_FILES" | grep -q '^.github/workflows/' && echo "true" || echo "false")
 
-          if echo "$CHANGED_FILES" | grep -q '^.github/workflows/' && [[ "$V1_CHANGED" == "false" ]]; then
+          if [[ "$WORKFLOW_CHANGED" == "true" && "$V1_CHANGED" == "false" && "$BETA_CHANGED" == "false" ]]; then
             echo "Workflow-only changes detected, rebuilding all variants without creating a new firmware version"
             echo "v1=false" >> "$GITHUB_OUTPUT"
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            echo "beta=false" >> "$GITHUB_OUTPUT"
+            echo "beta_build=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           echo "v1=$V1_CHANGED" >> "$GITHUB_OUTPUT"
           echo "v1_build=$V1_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "beta=$BETA_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "beta_build=$BETA_CHANGED" >> "$GITHUB_OUTPUT"
           echo "V1 changed: $V1_CHANGED"
+          echo "Beta changed: $BETA_CHANGED"
 
       - name: Update version numbers for changed versions
         id: versions
@@ -159,6 +177,7 @@ jobs:
 
           IS_SCHEDULED="${{ github.event_name == 'schedule' }}"
           VERSION_FILE="ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml"
+          BETA_VERSION_FILE="ultimatesensor-mini-v1/beta-ultimatesensor-mini-common.yaml"
 
           update_version() {
             local current_version
@@ -200,6 +219,21 @@ jobs:
             echo "v1_version=$V1_CURRENT" >> "$GITHUB_OUTPUT"
           fi
 
+          BETA_CURRENT=$(grep "project_version:" "$BETA_VERSION_FILE" 2>/dev/null | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "${V1_CURRENT:-1.0}-beta")
+          if [[ "$IS_SCHEDULED" == "true" ]]; then
+            BETA_VERSION="$BETA_CURRENT"
+          elif [[ "${{ steps.changes.outputs.beta }}" == "true" || "${{ steps.changes.outputs.beta_build }}" == "true" ]]; then
+            if [[ "$BETA_CURRENT" =~ ^([0-9]+)\.([0-9]+)(.*)$ ]]; then
+              BETA_VERSION="${BASH_REMATCH[1]}.$((BASH_REMATCH[2] + 1))-beta.${{ github.run_number }}"
+            else
+              BETA_VERSION="${V1_CURRENT:-1.0}-beta.${{ github.run_number }}"
+            fi
+          else
+            BETA_VERSION="$BETA_CURRENT"
+          fi
+          echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Beta version: $BETA_VERSION"
+
       - name: Commit version updates and create tags
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
@@ -229,11 +263,21 @@ jobs:
               return
             fi
 
-            {
-              printf '## [UltimateSensor Mini V1 %s] - %s\n\n' "${{ steps.versions.outputs.v1_version }}" "$release_date"
-              cat "$unreleased_notes"
-              printf '\n'
-            } >> "$release_blocks"
+            if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]]; then
+              {
+                printf '## [UltimateSensor Mini V1 %s] - %s\n\n' "${{ steps.versions.outputs.v1_version }}" "$release_date"
+                cat "$unreleased_notes"
+                printf '\n'
+              } >> "$release_blocks"
+            fi
+
+            if [[ "${{ steps.changes.outputs.beta }}" == "true" ]]; then
+              {
+                printf '## [UltimateSensor Mini Beta V1 %s] - %s\n\n' "${{ steps.versions.outputs.beta_version }}" "$release_date"
+                cat "$unreleased_notes"
+                printf '\n'
+              } >> "$release_blocks"
+            fi
 
             awk -v blocks_file="$release_blocks" '
               BEGIN { in_unreleased=0 }
@@ -277,18 +321,39 @@ jobs:
 
           if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]]; then
             sed -i "s/^\s*project_version: \".*\"/  project_version: \"${{ steps.versions.outputs.v1_version }}\"/" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
+          fi
+
+          if [[ "${{ steps.changes.outputs.beta }}" == "true" ]]; then
+            sed -i "s/^\s*project_version: \".*\"/  project_version: \"${{ steps.versions.outputs.beta_version }}\"/" ultimatesensor-mini-v1/beta-ultimatesensor-mini-common.yaml
+          fi
+
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" || "${{ steps.changes.outputs.beta }}" == "true" ]]; then
             finalize_changelog
           fi
 
-          if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]] && ! git diff --quiet; then
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" || "${{ steps.changes.outputs.beta }}" == "true" ]] && ! git diff --quiet; then
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
-            git add CHANGELOG.md ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
-            git commit -m "chore: update version V1=${{ steps.versions.outputs.v1_version }} [skip ci]" || exit 0
+            git add CHANGELOG.md ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml ultimatesensor-mini-v1/beta-ultimatesensor-mini-common.yaml
+
+            MSG="chore: update versions"
+            [[ "${{ steps.changes.outputs.v1 }}" == "true" ]] && MSG="$MSG V1=${{ steps.versions.outputs.v1_version }}"
+            [[ "${{ steps.changes.outputs.beta }}" == "true" ]] && MSG="$MSG Beta=${{ steps.versions.outputs.beta_version }}"
+            MSG="$MSG [skip ci]"
+
+            git commit -m "$MSG" || exit 0
             git push || echo "Nothing to push"
 
             if [[ ! "${{ steps.versions.outputs.v1_version }}" =~ ^dev- ]]; then
-              create_tag "ultimatesensor-mini-v1-${{ steps.versions.outputs.v1_version }}"
+              if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]]; then
+                create_tag "ultimatesensor-mini-v1-${{ steps.versions.outputs.v1_version }}"
+              fi
+            fi
+
+            if [[ ! "${{ steps.versions.outputs.beta_version }}" =~ ^dev- ]]; then
+              if [[ "${{ steps.changes.outputs.beta }}" == "true" ]]; then
+                create_tag "beta-ultimatesensor-mini-v1-${{ steps.versions.outputs.beta_version }}"
+              fi
             fi
           fi
 
@@ -321,6 +386,38 @@ jobs:
       directory_name: ultimatesensor-mini-complete
       project_version: ${{ needs.detect-changes.outputs.v1_version }}
       base_path: ultimatesensor-mini-v1
+
+  publish-ultimatesensor-mini-beta-basic:
+    name: Publish UltimateSensor Mini Beta Basic
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.beta_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/beta-ultimatesensor-mini-basic.yaml
+      name: UltimateSensor Mini Beta Basic
+      manifest_filename: beta-ultimatesensor-mini-basic-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: beta-ultimatesensor-mini-basic
+      project_version: ${{ needs.detect-changes.outputs.beta_version }}
+      base_path: ultimatesensor-mini-v1
+      version_file: beta-ultimatesensor-mini-common.yaml
+
+  publish-ultimatesensor-mini-beta-complete:
+    name: Publish UltimateSensor Mini Beta Complete
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.beta_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/beta-ultimatesensor-mini-complete.yaml
+      name: UltimateSensor Mini Beta Complete
+      manifest_filename: beta-ultimatesensor-mini-complete-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: beta-ultimatesensor-mini-complete
+      project_version: ${{ needs.detect-changes.outputs.beta_version }}
+      base_path: ultimatesensor-mini-v1
+      version_file: beta-ultimatesensor-mini-common.yaml
 
   create-releases:
     name: Create GitHub releases
@@ -380,4 +477,8 @@ jobs:
 
           if [[ "${{ needs.detect-changes.outputs.v1_changed }}" == "true" && ! "${{ needs.detect-changes.outputs.v1_version }}" =~ ^dev- ]]; then
             create_release "ultimatesensor-mini-v1-${{ needs.detect-changes.outputs.v1_version }}" "UltimateSensor Mini V1 ${{ needs.detect-changes.outputs.v1_version }}"
+          fi
+
+          if [[ "${{ needs.detect-changes.outputs.beta_changed }}" == "true" && ! "${{ needs.detect-changes.outputs.beta_version }}" =~ ^dev- ]]; then
+            create_release "beta-ultimatesensor-mini-v1-${{ needs.detect-changes.outputs.beta_version }}" "UltimateSensor Mini Beta V1 ${{ needs.detect-changes.outputs.beta_version }}"
           fi

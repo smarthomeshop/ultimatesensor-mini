@@ -41,6 +41,11 @@ on:
         description: Path to the base YAML directory, e.g. ultimatesensor-mini-v1.
         required: true
         type: string
+      version_file:
+        description: YAML file within base_path where project_version should be injected.
+        required: false
+        type: string
+        default: ultimatesensor-mini-common.yaml
 
 jobs:
   prepare:
@@ -86,7 +91,7 @@ jobs:
 
           echo "Using VERSION=$VERSION"
 
-          sed -i "s/^\s*project_version: \".*\"/  project_version: \"${VERSION}\"/" ${{ inputs.base_path }}/ultimatesensor-mini-common.yaml
+          sed -i "s/^\s*project_version: \".*\"/  project_version: \"${VERSION}\"/" ${{ inputs.base_path }}/${{ inputs.version_file }}
 
       - name: Create dummy secrets for build
         shell: bash
