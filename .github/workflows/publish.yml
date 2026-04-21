@@ -1,68 +1,301 @@
-name: Build and Publish UltimateSensor Mini firmware and website
+name: Build and Publish UltimateSensor Mini firmware
 
 on:
   pull_request:
   workflow_dispatch:
+    inputs:
+      force_all:
+        description: 'Force build all variants'
+        required: false
+        type: boolean
+        default: false
+  # Scheduled build: rebuild all firmware monthly with latest ESPHome.
+  # ESPHome releases new versions around the 15th; the 20th gives early bugfixes time to land.
+  schedule:
+    - cron: '0 3 20 * *'
   push:
     branches:
       - main
     paths:
-      - '**.yaml'
-    tags:
-      - 'v*'
+      - 'CHANGELOG.md'
+      - '.github/workflows/**'
+      - 'ultimatesensor-mini-v1/**'
 
 permissions:
   contents: write
 
 jobs:
-  update-versions:
-    name: Update version numbers in YAML files
+  validate-changelog:
+    name: Validate changelog updates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update version numbers
+          fetch-depth: 0
+
+      - name: Require changelog update for firmware changes
         shell: bash
         run: |
-          # Determine VERSION from tag or fallback to dev-<sha>
-          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          else
-            SHORTSHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
-            VERSION="dev-${SHORTSHA}"
-          fi
-          echo "Using VERSION=$VERSION"
-          
-          # Extract main version and create full version with build number
-          MAIN_VERSION=$(grep "project_main_version:" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml | sed 's/.*: *"\([^"]*\)".*/\1/')
-          FULL_VERSION="${MAIN_VERSION}.${{ github.run_number }}"
-          echo "Using FULL_VERSION=$FULL_VERSION"
-          
-          # Update project_version in common.yaml
-          sed -i "s/^\s*project_version: \".*\"/  project_version: \"${FULL_VERSION}\"/" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
-          
-          # Check if files were actually modified
-          if git diff --quiet ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml; then
-            echo "No version changes needed"
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" != "pull_request" && "${{ github.event_name }}" != "push" ]]; then
+            echo "Event does not require changelog validation"
             exit 0
           fi
-          
-          echo "Version updated to ${FULL_VERSION}"
-      - name: Commit version updates
+
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.actor }}" == "github-actions[bot]" ]]; then
+            echo "Skipping changelog validation for GitHub Actions version bump commit"
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_SHA=${{ github.event.pull_request.base.sha }}
+            HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          else
+            BASE_SHA=${{ github.event.before }}
+            HEAD_SHA=${{ github.sha }}
+          fi
+
+          if [[ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]]; then
+            echo "First push detected; skipping changelog validation"
+            exit 0
+          fi
+
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          if ! echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/.*\.ya?ml$'; then
+            echo "No firmware YAML changes detected; changelog update not required"
+            exit 0
+          fi
+
+          if echo "$CHANGED_FILES" | grep -qx 'CHANGELOG.md'; then
+            echo "CHANGELOG.md updated"
+            exit 0
+          fi
+
+          echo "::error file=CHANGELOG.md::Firmware YAML changes require a customer-facing CHANGELOG.md update."
+          exit 1
+
+  detect-changes:
+    name: Detect changed versions
+    needs: [validate-changelog]
+    runs-on: ubuntu-latest
+    outputs:
+      v1_changed: ${{ steps.changes.outputs.v1 }}
+      v1_build: ${{ steps.changes.outputs.v1_build }}
+      v1_version: ${{ steps.versions.outputs.v1_version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for changes in each version
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.force_all }}" == "true" ]]; then
+            echo "Force building all variants"
+            echo "v1=true" >> "$GITHUB_OUTPUT"
+            echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "Scheduled build - rebuilding all variants with latest ESPHome"
+            echo "v1=true" >> "$GITHUB_OUTPUT"
+            echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "Tag detected, building all variants"
+            echo "v1=true" >> "$GITHUB_OUTPUT"
+            echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE_SHA=${{ github.event.pull_request.base.sha }}
+            HEAD_SHA=${{ github.event.pull_request.head.sha }}
+          else
+            BASE_SHA=${{ github.event.before }}
+            HEAD_SHA=${{ github.sha }}
+          fi
+
+          if [[ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]]; then
+            echo "First push detected, building all variants"
+            echo "v1=true" >> "$GITHUB_OUTPUT"
+            echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/.*\.ya?ml$' && echo "true" || echo "false")
+
+          if echo "$CHANGED_FILES" | grep -q '^.github/workflows/' && [[ "$V1_CHANGED" == "false" ]]; then
+            echo "Workflow-only changes detected, rebuilding all variants without creating a new firmware version"
+            echo "v1=false" >> "$GITHUB_OUTPUT"
+            echo "v1_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "v1=$V1_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "v1_build=$V1_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "V1 changed: $V1_CHANGED"
+
+      - name: Update version numbers for changed versions
+        id: versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          IS_SCHEDULED="${{ github.event_name == 'schedule' }}"
+          VERSION_FILE="ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml"
+
+          update_version() {
+            local current_version
+
+            current_version=$(grep "project_version:" "$VERSION_FILE" | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/')
+            echo "Current version for $VERSION_FILE: $current_version"
+
+            if [[ "$IS_SCHEDULED" == "true" ]]; then
+              echo "v1_version=${current_version}" >> "$GITHUB_OUTPUT"
+              echo "Scheduled build - keeping version: $current_version"
+              return
+            fi
+
+            if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+              echo "v1_version=${current_version}" >> "$GITHUB_OUTPUT"
+              echo "Tag build - keeping version: $current_version"
+              return
+            fi
+
+            if [[ "$current_version" =~ ^([0-9]+)\.([0-9]+)(.*)$ ]]; then
+              MAJOR="${BASH_REMATCH[1]}"
+              MINOR="${BASH_REMATCH[2]}"
+              SUFFIX="${BASH_REMATCH[3]}"
+              NEW_MINOR=$((MINOR + 1))
+              NEW_VERSION="${MAJOR}.${NEW_MINOR}${SUFFIX}"
+            else
+              SHORTSHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+              NEW_VERSION="dev-${SHORTSHA}"
+            fi
+
+            echo "v1_version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+            echo "New version for $VERSION_FILE: $NEW_VERSION"
+          }
+
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]]; then
+            update_version
+          else
+            V1_CURRENT=$(grep "project_version:" "$VERSION_FILE" 2>/dev/null | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "1.0")
+            echo "v1_version=$V1_CURRENT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit version updates and create tags
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         shell: bash
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
-          git commit -m "chore: update version to $(grep 'project_version:' ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml | sed 's/.*: *"\([^"]*\)".*/\1/') [skip ci]" || exit 0
-          git push || echo "Nothing to push"
+          set -euo pipefail
+
+          finalize_changelog() {
+            local unreleased_notes
+            local release_blocks
+            local release_date
+
+            unreleased_notes=$(mktemp)
+            release_blocks=$(mktemp)
+            release_date=$(TZ=Europe/Amsterdam date +%Y-%m-%d)
+
+            awk '
+              $0 == "## [Unreleased]" { found=1; next }
+              found && /^## \[/ { exit }
+              found { print }
+            ' CHANGELOG.md \
+              | sed '/^- Add customer-facing firmware notes here before merging a PR\.$/d' \
+              > "$unreleased_notes"
+
+            if ! grep -q '[^[:space:]]' "$unreleased_notes"; then
+              echo "No unreleased changelog notes to finalize"
+              rm -f "$unreleased_notes" "$release_blocks"
+              return
+            fi
+
+            {
+              printf '## [UltimateSensor Mini V1 %s] - %s\n\n' "${{ steps.versions.outputs.v1_version }}" "$release_date"
+              cat "$unreleased_notes"
+              printf '\n'
+            } >> "$release_blocks"
+
+            awk -v blocks_file="$release_blocks" '
+              BEGIN { in_unreleased=0 }
+              $0 == "## [Unreleased]" {
+                print
+                print ""
+                print "- Add customer-facing firmware notes here before merging a PR."
+                print ""
+                while ((getline line < blocks_file) > 0) {
+                  print line
+                }
+                in_unreleased=1
+                next
+              }
+              in_unreleased && /^## \[/ {
+                in_unreleased=0
+                print
+                next
+              }
+              in_unreleased { next }
+              { print }
+            ' CHANGELOG.md > CHANGELOG.md.tmp
+
+            mv CHANGELOG.md.tmp CHANGELOG.md
+            rm -f "$unreleased_notes" "$release_blocks"
+          }
+
+          create_tag() {
+            local TAG_NAME=$1
+
+            if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+              echo "Tag $TAG_NAME already exists, skipping"
+              return
+            fi
+
+            echo "Creating tag: $TAG_NAME"
+            git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+            git push origin "$TAG_NAME"
+            echo "Tag $TAG_NAME created and pushed"
+          }
+
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]]; then
+            sed -i "s/^\s*project_version: \".*\"/  project_version: \"${{ steps.versions.outputs.v1_version }}\"/" ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
+            finalize_changelog
+          fi
+
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]] && ! git diff --quiet; then
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add CHANGELOG.md ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml
+            git commit -m "chore: update version V1=${{ steps.versions.outputs.v1_version }} [skip ci]" || exit 0
+            git push || echo "Nothing to push"
+
+            if [[ ! "${{ steps.versions.outputs.v1_version }}" =~ ^dev- ]]; then
+              create_tag "ultimatesensor-mini-v1-${{ steps.versions.outputs.v1_version }}"
+            fi
+          fi
 
   publish-ultimatesensor-mini-basic:
     name: Publish UltimateSensor Mini Basic
-    needs: [update-versions]
-    if: always() && (needs.update-versions.result == 'success' || needs.update-versions.result == 'skipped')
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v1_build == 'true'
     uses: ./.github/workflows/esphome-build.yml
     with:
       files: ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml
@@ -71,10 +304,13 @@ jobs:
       clean: false
       esphome_version: latest
       directory_name: ultimatesensor-mini-basic
+      project_version: ${{ needs.detect-changes.outputs.v1_version }}
+      base_path: ultimatesensor-mini-v1
+
   publish-ultimatesensor-mini-complete:
     name: Publish UltimateSensor Mini Complete
-    needs: [update-versions]
-    if: always() && (needs.update-versions.result == 'success' || needs.update-versions.result == 'skipped')
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v1_build == 'true'
     uses: ./.github/workflows/esphome-build.yml
     with:
       files: ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml
@@ -83,5 +319,65 @@ jobs:
       clean: false
       esphome_version: latest
       directory_name: ultimatesensor-mini-complete
+      project_version: ${{ needs.detect-changes.outputs.v1_version }}
+      base_path: ultimatesensor-mini-v1
 
+  create-releases:
+    name: Create GitHub releases
+    needs: [detect-changes]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
+      - name: Create releases for changed hardware versions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          create_release() {
+            local tag_name=$1
+            local title=$2
+            local heading="## [${title}]"
+
+            if gh release view "$tag_name" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo "Release $tag_name already exists, skipping"
+              return
+            fi
+
+            awk -v heading="$heading" '
+              $0 == heading { found=1; next }
+              found && /^## \[/ { exit }
+              found { print }
+            ' CHANGELOG.md > release-notes.txt
+
+            if [[ ! -s release-notes.txt ]]; then
+              awk '
+                $0 == "## [Unreleased]" { found=1; next }
+                found && /^## \[/ { exit }
+                found { print }
+              ' CHANGELOG.md > release-notes.txt
+            fi
+
+            if [[ ! -s release-notes.txt ]]; then
+              printf '%s\n\n%s\n' \
+                "Customer-facing firmware notes live in CHANGELOG.md." \
+                "Changelog: https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md" \
+                > release-notes.txt
+            fi
+
+            gh release create "$tag_name" \
+              -R "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --title "$title" \
+              --notes-file release-notes.txt
+          }
+
+          if [[ "${{ needs.detect-changes.outputs.v1_changed }}" == "true" && ! "${{ needs.detect-changes.outputs.v1_version }}" =~ ^dev- ]]; then
+            create_release "ultimatesensor-mini-v1-${{ needs.detect-changes.outputs.v1_version }}" "UltimateSensor Mini V1 ${{ needs.detect-changes.outputs.v1_version }}"
+          fi

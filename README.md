@@ -1,63 +1,110 @@
-## UltimateSensor Mini for Home Assistant / ESPHome
+# UltimateSensor Mini for Home Assistant / ESPHome
 
 ![UltimateSensor Mini](images/ultimatesensor-mini-inaction-shop.png)
 
-[![CI – Build & Publish](https://github.com/smarthomeshop/ultimatesensor-mini/actions/workflows/publish.yml/badge.svg)](https://github.com/smarthomeshop/ultimatesensor-mini/actions/workflows/publish.yml)
+UltimateSensor Mini is a compact all-in-one ESPHome room sensor for Home Assistant. It measures air quality, occupancy, light, temperature, humidity, and optionally particulate matter, with fully local operation by default.
 
-UltimateSensor Mini is a compact, all‑in‑one room sensor powered by ESPHome. It runs fully local (no cloud) and integrates seamlessly with Home Assistant.
+Product page: https://ultimatesensor.nl/en/mini
 
-- **Connectivity**: Wi‑Fi (no Ethernet/PoE)
-- **Sensors**: CO₂ (SCD41), temperature, humidity, light (BH1750), VOC/NOx (SGP41), particulate matter (SPS30, Complete variant)
-- **Audio & VA**: microphone and speaker with Voice Assistant
-- **Provisioning**: Improv over BLE/Serial and captive portal
+## How It Works
 
-More info: `https://ultimatesensor.nl/en/mini`
+UltimateSensor Mini combines multiple room sensors on one ESP32-S3 device. The ESPHome firmware exposes the measurements directly to Home Assistant and supports local onboarding through captive portal, Improv BLE, and Improv Serial.
 
-### Variants
+The Complete firmware adds SPS30 particulate matter sensing for PM measurements. The Basic firmware uses the same shared configuration without the particulate matter sensor.
 
-- **Basic**: core features without the SPS30 particulate sensor
-  - YAML: `ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml`
-  - Dashboard import: `github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml@main`
-  - OTA manifest: `https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-basic-manifest.json`
+## Key Features
 
-- **Complete**: everything in Basic + SPS30 particulate sensor
-  - YAML: `ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml`
-  - Dashboard import: `github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-complete.yaml@main`
-  - OTA manifest: `https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-manifest.json`
+- CO2 sensing with SCD41
+- Temperature and humidity sensing
+- Light sensing with BH1750
+- VOC and NOx index sensing with SGP41
+- LD2450 mmWave occupancy sensing
+- Microphone, speaker, and Home Assistant Voice Assistant support
+- RGB front and back lights
+- WiFi onboarding with captive portal, Improv BLE, and Improv Serial
+- Fully local operation with ESPHome and Home Assistant
+- Optional SPS30 particulate matter sensing in the Complete variant
 
-### Quick start
+## Hardware Versions
 
-1. Mount/place the device and power it via USB‑C.
-2. Flash firmware:
-   - Via GitHub Pages manifest (OTA or your own Web Tools page), or
-   - Locally with ESPHome CLI: `esphome run ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml`
-3. Provisioning: use Improv (BLE/Serial) or the captive portal to set up Wi‑Fi.
+| Version | Chip | Connectivity | Description |
+|---------|------|--------------|-------------|
+| V1 | ESP32-S3 | WiFi | UltimateSensor Mini hardware with Basic and Complete firmware variants |
 
-### OTA updates in ESPHome
+## Variants
 
-Both variants expose an `update` entity (HTTP manifest). The YAML uses substitutions similar to:
+We publish two customer-facing firmware variants for the V1 hardware.
 
-- `wifi_fast_connect: "true"`
-- `name_add_mac_suffix: true`
-- `update_manifest_url: <variant‑specific manifest URL>`
+| Hardware | Variant | Description |
+|----------|---------|-------------|
+| V1 (ESP32-S3) | Basic | Standard firmware without the SPS30 particulate matter sensor |
+| V1 (ESP32-S3) | Complete | Full firmware with SPS30 particulate matter sensing |
 
-### Repository layout
+## Sensors
 
-- `ultimatesensor-mini-v1/` — ESPHome configurations (common + Basic/Complete variants)
-- `.github/workflows/` — CI that builds and publishes binaries and manifests to `gh-pages`
-- `ceilsense/` — reference project with a similar setup (Wi‑Fi/Ethernet variants)
-- `gh-pages` branch — public firmware and manifests (for OTA/ESP Web Tools)
+| Sensor | Description |
+|--------|-------------|
+| CO2 | Room CO2 concentration |
+| Temperature | Environment temperature |
+| Humidity | Environment humidity |
+| Light | Ambient light level |
+| VOC Index | Volatile organic compound index |
+| NOx Index | Nitrogen oxide index |
+| Occupancy | mmWave occupancy detection |
+| PM1.0 / PM2.5 / PM4.0 / PM10 | Particulate matter measurements in the Complete variant |
+| WiFi Signal | WiFi signal strength |
+| Uptime | Device uptime |
 
-### CI / version injection
+## Getting Started
 
-- GitHub Actions build on each commit/tag and publish to `gh-pages`.
-- Version injection: during CI `ultimatesensor_mini_software_version` is set to the tag version (`vX.Y.Z` → `X.Y.Z`) or `dev-<shortsha>`.
+1. Power the UltimateSensor Mini with USB-C.
+2. Flash the desired firmware with the web flasher or ESPHome CLI.
+3. If WiFi is not configured yet, connect to the fallback hotspot.
+4. Complete onboarding with captive portal, Improv BLE, or Improv Serial.
+5. Add the device to Home Assistant through the ESPHome integration.
 
-### Contributing & support
+Web flasher: https://smarthomeshop.io/firmware
+Product page: https://ultimatesensor.nl/en/mini
 
-- PRs and issues are welcome.
-- Community & support (Discord): `https://smarthomeshop.io/discord`
+## Version History
 
-### License
+- Customer-facing release notes: [CHANGELOG.md](CHANGELOG.md)
+- GitHub Releases: https://github.com/smarthomeshop/ultimatesensor-mini/releases
 
-This project is released under [CC BY‑NC 4.0](license).
+## Repository Layout
+
+```text
+ultimatesensor-mini/
+├── ultimatesensor-mini-v1/          # V1 ESPHome configurations
+│   ├── ultimatesensor-mini-common.yaml
+│   ├── ultimatesensor-mini-basic.yaml
+│   ├── ultimatesensor-mini-complete.yaml
+│   └── default_16MB.csv
+├── .github/workflows/               # Build and release automation
+├── CHANGELOG.md                     # Customer-facing firmware notes
+├── SECURITY.md
+└── images/
+```
+
+## Firmware Downloads
+
+Pre-built firmware manifests are published on the `gh-pages` branch.
+
+- V1 Basic: `ultimatesensor-mini-basic-manifest.json`
+- V1 Complete: `ultimatesensor-mini-complete-manifest.json`
+
+## Contributing
+
+PRs and issues are welcome. Please keep changes modular and follow ESPHome best practices.
+
+If a PR changes firmware behavior or release-visible functionality, add a customer-facing note to [CHANGELOG.md](CHANGELOG.md) under `Unreleased`.
+
+## Support
+
+- Product info and guides: https://ultimatesensor.nl/en/mini
+- Store: https://smarthomeshop.io
+- Community and support: https://smarthomeshop.io/discord
+
+## License
+
+This project is released under the CC BY-NC 4.0 license. See [license](license).
