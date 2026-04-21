@@ -1,5 +1,7 @@
 # UltimateSensor Mini Beta Common Configuration
 # Experimental ESP-IDF firmware with on-device Micro Wake Word.
+# Thanks to HA-TB303. This beta firmware is based on:
+# https://github.com/HA-TB303/ultimatesensor_mini
 
 substitutions:
   project_main_version: "2"
