@@ -6,7 +6,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Fix boot audio playback by compiling all speaker media player codecs.
 
 ## [UltimateSensor Mini Beta V1 2.35-beta.36] - 2026-04-21
 

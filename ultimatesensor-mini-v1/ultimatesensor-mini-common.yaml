@@ -157,6 +157,7 @@ media_player:
   - platform: speaker
     id: media_player_main
     name: US Mini Media Player
+    codec_support_enabled: ALL
     announcement_pipeline:
       speaker: i2s_speaker_output
       num_channels: 1
