@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-S3",
       "ota": {
         "path": "ultimatesensor-mini-complete/ultimatesensor-mini-esp32s3.ota.bin",
-        "md5": "3c01c5baee183b8a6ee15408a0b3f2f2"
+        "md5": "b7f1dbc6a6a2b6b3d5ab4469811db6e0"
       },
       "parts": [
         {
