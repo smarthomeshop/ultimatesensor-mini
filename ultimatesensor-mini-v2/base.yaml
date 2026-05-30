@@ -1,5 +1,5 @@
-# UltimateSensor Mini V2 Common Configuration
-# Shared hardware and sensor stack for ESP32-C6 based V2 variants.
+# UltimateSensor Mini V2 Base Configuration
+# Shared production hardware and sensor stack for ESP32-C6 based V2 variants.
 
 substitutions:
   ultimatesensor_mini_software_version: "1.0"

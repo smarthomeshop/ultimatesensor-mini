@@ -247,6 +247,7 @@ jobs:
             local key=$3
             local fallback=$4
             local changed=$5
+            local release_tag_prefix=${6:-}
             local current_version
             local new_version
 
@@ -262,6 +263,12 @@ jobs:
             if [[ -n "$BASE_SHA" ]] && ! git cat-file -e "${BASE_SHA}:${file}" 2>/dev/null; then
               echo "${output_name}=${current_version}" >> "$GITHUB_OUTPUT"
               echo "Initial release for $file - keeping version: $current_version"
+              return
+            fi
+
+            if [[ -n "$release_tag_prefix" ]] && ! git rev-parse "${release_tag_prefix}-${current_version}" >/dev/null 2>&1; then
+              echo "${output_name}=${current_version}" >> "$GITHUB_OUTPUT"
+              echo "No release tag found for ${release_tag_prefix}-${current_version} - keeping version: $current_version"
               return
             fi
 
@@ -290,7 +297,7 @@ jobs:
           echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
           echo "Beta version: $BETA_VERSION"
 
-          version_for_change "v2_version" "$V2_VERSION_FILE" "ultimatesensor_mini_software_version" "1.0" "${{ steps.changes.outputs.v2 }}"
+          version_for_change "v2_version" "$V2_VERSION_FILE" "ultimatesensor_mini_software_version" "1.0" "${{ steps.changes.outputs.v2 }}" "ultimatesensor-mini-v2"
 
       - name: Commit version updates and create tags
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
