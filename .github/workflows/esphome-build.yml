@@ -142,7 +142,16 @@ jobs:
       - name: Create single manifest.json
         shell: bash
         run: |
-          jq -s '{"name": "${{ inputs.name }}", "version": "${{ needs.build.outputs.project-version }}", "home_assistant_domain": "esphome", "new_install_skip_erase": false, "builds":.}' output/*/manifest.json \
+          MANIFEST_VERSION="${{ inputs.project_version }}"
+          if [[ -z "$MANIFEST_VERSION" ]]; then
+            MANIFEST_VERSION="${{ needs.build.outputs.project-version }}"
+          fi
+
+          jq -s \
+            --arg name "${{ inputs.name }}" \
+            --arg version "$MANIFEST_VERSION" \
+            '{"name": $name, "version": $version, "home_assistant_domain": "esphome", "new_install_skip_erase": false, "builds":.}' \
+            output/*/manifest.json \
             > output/${{ inputs.manifest_filename }}
 
           jq --arg dir "${{ inputs.directory_name }}" '
