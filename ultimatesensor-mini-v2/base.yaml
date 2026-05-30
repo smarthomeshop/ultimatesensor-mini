@@ -1,0 +1,469 @@
+# UltimateSensor Mini V2 Common Configuration
+# Shared hardware and sensor stack for ESP32-C6 based V2 variants.
+
+substitutions:
+  ultimatesensor_mini_software_version: "1.0"
+  log_level: "INFO"
+  scd41_temperature_offset: "13.2"
+  scd41_humidity_offset: "3.0"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+  project:
+    name: "smarthomeshop.ultimatesensor_mini_v2"
+    version: ${ultimatesensor_mini_software_version}
+
+esp32:
+  board: esp32-c6-devkitc-1
+  variant: esp32c6
+  framework:
+    type: esp-idf
+
+logger:
+  level: ${log_level}
+
+api:
+  actions:
+    - action: set_ambient_pressure
+      variables:
+        pressure_mbar: int
+      then:
+        - lambda: "id(scd41)->set_ambient_pressure_compensation(pressure_mbar);"
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+
+web_server:
+  port: 80
+
+status_led:
+  pin: GPIO23
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO22
+    num_leds: 3
+    chipset: ws2812
+    id: rgb_status_led
+    name: "Status LED"
+    restore_mode: ALWAYS_OFF
+    default_transition_length: 0s
+    effects:
+      - addressable_scan:
+          name: "Knight Rider"
+          move_interval: 100ms
+          scan_width: 1
+
+i2c:
+  - id: bus_a
+    sda: GPIO6
+    scl: GPIO7
+    scan: true
+    frequency: 100kHz
+
+uart:
+  - id: uart_ld2412
+    tx_pin: GPIO21
+    rx_pin: GPIO20
+    baud_rate: 115200
+    parity: NONE
+    stop_bits: 1
+  - id: uart_ld2450
+    tx_pin: GPIO18
+    rx_pin: GPIO19
+    baud_rate: 256000
+    parity: NONE
+    stop_bits: 1
+    rx_buffer_size: 1024
+
+ld2412:
+  id: ld2412_radar
+  uart_id: uart_ld2412
+
+ld2450:
+  id: ld2450_radar
+  uart_id: uart_ld2450
+
+sensor:
+  - platform: uptime
+    id: uptime_sensor
+    name: "Uptime"
+    entity_category: diagnostic
+    update_interval: 60s
+
+  - platform: internal_temperature
+    id: cpu_temperature
+    name: "CPU Temperature"
+    entity_category: diagnostic
+    update_interval: 60s
+
+  - platform: scd4x
+    id: scd41
+    co2:
+      id: scd41_co2
+      name: "SCD41 CO2"
+    temperature:
+      id: scd41_temperature
+      name: "SCD41 Temperature"
+      filters:
+        - lambda: return x + ${scd41_temperature_offset};
+    humidity:
+      id: scd41_humidity
+      name: "SCD41 Humidity"
+      filters:
+        - lambda: return x + ${scd41_humidity_offset};
+    measurement_mode: low_power_periodic
+    automatic_self_calibration: true
+    update_interval: 30s
+    temperature_offset: ${scd41_temperature_offset}
+
+  - platform: bh1750
+    id: illuminance
+    name: "BH1750 Illuminance"
+    address: 0x23
+    update_interval: 60s
+
+  - platform: sgp4x
+    id: sgp41
+    voc:
+      id: voc_index
+      name: "VOC Index"
+    nox:
+      id: nox_index
+      name: "NOx Index"
+    compensation:
+      humidity_source: scd41_humidity
+      temperature_source: scd41_temperature
+    update_interval: 60s
+
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    moving_distance:
+      name: "LD2412 Moving Distance"
+    still_distance:
+      name: "LD2412 Still Distance"
+    moving_energy:
+      name: "LD2412 Moving Energy"
+    still_energy:
+      name: "LD2412 Still Energy"
+    detection_distance:
+      name: "LD2412 Detection Distance"
+    light:
+      name: "LD2412 Light"
+
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    target_count:
+      id: ld2450_target_count
+      name: "LD2450 Target Count"
+    still_target_count:
+      name: "LD2450 Still Target Count"
+    moving_target_count:
+      name: "LD2450 Moving Target Count"
+    target_1:
+      x:
+        name: "LD2450 Target 1 X"
+      y:
+        name: "LD2450 Target 1 Y"
+      speed:
+        name: "LD2450 Target 1 Speed"
+      angle:
+        name: "LD2450 Target 1 Angle"
+      distance:
+        name: "LD2450 Target 1 Distance"
+      resolution:
+        name: "LD2450 Target 1 Resolution"
+    target_2:
+      x:
+        name: "LD2450 Target 2 X"
+      y:
+        name: "LD2450 Target 2 Y"
+      speed:
+        name: "LD2450 Target 2 Speed"
+      angle:
+        name: "LD2450 Target 2 Angle"
+      distance:
+        name: "LD2450 Target 2 Distance"
+      resolution:
+        name: "LD2450 Target 2 Resolution"
+    target_3:
+      x:
+        name: "LD2450 Target 3 X"
+      y:
+        name: "LD2450 Target 3 Y"
+      speed:
+        name: "LD2450 Target 3 Speed"
+      angle:
+        name: "LD2450 Target 3 Angle"
+      distance:
+        name: "LD2450 Target 3 Distance"
+      resolution:
+        name: "LD2450 Target 3 Resolution"
+    zone_1:
+      target_count:
+        name: "LD2450 Zone 1 Target Count"
+      still_target_count:
+        name: "LD2450 Zone 1 Still Target Count"
+      moving_target_count:
+        name: "LD2450 Zone 1 Moving Target Count"
+    zone_2:
+      target_count:
+        name: "LD2450 Zone 2 Target Count"
+      still_target_count:
+        name: "LD2450 Zone 2 Still Target Count"
+      moving_target_count:
+        name: "LD2450 Zone 2 Moving Target Count"
+    zone_3:
+      target_count:
+        name: "LD2450 Zone 3 Target Count"
+      still_target_count:
+        name: "LD2450 Zone 3 Still Target Count"
+      moving_target_count:
+        name: "LD2450 Zone 3 Moving Target Count"
+
+binary_sensor:
+  - platform: status
+    id: api_connection
+    name: "API Connection"
+    device_class: connectivity
+
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    has_target:
+      id: ld2412_presence
+      name: "LD2412 Presence"
+      device_class: occupancy
+    has_moving_target:
+      name: "LD2412 Moving Target"
+      device_class: motion
+    has_still_target:
+      name: "LD2412 Still Target"
+      device_class: occupancy
+    dynamic_background_correction_status:
+      name: "LD2412 Dynamic Background Correction"
+      entity_category: diagnostic
+
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    has_target:
+      id: ld2450_presence
+      name: "LD2450 Presence"
+      device_class: occupancy
+    has_moving_target:
+      name: "LD2450 Moving Target"
+      device_class: motion
+    has_still_target:
+      name: "LD2450 Still Target"
+      device_class: occupancy
+
+  - platform: template
+    id: occupancy
+    name: "Occupancy"
+    device_class: occupancy
+    lambda: |-
+      return id(ld2412_presence).state || id(ld2450_presence).state;
+    filters:
+      - delayed_off: !lambda return id(occupancy_off_delay).state * 1000;
+
+number:
+  - platform: template
+    id: occupancy_off_delay
+    name: "Occupancy Off Delay"
+    entity_category: config
+    unit_of_measurement: "s"
+    min_value: 0
+    max_value: 600
+    step: 1
+    initial_value: 15
+    restore_value: true
+    optimistic: true
+
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    timeout:
+      name: "LD2412 Presence Timeout"
+      entity_category: config
+    min_distance_gate:
+      name: "LD2412 Minimum Distance Gate"
+      entity_category: config
+    max_distance_gate:
+      name: "LD2412 Maximum Distance Gate"
+      entity_category: config
+    light_threshold:
+      name: "LD2412 Light Threshold"
+      entity_category: config
+
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    presence_timeout:
+      name: "LD2450 Presence Timeout"
+      entity_category: config
+    zone_1:
+      x1:
+        name: "LD2450 Zone 1 X1"
+      y1:
+        name: "LD2450 Zone 1 Y1"
+      x2:
+        name: "LD2450 Zone 1 X2"
+      y2:
+        name: "LD2450 Zone 1 Y2"
+    zone_2:
+      x1:
+        name: "LD2450 Zone 2 X1"
+      y1:
+        name: "LD2450 Zone 2 Y1"
+      x2:
+        name: "LD2450 Zone 2 X2"
+      y2:
+        name: "LD2450 Zone 2 Y2"
+    zone_3:
+      x1:
+        name: "LD2450 Zone 3 X1"
+      y1:
+        name: "LD2450 Zone 3 Y1"
+      x2:
+        name: "LD2450 Zone 3 X2"
+      y2:
+        name: "LD2450 Zone 3 Y2"
+
+switch:
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    engineering_mode:
+      name: "LD2412 Engineering Mode"
+      entity_category: config
+      disabled_by_default: true
+    bluetooth:
+      name: "LD2412 Bluetooth"
+      entity_category: config
+
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    bluetooth:
+      name: "LD2450 Bluetooth"
+      entity_category: config
+    multi_target:
+      name: "LD2450 Multi Target Tracking"
+      entity_category: config
+
+select:
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    out_pin_level:
+      name: "LD2412 Output Pin Level"
+      entity_category: config
+    distance_resolution:
+      name: "LD2412 Distance Resolution"
+      entity_category: config
+    light_function:
+      name: "LD2412 Light Function"
+      entity_category: config
+
+button:
+  - platform: restart
+    id: restart_button
+    name: "Restart"
+    entity_category: config
+
+  - platform: safe_mode
+    id: safe_mode_button
+    name: "Restart in Safe Mode"
+    entity_category: diagnostic
+
+  - platform: factory_reset
+    id: factory_reset_button
+    name: "Factory Reset"
+    entity_category: config
+    disabled_by_default: true
+
+  - platform: template
+    id: co2_calibration_button
+    name: "CO2 Manual Calibration"
+    entity_category: config
+    disabled_by_default: true
+    on_press:
+      then:
+        - scd4x.perform_forced_calibration:
+            id: scd41
+            value: 420
+
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    restart:
+      name: "LD2412 Restart"
+      entity_category: diagnostic
+    factory_reset:
+      name: "LD2412 Factory Reset"
+      entity_category: diagnostic
+      disabled_by_default: true
+    query_params:
+      name: "LD2412 Query Parameters"
+      entity_category: diagnostic
+      disabled_by_default: true
+    start_dynamic_background_correction:
+      name: "LD2412 Dynamic Background Correction"
+      entity_category: config
+      disabled_by_default: true
+
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    restart:
+      name: "LD2450 Restart"
+      entity_category: diagnostic
+    factory_reset:
+      name: "LD2450 Factory Reset"
+      entity_category: diagnostic
+      disabled_by_default: true
+
+text_sensor:
+  - platform: version
+    id: esphome_version
+    name: "ESPHome Version"
+    hide_timestamp: true
+    entity_category: diagnostic
+
+  - platform: template
+    id: software_version
+    name: "Software Version"
+    update_interval: 5h
+    lambda: |-
+      return {"${ultimatesensor_mini_software_version}"};
+    entity_category: diagnostic
+
+  - platform: template
+    id: hardware_version
+    name: "Hardware Version"
+    update_interval: 5h
+    lambda: |-
+      return {"${ultimatesensor_mini_hardware_version}"};
+    entity_category: diagnostic
+
+  - platform: template
+    id: connection_type
+    name: "Connection type"
+    update_interval: 5h
+    lambda: |-
+      return {"${ultimatesensor_mini_connection_type}"};
+    entity_category: diagnostic
+
+  - platform: ld2412
+    ld2412_id: ld2412_radar
+    version:
+      name: "LD2412 Firmware"
+      entity_category: diagnostic
+    mac_address:
+      name: "LD2412 Bluetooth MAC"
+      entity_category: diagnostic
+
+  - platform: ld2450
+    ld2450_id: ld2450_radar
+    version:
+      name: "LD2450 Firmware"
+      entity_category: diagnostic
+    mac_address:
+      name: "LD2450 Bluetooth MAC"
+      entity_category: diagnostic

@@ -1,0 +1,66 @@
+# UltimateSensor Mini V2 WiFi network package.
+# Ethernet power is disabled and W5500 reset is held active in WiFi firmware.
+
+esphome:
+  on_boot:
+    - priority: 800
+      then:
+        - switch.turn_off: eth_power
+        - output.turn_on: w5500_reset_hold
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: ${wifi_fast_connect}
+  ap:
+    ssid: ${device_name}
+    password: ${device_name}
+
+captive_portal:
+
+improv_serial:
+
+output:
+  - platform: gpio
+    id: w5500_reset_hold
+    pin:
+      number: GPIO13
+      inverted: true
+
+switch:
+  - platform: gpio
+    id: eth_power
+    pin:
+      number: GPIO2
+      inverted: true
+    restore_mode: ALWAYS_OFF
+    internal: true
+
+sensor:
+  - platform: wifi_signal
+    id: wifi_signal_sensor
+    name: "WiFi Signal"
+    entity_category: diagnostic
+    update_interval: 60s
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      id: wifi_ip_address
+      name: "WiFi IP Address"
+      entity_category: diagnostic
+    ssid:
+      id: connected_ssid
+      name: "Connected SSID"
+      entity_category: diagnostic
+    bssid:
+      id: connected_bssid
+      name: "Connected BSSID"
+      entity_category: diagnostic
+    mac_address:
+      id: wifi_mac_address
+      name: "WiFi MAC Address"
+      entity_category: diagnostic
+    dns_address:
+      name: "WiFi DNS Address"
+      entity_category: diagnostic

@@ -42,10 +42,15 @@ on:
         required: true
         type: string
       version_file:
-        description: YAML file within base_path where project_version should be injected.
+        description: YAML file within base_path where the project version should be injected.
         required: false
         type: string
         default: ultimatesensor-mini-common.yaml
+      version_key:
+        description: YAML substitution key that stores the project version.
+        required: false
+        type: string
+        default: project_version
 
 jobs:
   prepare:
@@ -91,7 +96,8 @@ jobs:
 
           echo "Using VERSION=$VERSION"
 
-          sed -i "s/^\s*project_version: \".*\"/  project_version: \"${VERSION}\"/" ${{ inputs.base_path }}/${{ inputs.version_file }}
+          VERSION_KEY="${{ inputs.version_key }}"
+          sed -i "s/^\s*${VERSION_KEY}: \".*\"/  ${VERSION_KEY}: \"${VERSION}\"/" ${{ inputs.base_path }}/${{ inputs.version_file }}
 
       - name: Create dummy secrets for build
         shell: bash

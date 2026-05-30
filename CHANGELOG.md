@@ -6,7 +6,9 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Added UltimateSensor Mini V2 production firmware for ESP32-C6 hardware with WiFi and W5500 Ethernet Basic/Complete variants.
+- Added LD2412 and LD2450 occupancy support for UltimateSensor Mini V2.
+- Added SPS30 particulate matter support for UltimateSensor Mini V2 Complete variants.
 
 ## [UltimateSensor Mini V1 2.35] - 2026-05-06
 
