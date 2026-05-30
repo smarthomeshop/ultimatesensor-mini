@@ -259,7 +259,7 @@ jobs:
               return
             fi
 
-            if [[ -n "$BASE_SHA" && ! git cat-file -e "${BASE_SHA}:${file}" 2>/dev/null ]]; then
+            if [[ -n "$BASE_SHA" ]] && ! git cat-file -e "${BASE_SHA}:${file}" 2>/dev/null; then
               echo "${output_name}=${current_version}" >> "$GITHUB_OUTPUT"
               echo "Initial release for $file - keeping version: $current_version"
               return
