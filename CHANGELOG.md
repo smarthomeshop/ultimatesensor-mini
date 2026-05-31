@@ -21,6 +21,10 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 
 - Fix boot audio playback by compiling all speaker media player codecs.
+- Added UltimateSensor Mini V2 firmware variants for WiFi and W5500 Ethernet with standard LD2412 + LD2450 tracking.
+- Added optional UltimateSensor Mini V2 LD2460 upgrade firmware variants for customers replacing the LD2450 module while keeping LD2412 installed.
+- Added four-way firmware switching for UltimateSensor Mini V1 with dedicated Home Assistant `Firmware Variant` and `Firmware Update` controls.
+- Added SmartHomeShop App cloud firmware variants for UltimateSensor Mini V1 Basic and Complete, including cloud registration, sensor sync, and cloud manifests.
 
 
 ## [UltimateSensor Mini Beta V1 2.35-beta.36] - 2026-04-21

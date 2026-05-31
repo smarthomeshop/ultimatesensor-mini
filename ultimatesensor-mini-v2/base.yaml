@@ -1,5 +1,5 @@
-# UltimateSensor Mini V2 Base Configuration
-# Shared production hardware and sensor stack for ESP32-C6 based WiFi/Ethernet V2 variants.
+# UltimateSensor Mini V2 Common Configuration
+# Shared hardware and sensor stack for ESP32-C6 based V2 variants.
 
 substitutions:
   ultimatesensor_mini_software_version: "1.0"
@@ -72,21 +72,10 @@ uart:
     baud_rate: 115200
     parity: NONE
     stop_bits: 1
-  - id: uart_ld2450
-    tx_pin: GPIO18
-    rx_pin: GPIO19
-    baud_rate: 256000
-    parity: NONE
-    stop_bits: 1
-    rx_buffer_size: 1024
 
 ld2412:
   id: ld2412_radar
   uart_id: uart_ld2412
-
-ld2450:
-  id: ld2450_radar
-  uart_id: uart_ld2450
 
 sensor:
   - platform: uptime
@@ -155,76 +144,6 @@ sensor:
     light:
       name: "LD2412 Light"
 
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    target_count:
-      id: ld2450_target_count
-      name: "LD2450 Target Count"
-    still_target_count:
-      name: "LD2450 Still Target Count"
-    moving_target_count:
-      name: "LD2450 Moving Target Count"
-    target_1:
-      x:
-        name: "LD2450 Target 1 X"
-      y:
-        name: "LD2450 Target 1 Y"
-      speed:
-        name: "LD2450 Target 1 Speed"
-      angle:
-        name: "LD2450 Target 1 Angle"
-      distance:
-        name: "LD2450 Target 1 Distance"
-      resolution:
-        name: "LD2450 Target 1 Resolution"
-    target_2:
-      x:
-        name: "LD2450 Target 2 X"
-      y:
-        name: "LD2450 Target 2 Y"
-      speed:
-        name: "LD2450 Target 2 Speed"
-      angle:
-        name: "LD2450 Target 2 Angle"
-      distance:
-        name: "LD2450 Target 2 Distance"
-      resolution:
-        name: "LD2450 Target 2 Resolution"
-    target_3:
-      x:
-        name: "LD2450 Target 3 X"
-      y:
-        name: "LD2450 Target 3 Y"
-      speed:
-        name: "LD2450 Target 3 Speed"
-      angle:
-        name: "LD2450 Target 3 Angle"
-      distance:
-        name: "LD2450 Target 3 Distance"
-      resolution:
-        name: "LD2450 Target 3 Resolution"
-    zone_1:
-      target_count:
-        name: "LD2450 Zone 1 Target Count"
-      still_target_count:
-        name: "LD2450 Zone 1 Still Target Count"
-      moving_target_count:
-        name: "LD2450 Zone 1 Moving Target Count"
-    zone_2:
-      target_count:
-        name: "LD2450 Zone 2 Target Count"
-      still_target_count:
-        name: "LD2450 Zone 2 Still Target Count"
-      moving_target_count:
-        name: "LD2450 Zone 2 Moving Target Count"
-    zone_3:
-      target_count:
-        name: "LD2450 Zone 3 Target Count"
-      still_target_count:
-        name: "LD2450 Zone 3 Still Target Count"
-      moving_target_count:
-        name: "LD2450 Zone 3 Moving Target Count"
-
 binary_sensor:
   - platform: status
     id: api_connection
@@ -247,25 +166,12 @@ binary_sensor:
       name: "LD2412 Dynamic Background Correction"
       entity_category: diagnostic
 
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    has_target:
-      id: ld2450_presence
-      name: "LD2450 Presence"
-      device_class: occupancy
-    has_moving_target:
-      name: "LD2450 Moving Target"
-      device_class: motion
-    has_still_target:
-      name: "LD2450 Still Target"
-      device_class: occupancy
-
   - platform: template
     id: occupancy
     name: "Occupancy"
     device_class: occupancy
     lambda: |-
-      return id(ld2412_presence).state || id(ld2450_presence).state;
+      return id(ld2412_presence).state || id(tracking_presence).state;
     filters:
       - delayed_off: !lambda return id(occupancy_off_delay).state * 1000;
 
@@ -297,39 +203,6 @@ number:
       name: "LD2412 Light Threshold"
       entity_category: config
 
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    presence_timeout:
-      name: "LD2450 Presence Timeout"
-      entity_category: config
-    zone_1:
-      x1:
-        name: "LD2450 Zone 1 X1"
-      y1:
-        name: "LD2450 Zone 1 Y1"
-      x2:
-        name: "LD2450 Zone 1 X2"
-      y2:
-        name: "LD2450 Zone 1 Y2"
-    zone_2:
-      x1:
-        name: "LD2450 Zone 2 X1"
-      y1:
-        name: "LD2450 Zone 2 Y1"
-      x2:
-        name: "LD2450 Zone 2 X2"
-      y2:
-        name: "LD2450 Zone 2 Y2"
-    zone_3:
-      x1:
-        name: "LD2450 Zone 3 X1"
-      y1:
-        name: "LD2450 Zone 3 Y1"
-      x2:
-        name: "LD2450 Zone 3 X2"
-      y2:
-        name: "LD2450 Zone 3 Y2"
-
 switch:
   - platform: ld2412
     ld2412_id: ld2412_radar
@@ -339,15 +212,6 @@ switch:
       disabled_by_default: true
     bluetooth:
       name: "LD2412 Bluetooth"
-      entity_category: config
-
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    bluetooth:
-      name: "LD2450 Bluetooth"
-      entity_category: config
-    multi_target:
-      name: "LD2450 Multi Target Tracking"
       entity_category: config
 
 select:
@@ -409,16 +273,6 @@ button:
       entity_category: config
       disabled_by_default: true
 
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    restart:
-      name: "LD2450 Restart"
-      entity_category: diagnostic
-    factory_reset:
-      name: "LD2450 Factory Reset"
-      entity_category: diagnostic
-      disabled_by_default: true
-
 text_sensor:
   - platform: version
     id: esphome_version
@@ -457,13 +311,4 @@ text_sensor:
       entity_category: diagnostic
     mac_address:
       name: "LD2412 Bluetooth MAC"
-      entity_category: diagnostic
-
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    version:
-      name: "LD2450 Firmware"
-      entity_category: diagnostic
-    mac_address:
-      name: "LD2450 Bluetooth MAC"
       entity_category: diagnostic

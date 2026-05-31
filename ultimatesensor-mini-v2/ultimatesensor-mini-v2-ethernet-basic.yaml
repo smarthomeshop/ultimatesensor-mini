@@ -5,13 +5,13 @@
 substitutions:
   device_name: ultimatesensor-mini-v2
   friendly_name: "UltimateSensor Mini V2"
-  ultimatesensor_mini_software_version: "0.1"
   ultimatesensor_mini_hardware_version: "V2-Basic"
   ultimatesensor_mini_connection_type: "Ethernet"
   wifi_fast_connect: "false"
 
 packages:
   base: !include base.yaml
+  tracking: !include tracking-ld2450.yaml
   net: !include ethernet.yaml
 
 dashboard_import:

@@ -1,0 +1,10 @@
+# Optional UltimateSensor Mini V2 LD2460 tracking upgrade package.
+# Use only after physically replacing/removing the LD2450 module and installing the LD2460 upgrade.
+# Keep the LD2412 installed; it remains the reliable close-range presence fallback.
+
+substitutions:
+  ld2460_tx_pin: GPIO4
+  ld2460_rx_pin: GPIO5
+
+packages:
+  ld2460_tracking: github://smarthomeshop/ld2460/tracking-ld2460.yaml@v0.1.1

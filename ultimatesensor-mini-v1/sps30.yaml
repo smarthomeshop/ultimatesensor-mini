@@ -1,0 +1,107 @@
+# SPS30 Particulate Matter Sensor (Complete variants only)
+#
+# The SPS30 supports idle mode to extend sensor lifetime by turning off
+# the fan and laser between measurement cycles.
+#
+# Two configurable sliders appear under Configuration entities in Home Assistant:
+#
+#   SPS30 Update Interval (default: 60s, range: 10-300s)
+#     How often the sensor reads data when active.
+#
+#   SPS30 Idle Interval (default: 5 min, range: 0-30 min)
+#     How long the sensor sleeps between measurement cycles.
+#     Set to 0 to keep the sensor always on (no idle mode).
+#
+# With default settings (60s update, 5min idle), the sensor runs at ~33%
+# duty cycle, roughly tripling the SPS30's operational lifetime.
+
+sensor:
+  - platform: sps30
+    id: sps30_sensor
+    pm_1_0:
+      id: "PM_1_0"
+      name: "PM <1µm Weight concentration"
+    pm_2_5:
+      id: "PM_2_5"
+      name: "PM <2.5µm Weight concentration"
+    pm_4_0:
+      id: "PM_4_0"
+      name: "PM <4µm Weight concentration"
+    pm_10_0:
+      id: "PM_10_0"
+      name: "PM <10µm Weight concentration"
+    pmc_0_5:
+      id: "PMC_0_5"
+      name: "PM <0.5µm Number concentration"
+    pmc_1_0:
+      id: "PMC_1_0"
+      name: "PM <1µm Number concentration"
+    pmc_2_5:
+      id: "PMC_2_5"
+      name: "PM <2.5µm Number concentration"
+    pmc_4_0:
+      id: "PMC_4_0"
+      name: "PM <4µm Number concentration"
+    pmc_10_0:
+      id: "PMC_10_0"
+      name: "PM <10µm Number concentration"
+    pm_size:
+      id: "pm_size"
+      name: "Typical Particle size"
+    address: 0x69
+    update_interval: 60s
+
+script:
+  - id: sps30_idle_cycle
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: 'return id(sps30_idle_interval).state <= 0;'
+          then:
+            - sps30.start_measurement: sps30_sensor
+          else:
+            - while:
+                condition:
+                  lambda: 'return id(sps30_idle_interval).state > 0;'
+                then:
+                  - sps30.start_measurement: sps30_sensor
+                  - delay: !lambda |-
+                      return (uint32_t)(30000 + id(sps30_update_interval).state * 2000);
+                  - sps30.stop_measurement: sps30_sensor
+                  - delay: !lambda |-
+                      return (uint32_t)(id(sps30_idle_interval).state * 60000);
+
+number:
+  - platform: template
+    name: "SPS30 Update Interval"
+    id: sps30_update_interval
+    min_value: 10
+    max_value: 300
+    step: 10
+    initial_value: 60
+    unit_of_measurement: "s"
+    icon: mdi:update
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - lambda: |-
+            id(sps30_sensor).set_update_interval((uint32_t)(x * 1000));
+
+  - platform: template
+    name: "SPS30 Idle Interval"
+    id: sps30_idle_interval
+    min_value: 0
+    max_value: 30
+    step: 1
+    initial_value: 5
+    unit_of_measurement: "min"
+    icon: mdi:sleep
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    on_value:
+      then:
+        - script.execute: sps30_idle_cycle

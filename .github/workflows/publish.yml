@@ -161,9 +161,9 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
-          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/(ultimatesensor-mini-basic|ultimatesensor-mini-complete|ultimatesensor-mini-common)\.ya?ml$' && echo "true" || echo "false")
+          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/(ultimatesensor-mini-(basic|complete)(-cloud)?|ultimatesensor-mini-common|sps30|cloud|cloud-pm)\.ya?ml$' && echo "true" || echo "false")
           BETA_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/beta-ultimatesensor-mini-(basic|complete|common)\.ya?ml$' && echo "true" || echo "false")
-          V2_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v2/(ultimatesensor-mini-v2-(wifi|ethernet)-(basic|complete)|base|wifi|ethernet|complete)\.ya?ml$' && echo "true" || echo "false")
+          V2_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v2/.*\.ya?ml$' && echo "true" || echo "false")
           WORKFLOW_CHANGED=$(echo "$CHANGED_FILES" | grep -q '^.github/workflows/' && echo "true" || echo "false")
 
           if [[ "$WORKFLOW_CHANGED" == "true" && "$V1_CHANGED" == "false" && "$BETA_CHANGED" == "false" && "$V2_CHANGED" == "false" ]]; then
@@ -198,32 +198,23 @@ jobs:
           BETA_VERSION_FILE="ultimatesensor-mini-v1/beta-ultimatesensor-mini-common.yaml"
           V2_VERSION_FILE="ultimatesensor-mini-v2/base.yaml"
 
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            BASE_SHA=${{ github.event.pull_request.base.sha }}
-          elif [[ "${{ github.event_name }}" == "push" ]]; then
-            BASE_SHA=${{ github.event.before }}
-          else
-            BASE_SHA=""
-          fi
+          git fetch --tags --force >/dev/null 2>&1 || true
 
-          read_version() {
-            local file=$1
-            local key=$2
-            local fallback=$3
+          update_version() {
+            local current_version
 
-            awk -F'"' -v key="$key" '$0 ~ "^[[:space:]]*" key ":[[:space:]]*\\\"" { print $2; exit }' "$file" 2>/dev/null || true
-          }
-
-          increment_version() {
-            local current_version=$1
+            current_version=$(grep "project_version:" "$VERSION_FILE" | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/')
+            echo "Current version for $VERSION_FILE: $current_version"
 
             if [[ "$IS_SCHEDULED" == "true" ]]; then
-              echo "$current_version"
+              echo "v1_version=${current_version}" >> "$GITHUB_OUTPUT"
+              echo "Scheduled build - keeping version: $current_version"
               return
             fi
 
             if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-              echo "$current_version"
+              echo "v1_version=${current_version}" >> "$GITHUB_OUTPUT"
+              echo "Tag build - keeping version: $current_version"
               return
             fi
 
@@ -238,51 +229,18 @@ jobs:
               NEW_VERSION="dev-${SHORTSHA}"
             fi
 
-            echo "$NEW_VERSION"
+            echo "v1_version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+            echo "New version for $VERSION_FILE: $NEW_VERSION"
           }
 
-          version_for_change() {
-            local output_name=$1
-            local file=$2
-            local key=$3
-            local fallback=$4
-            local changed=$5
-            local release_tag_prefix=${6:-}
-            local current_version
-            local new_version
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" ]]; then
+            update_version
+          else
+            V1_CURRENT=$(grep "project_version:" "$VERSION_FILE" 2>/dev/null | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "1.0")
+            echo "v1_version=$V1_CURRENT" >> "$GITHUB_OUTPUT"
+          fi
 
-            current_version=$(read_version "$file" "$key" "$fallback")
-            current_version=${current_version:-$fallback}
-            echo "Current version for $file: $current_version"
-
-            if [[ "$changed" != "true" ]]; then
-              echo "${output_name}=${current_version}" >> "$GITHUB_OUTPUT"
-              return
-            fi
-
-            if [[ -n "$BASE_SHA" ]] && ! git cat-file -e "${BASE_SHA}:${file}" 2>/dev/null; then
-              echo "${output_name}=${current_version}" >> "$GITHUB_OUTPUT"
-              echo "Initial release for $file - keeping version: $current_version"
-              return
-            fi
-
-            if [[ -n "$release_tag_prefix" ]] && ! git rev-parse "${release_tag_prefix}-${current_version}" >/dev/null 2>&1; then
-              echo "${output_name}=${current_version}" >> "$GITHUB_OUTPUT"
-              echo "No release tag found for ${release_tag_prefix}-${current_version} - keeping version: $current_version"
-              return
-            fi
-
-            new_version=$(increment_version "$current_version")
-            echo "${output_name}=${new_version}" >> "$GITHUB_OUTPUT"
-            echo "New version for $file: $new_version"
-          }
-
-          version_for_change "v1_version" "$VERSION_FILE" "project_version" "1.0" "${{ steps.changes.outputs.v1 }}"
-          V1_CURRENT=$(read_version "$VERSION_FILE" "project_version" "1.0")
-          V1_CURRENT=${V1_CURRENT:-1.0}
-
-          BETA_CURRENT=$(read_version "$BETA_VERSION_FILE" "project_version" "${V1_CURRENT}-beta")
-          BETA_CURRENT=${BETA_CURRENT:-${V1_CURRENT}-beta}
+          BETA_CURRENT=$(grep "project_version:" "$BETA_VERSION_FILE" 2>/dev/null | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "${V1_CURRENT:-1.0}-beta")
           if [[ "$IS_SCHEDULED" == "true" ]]; then
             BETA_VERSION="$BETA_CURRENT"
           elif [[ "${{ steps.changes.outputs.beta }}" == "true" || "${{ steps.changes.outputs.beta_build }}" == "true" ]]; then
@@ -297,7 +255,20 @@ jobs:
           echo "beta_version=$BETA_VERSION" >> "$GITHUB_OUTPUT"
           echo "Beta version: $BETA_VERSION"
 
-          version_for_change "v2_version" "$V2_VERSION_FILE" "ultimatesensor_mini_software_version" "1.0" "${{ steps.changes.outputs.v2 }}" "ultimatesensor-mini-v2"
+          V2_CURRENT=$(grep "ultimatesensor_mini_software_version:" "$V2_VERSION_FILE" 2>/dev/null | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "1.0")
+          if [[ "$IS_SCHEDULED" == "true" || "${GITHUB_REF_TYPE}" == "tag" || "${{ steps.changes.outputs.v2 }}" != "true" ]]; then
+            V2_VERSION="$V2_CURRENT"
+          elif ! git rev-parse -q --verify "refs/tags/ultimatesensor-mini-v2-${V2_CURRENT}" >/dev/null; then
+            V2_VERSION="$V2_CURRENT"
+            echo "No release tag found for ultimatesensor-mini-v2-${V2_CURRENT} - keeping version: $V2_VERSION"
+          elif [[ "$V2_CURRENT" =~ ^([0-9]+)\.([0-9]+)(.*)$ ]]; then
+            V2_VERSION="${BASH_REMATCH[1]}.$((BASH_REMATCH[2] + 1))${BASH_REMATCH[3]}"
+          else
+            SHORTSHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+            V2_VERSION="dev-${SHORTSHA}"
+          fi
+          echo "v2_version=$V2_VERSION" >> "$GITHUB_OUTPUT"
+          echo "V2 version: $V2_VERSION"
 
       - name: Commit version updates and create tags
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -471,6 +442,68 @@ jobs:
       project_version: ${{ needs.detect-changes.outputs.v1_version }}
       base_path: ultimatesensor-mini-v1
 
+  publish-ultimatesensor-mini-basic-cloud:
+    name: Publish UltimateSensor Mini Basic Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v1_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/ultimatesensor-mini-basic-cloud.yaml
+      name: UltimateSensor Mini Basic Cloud
+      manifest_filename: ultimatesensor-mini-basic-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-basic-cloud
+      project_version: ${{ needs.detect-changes.outputs.v1_version }}
+      base_path: ultimatesensor-mini-v1
+
+  publish-ultimatesensor-mini-complete-cloud:
+    name: Publish UltimateSensor Mini Complete Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v1_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/ultimatesensor-mini-complete-cloud.yaml
+      name: UltimateSensor Mini Complete Cloud
+      manifest_filename: ultimatesensor-mini-complete-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-complete-cloud
+      project_version: ${{ needs.detect-changes.outputs.v1_version }}
+      base_path: ultimatesensor-mini-v1
+
+  publish-ultimatesensor-mini-beta-basic:
+    name: Publish UltimateSensor Mini Beta Basic
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.beta_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/beta-ultimatesensor-mini-basic.yaml
+      name: UltimateSensor Mini Beta Basic
+      manifest_filename: beta-ultimatesensor-mini-basic-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: beta-ultimatesensor-mini-basic
+      project_version: ${{ needs.detect-changes.outputs.beta_version }}
+      base_path: ultimatesensor-mini-v1
+      version_file: beta-ultimatesensor-mini-common.yaml
+
+  publish-ultimatesensor-mini-beta-complete:
+    name: Publish UltimateSensor Mini Beta Complete
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.beta_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v1/beta-ultimatesensor-mini-complete.yaml
+      name: UltimateSensor Mini Beta Complete
+      manifest_filename: beta-ultimatesensor-mini-complete-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: beta-ultimatesensor-mini-complete
+      project_version: ${{ needs.detect-changes.outputs.beta_version }}
+      base_path: ultimatesensor-mini-v1
+      version_file: beta-ultimatesensor-mini-common.yaml
+
   publish-ultimatesensor-mini-v2-wifi-basic:
     name: Publish UltimateSensor Mini V2 WiFi Basic
     needs: [detect-changes]
@@ -539,37 +572,73 @@ jobs:
       version_file: base.yaml
       version_key: ultimatesensor_mini_software_version
 
-  publish-ultimatesensor-mini-beta-basic:
-    name: Publish UltimateSensor Mini Beta Basic
+  publish-ultimatesensor-mini-v2-wifi-basic-ld2460:
+    name: Publish UltimateSensor Mini V2 WiFi Basic LD2460
     needs: [detect-changes]
-    if: needs.detect-changes.outputs.beta_build == 'true'
+    if: needs.detect-changes.outputs.v2_build == 'true'
     uses: ./.github/workflows/esphome-build.yml
     with:
-      files: ultimatesensor-mini-v1/beta-ultimatesensor-mini-basic.yaml
-      name: UltimateSensor Mini Beta Basic
-      manifest_filename: beta-ultimatesensor-mini-basic-manifest.json
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-wifi-basic-ld2460.yaml
+      name: UltimateSensor Mini V2 WiFi Basic LD2460
+      manifest_filename: ultimatesensor-mini-v2-wifi-basic-ld2460-manifest.json
       clean: false
       esphome_version: latest
-      directory_name: beta-ultimatesensor-mini-basic
-      project_version: ${{ needs.detect-changes.outputs.beta_version }}
-      base_path: ultimatesensor-mini-v1
-      version_file: beta-ultimatesensor-mini-common.yaml
+      directory_name: ultimatesensor-mini-v2-wifi-basic-ld2460
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
 
-  publish-ultimatesensor-mini-beta-complete:
-    name: Publish UltimateSensor Mini Beta Complete
+  publish-ultimatesensor-mini-v2-wifi-complete-ld2460:
+    name: Publish UltimateSensor Mini V2 WiFi Complete LD2460
     needs: [detect-changes]
-    if: needs.detect-changes.outputs.beta_build == 'true'
+    if: needs.detect-changes.outputs.v2_build == 'true'
     uses: ./.github/workflows/esphome-build.yml
     with:
-      files: ultimatesensor-mini-v1/beta-ultimatesensor-mini-complete.yaml
-      name: UltimateSensor Mini Beta Complete
-      manifest_filename: beta-ultimatesensor-mini-complete-manifest.json
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-wifi-complete-ld2460.yaml
+      name: UltimateSensor Mini V2 WiFi Complete LD2460
+      manifest_filename: ultimatesensor-mini-v2-wifi-complete-ld2460-manifest.json
       clean: false
       esphome_version: latest
-      directory_name: beta-ultimatesensor-mini-complete
-      project_version: ${{ needs.detect-changes.outputs.beta_version }}
-      base_path: ultimatesensor-mini-v1
-      version_file: beta-ultimatesensor-mini-common.yaml
+      directory_name: ultimatesensor-mini-v2-wifi-complete-ld2460
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-ethernet-basic-ld2460:
+    name: Publish UltimateSensor Mini V2 Ethernet Basic LD2460
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-basic-ld2460.yaml
+      name: UltimateSensor Mini V2 Ethernet Basic LD2460
+      manifest_filename: ultimatesensor-mini-v2-ethernet-basic-ld2460-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-ethernet-basic-ld2460
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-ethernet-complete-ld2460:
+    name: Publish UltimateSensor Mini V2 Ethernet Complete LD2460
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-complete-ld2460.yaml
+      name: UltimateSensor Mini V2 Ethernet Complete LD2460
+      manifest_filename: ultimatesensor-mini-v2-ethernet-complete-ld2460-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-ethernet-complete-ld2460
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
 
   create-releases:
     name: Create GitHub releases

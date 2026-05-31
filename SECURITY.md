@@ -21,9 +21,11 @@ We aim to respond within **7 days** and will keep you updated on the fix progres
 ## Known Security Considerations
 
 ### LD2450 Bluetooth
-The LD2450 mmWave radar sensor exposes a Bluetooth interface used by the HLKRadarTool app for configuration. Anyone physically within Bluetooth range (~10m) could potentially connect and modify radar settings such as detection zones or sensitivity.
+The standard UltimateSensor Mini V2 firmware uses the LD2450 tracking radar. The LD2450 exposes a Bluetooth interface used by the HLKRadarTool app for configuration. Anyone physically within Bluetooth range (~10m) could potentially connect and modify radar settings such as detection zones or sensitivity.
 
 **Mitigation:** A toggle switch is available under the device's Configuration entities in Home Assistant to disable LD2450 Bluetooth when not actively configuring the sensor. It is recommended to keep Bluetooth disabled during normal operation.
+
+LD2460 upgrade firmware variants do not use the LD2450 component. Use those variants only after physically replacing/removing the LD2450 module and installing the optional LD2460 module.
 
 ### OTA Updates
 Over-the-air firmware updates are protected by ESPHome's built-in OTA mechanism. Ensure your Home Assistant instance and local network are secured to prevent unauthorized firmware updates.

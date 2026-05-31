@@ -1,0 +1,183 @@
+# Standard UltimateSensor Mini V2 tracking package.
+# Factory hardware ships with LD2450 on GPIO18/GPIO19.
+
+uart:
+  - id: uart_tracking
+    tx_pin: GPIO18
+    rx_pin: GPIO19
+    baud_rate: 256000
+    parity: NONE
+    stop_bits: 1
+    rx_buffer_size: 1024
+
+ld2450:
+  id: tracking_radar
+  uart_id: uart_tracking
+
+sensor:
+  - platform: ld2450
+    ld2450_id: tracking_radar
+    target_count:
+      id: tracking_target_count
+      name: "Tracking Target Count"
+    still_target_count:
+      name: "Tracking Still Target Count"
+    moving_target_count:
+      name: "Tracking Moving Target Count"
+    target_1:
+      x:
+        id: tracking_target_1_x
+        name: "Tracking Target 1 X"
+      y:
+        id: tracking_target_1_y
+        name: "Tracking Target 1 Y"
+      speed:
+        id: tracking_target_1_speed
+        name: "Tracking Target 1 Speed"
+      angle:
+        id: tracking_target_1_angle
+        name: "Tracking Target 1 Angle"
+      distance:
+        id: tracking_target_1_distance
+        name: "Tracking Target 1 Distance"
+      resolution:
+        id: tracking_target_1_resolution
+        name: "Tracking Target 1 Resolution"
+    target_2:
+      x:
+        id: tracking_target_2_x
+        name: "Tracking Target 2 X"
+      y:
+        id: tracking_target_2_y
+        name: "Tracking Target 2 Y"
+      speed:
+        id: tracking_target_2_speed
+        name: "Tracking Target 2 Speed"
+      angle:
+        id: tracking_target_2_angle
+        name: "Tracking Target 2 Angle"
+      distance:
+        id: tracking_target_2_distance
+        name: "Tracking Target 2 Distance"
+      resolution:
+        id: tracking_target_2_resolution
+        name: "Tracking Target 2 Resolution"
+    target_3:
+      x:
+        id: tracking_target_3_x
+        name: "Tracking Target 3 X"
+      y:
+        id: tracking_target_3_y
+        name: "Tracking Target 3 Y"
+      speed:
+        id: tracking_target_3_speed
+        name: "Tracking Target 3 Speed"
+      angle:
+        id: tracking_target_3_angle
+        name: "Tracking Target 3 Angle"
+      distance:
+        id: tracking_target_3_distance
+        name: "Tracking Target 3 Distance"
+      resolution:
+        id: tracking_target_3_resolution
+        name: "Tracking Target 3 Resolution"
+    zone_1:
+      target_count:
+        name: "Tracking Zone 1 Target Count"
+      still_target_count:
+        name: "Tracking Zone 1 Still Target Count"
+      moving_target_count:
+        name: "Tracking Zone 1 Moving Target Count"
+    zone_2:
+      target_count:
+        name: "Tracking Zone 2 Target Count"
+      still_target_count:
+        name: "Tracking Zone 2 Still Target Count"
+      moving_target_count:
+        name: "Tracking Zone 2 Moving Target Count"
+    zone_3:
+      target_count:
+        name: "Tracking Zone 3 Target Count"
+      still_target_count:
+        name: "Tracking Zone 3 Still Target Count"
+      moving_target_count:
+        name: "Tracking Zone 3 Moving Target Count"
+
+binary_sensor:
+  - platform: ld2450
+    ld2450_id: tracking_radar
+    has_target:
+      id: tracking_presence
+      name: "Tracking Presence"
+      device_class: occupancy
+    has_moving_target:
+      name: "Tracking Moving Target"
+      device_class: motion
+    has_still_target:
+      name: "Tracking Still Target"
+      device_class: occupancy
+
+number:
+  - platform: ld2450
+    ld2450_id: tracking_radar
+    presence_timeout:
+      name: "Tracking Presence Timeout"
+      entity_category: config
+    zone_1:
+      x1:
+        name: "Tracking Zone 1 X1"
+      y1:
+        name: "Tracking Zone 1 Y1"
+      x2:
+        name: "Tracking Zone 1 X2"
+      y2:
+        name: "Tracking Zone 1 Y2"
+    zone_2:
+      x1:
+        name: "Tracking Zone 2 X1"
+      y1:
+        name: "Tracking Zone 2 Y1"
+      x2:
+        name: "Tracking Zone 2 X2"
+      y2:
+        name: "Tracking Zone 2 Y2"
+    zone_3:
+      x1:
+        name: "Tracking Zone 3 X1"
+      y1:
+        name: "Tracking Zone 3 Y1"
+      x2:
+        name: "Tracking Zone 3 X2"
+      y2:
+        name: "Tracking Zone 3 Y2"
+
+switch:
+  - platform: ld2450
+    ld2450_id: tracking_radar
+    bluetooth:
+      name: "Tracking Bluetooth"
+      entity_category: config
+    multi_target:
+      name: "Tracking Multi Target"
+      entity_category: config
+
+button:
+  - platform: ld2450
+    ld2450_id: tracking_radar
+    restart:
+      name: "Tracking Restart"
+      entity_category: diagnostic
+    factory_reset:
+      name: "Tracking Factory Reset"
+      entity_category: diagnostic
+      disabled_by_default: true
+
+text_sensor:
+  - platform: ld2450
+    ld2450_id: tracking_radar
+    version:
+      name: "Tracking Firmware"
+      entity_category: diagnostic
+    mac_address:
+      name: "Tracking Bluetooth MAC"
+      entity_category: diagnostic

@@ -1,24 +1,25 @@
-# UltimateSensor Basic Configuration
-# This configuration excludes the Particulate Matter (PM) sensor.
-# Use this file if your device does not include the PM/fine dust sensor.
+# UltimateSensor Complete Cloud Configuration
+# This configuration adds SmartHomeShop App cloud sync and the SPS30 sensor.
 
-# Name of device
 substitutions:
   device_name: ultimatesensor-mini
   friendly_name: "UltimateSensor Mini"
-  ultimatesensor_mini_hardware_version: "V1-Basic"
+  ultimatesensor_mini_hardware_version: "V1-Complete"
   wifi_fast_connect: "true"
-  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-basic-manifest.json"
+  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-cloud-manifest.json"
   basic_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-basic-manifest.json"
   complete_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-manifest.json"
   basic_cloud_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-basic-cloud-manifest.json"
   complete_cloud_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-cloud-manifest.json"
-  default_network: "WiFi Basic (local)"
-  cloud_enabled: "false"
+  default_network: "WiFi Complete + SmartHomeShop App (cloud)"
+  cloud_enabled: "true"
 
 packages:
   common: !include ultimatesensor-mini-common.yaml
+  sps30: !include sps30.yaml
+  cloud: !include cloud.yaml
+  cloud_pm: !include cloud-pm.yaml
 
 dashboard_import:
-  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-basic.yaml@main
+  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-complete-cloud.yaml@main
   import_full_config: false

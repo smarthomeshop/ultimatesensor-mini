@@ -1,10 +1,16 @@
 # UltimateSensor Common Configuration
-# This file contains all shared configuration between Basic and Complete versions
+# This file contains all shared configuration between local and cloud firmware variants.
 
 substitutions:
   project_main_version: "2"
   project_version: "2.35"
   log_level: "INFO"
+  basic_manifest_url: ${update_manifest_url}
+  complete_manifest_url: ${update_manifest_url}
+  basic_cloud_manifest_url: ${update_manifest_url}
+  complete_cloud_manifest_url: ${update_manifest_url}
+  default_network: "WiFi Basic (local)"
+  cloud_enabled: "false"
   
 # Esphome start
 esphome:
@@ -25,6 +31,11 @@ esphome:
             blue: 0%
             flash_length: 500ms
   on_boot:
+    - priority: 610
+      then:
+        - script.execute: sync_selected_firmware_source
+        - update.check:
+            id: firmware_update
     - then:
         - wait_until:
             condition:
@@ -54,12 +65,32 @@ esp32_ble:
 # Enable improv over BLE for initial WiFi provisioning
 esp32_improv:
   authorizer: none
+  next_url: "https://app.smarthomeshop.io/setup/welcome?device={{device_name}}&ip={{ip_address}}&cloud=${cloud_enabled}&hw=${ultimatesensor_mini_hardware_version}"
 
 # Enable improv over serial for USB provisioning
 improv_serial:
+  next_url: "https://app.smarthomeshop.io/setup/welcome?device={{device_name}}&ip={{ip_address}}&cloud=${cloud_enabled}&hw=${ultimatesensor_mini_hardware_version}"
 
 # Start up script
 script:
+  - id: sync_selected_firmware_source
+    then:
+      - lambda: |-
+          std::string option = id(firmware_selector).current_option();
+          if (option == "WiFi Complete (local)" || option == "Complete") {
+            ESP_LOGI("main", "OTA updates set to use WiFi Complete (local) firmware");
+            id(firmware_update).set_source_url("${complete_manifest_url}");
+          } else if (option == "WiFi Basic + SmartHomeShop App (cloud)" || option == "Basic Cloud") {
+            ESP_LOGI("main", "OTA updates set to use WiFi Basic + SmartHomeShop App (cloud) firmware");
+            id(firmware_update).set_source_url("${basic_cloud_manifest_url}");
+          } else if (option == "WiFi Complete + SmartHomeShop App (cloud)" || option == "Complete Cloud") {
+            ESP_LOGI("main", "OTA updates set to use WiFi Complete + SmartHomeShop App (cloud) firmware");
+            id(firmware_update).set_source_url("${complete_cloud_manifest_url}");
+          } else {
+            ESP_LOGI("main", "OTA updates set to use WiFi Basic (local) firmware");
+            id(firmware_update).set_source_url("${basic_manifest_url}");
+          }
+
   - id: play_stream
     then:
       - media_player.volume_set:  
@@ -110,10 +141,12 @@ ota:
 http_request:
   useragent: ultimatesensor-mini-esphome
   verify_ssl: false
+  timeout: 10s
 
 update:
   - platform: http_request
-    name: UltimateSensor Mini Firmware
+    name: "${friendly_name} Firmware"
+    id: firmware_update
     source: ${update_manifest_url}
     disabled_by_default: true
 
@@ -131,6 +164,26 @@ wifi:
 
 # Fallback hotspot
 captive_portal:  
+
+select:
+  - platform: template
+    id: firmware_selector
+    name: "${friendly_name} Firmware Variant"
+    icon: "mdi:network"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    options:
+      - "WiFi Basic (local)"
+      - "WiFi Complete (local)"
+      - "WiFi Basic + SmartHomeShop App (cloud)"
+      - "WiFi Complete + SmartHomeShop App (cloud)"
+    initial_option: ${default_network}
+    on_value:
+      then:
+        - script.execute: sync_selected_firmware_source
+        - update.check:
+            id: firmware_update
   
 # Enable web server so you can view data in browser if you go to ip of the device
 # web_server:
@@ -753,6 +806,23 @@ button:
     id: btn_restart
     name: "Restart"
   - platform: template
+    name: "${friendly_name} Firmware Update"
+    id: update_firmware
+    entity_category: config
+    icon: "mdi:update"
+    on_press:
+      then:
+        - script.execute: sync_selected_firmware_source
+        - lambda: |-
+            ESP_LOGI("main", "Refreshing OTA metadata before installing selected firmware variant");
+        - update.check:
+            id: firmware_update
+        - lambda: |-
+            ESP_LOGI("main", "Starting OTA install for selected firmware variant");
+        - update.perform:
+            id: firmware_update
+            force_update: true
+  - platform: template
     id: co2_calibration_button
     name: "CO2 manual calibration (only in fresh air for at least 10min)"
     entity_category: "config"
@@ -805,6 +875,7 @@ binary_sensor:
   #MMWave
   - platform: template
     name: "Occupancy"
+    id: occupancy_state
     device_class: occupancy
     filters:
       - delayed_off: !lambda return (id(off_delay).state *1000);
