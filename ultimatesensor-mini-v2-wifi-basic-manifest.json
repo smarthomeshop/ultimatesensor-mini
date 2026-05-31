@@ -1,6 +1,6 @@
 {
   "name": "UltimateSensor Mini V2 WiFi Basic",
-  "version": "1.0",
+  "version": "1.1",
   "home_assistant_domain": "esphome",
   "new_install_skip_erase": false,
   "builds": [
@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-C6",
       "ota": {
         "path": "ultimatesensor-mini-v2-wifi-basic/ultimatesensor-mini-v2-esp32c6.ota.bin",
-        "md5": "0914ba6802ddab0142b3c81eb0b50e62"
+        "md5": "1ba6f66f4728ca1e3ba8997b9a0f828f"
       },
       "parts": [
         {
