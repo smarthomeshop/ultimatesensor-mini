@@ -18,6 +18,9 @@ wifi:
 
 captive_portal:
 
+esp32_improv:
+  authorizer: none
+
 output:
   - platform: gpio
     id: w5500_reset_hold

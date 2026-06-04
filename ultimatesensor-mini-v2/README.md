@@ -11,7 +11,7 @@ Leave the LD2412 installed. It remains the close-range/still-presence fallback a
 | `base.yaml` | Shared ESP32-C6 hardware, sensors, API, OTA, web server, status LEDs, LD2412, and combined occupancy logic |
 | `tracking-ld2450.yaml` | Standard factory tracking package for LD2450 on GPIO18/GPIO19 |
 | `tracking-ld2460.yaml` | Optional upgrade tracking package for LD2460 on GPIO4/GPIO5 via `smarthomeshop/ld2460` |
-| `wifi.yaml` | WiFi firmware network stack, captive portal, Improv serial, WiFi diagnostics, W5500 held off/reset |
+| `wifi.yaml` | WiFi firmware network stack, captive portal, BLE Improv, WiFi diagnostics, W5500 held off/reset |
 | `ethernet.yaml` | W5500 Ethernet firmware network stack and Ethernet diagnostics |
 | `complete.yaml` | SPS30 particulate matter sensor and PM idle controls |
 
@@ -36,6 +36,8 @@ LD2460 upgrade variants are only for devices where the LD2450 module has been re
 | `ultimatesensor-mini-v2-ethernet-complete-ld2460.yaml` | Ethernet W5500 | Yes | LD2460 |
 
 ESPHome Ethernet and WiFi are kept as separate firmware variants. The WiFi variants keep the W5500 powered off and held in reset. The Ethernet variants power the W5500 and expose Ethernet network info sensors.
+
+Mini V2 WiFi firmware uses BLE Improv plus captive portal for onboarding. Serial Improv is intentionally not included on ESP32-C6 because both available hardware UARTs are reserved for LD2412 and LD2450/LD2460.
 
 ## Radar Policy
 

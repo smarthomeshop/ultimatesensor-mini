@@ -78,7 +78,7 @@ We publish local, cloud, and beta firmware variants for V1 hardware. V2 has sepa
 1. Power the UltimateSensor Mini with USB-C.
 2. Flash the desired firmware with the web flasher or ESPHome CLI.
 3. If WiFi is not configured yet, connect to the fallback hotspot.
-4. Complete onboarding with captive portal, Improv BLE, or Improv Serial.
+4. Complete onboarding with captive portal or Improv where available. Mini V2 WiFi uses BLE Improv; Mini V2 serial Improv is not enabled because both ESP32-C6 UARTs are used by the radar modules.
 5. Add the device to Home Assistant through the ESPHome integration.
 6. For V2 LD2460 upgrades, physically replace/remove the LD2450 module first, leave LD2412 installed, and flash one of the `*-ld2460` firmware files.
 
