@@ -1,0 +1,21 @@
+{
+  "name": "UltimateSensor Mini V2 WiFi Complete Cloud",
+  "version": "1.2",
+  "home_assistant_domain": "esphome",
+  "new_install_skip_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C6",
+      "ota": {
+        "path": "ultimatesensor-mini-v2-wifi-complete-cloud/ultimatesensor-mini-v2-esp32c6.ota.bin",
+        "md5": "7ab693ab1569801b2af3f08a415a7fc7"
+      },
+      "parts": [
+        {
+          "path": "ultimatesensor-mini-v2-wifi-complete-cloud/ultimatesensor-mini-v2-esp32c6.factory.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
