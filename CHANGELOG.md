@@ -6,9 +6,15 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V2 1.3] - 2026-06-04
+
+
 - Fixed UltimateSensor Mini V2 ESP32-C6 UART allocation by disabling serial UART logging in production firmware so LD2412 and LD2450/LD2460 can use the two available hardware UARTs.
 - Disabled WiFi fast-connect for UltimateSensor Mini V2 WiFi firmware variants so prebuilt firmware with placeholder WiFi credentials falls back to provisioning more cleanly.
 - Removed serial Improv from UltimateSensor Mini V2 production WiFi firmware because ESP32-C6 UARTs are reserved for the two radar modules; fallback AP provisioning remains available.
+
 
 ## [UltimateSensor Mini V1 2.37] - 2026-06-04
 
