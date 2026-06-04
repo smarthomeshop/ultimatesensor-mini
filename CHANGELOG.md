@@ -6,7 +6,13 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V2 1.4] - 2026-06-04
+
+
 - Added BLE Improv provisioning to UltimateSensor Mini V2 WiFi firmware variants for Made for ESPHome WiFi onboarding without reserving a serial UART.
+
 
 ## [UltimateSensor Mini V2 1.3] - 2026-06-04
 
