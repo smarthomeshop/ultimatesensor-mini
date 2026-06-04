@@ -11,10 +11,9 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [UltimateSensor Mini V1 2.37] - 2026-06-04
 
 
-- Added SmartHomeShop App cloud firmware variants for UltimateSensor Mini V2 WiFi, Ethernet, LD2450, and optional LD2460 firmware families.
-- Fixed UltimateSensor Mini V2 USB logging by routing the ESPHome logger to UART0 and setting the ESP32-C6 flash size explicitly.
+- Aligned UltimateSensor Mini V1 cloud payload keys for zone target counts and SPS30 PM size.
+- Pointed UltimateSensor Mini V1 Improv setup links to the SmartHomeShop API setup endpoint.
 - Fixed GitHub Release note extraction so dated changelog headings publish the matching customer-facing notes.
-- Aligned Mini V1 cloud payload keys for zone target counts and SPS30 PM size.
 
 
 ## [UltimateSensor Mini V2 1.2] - 2026-06-04
@@ -22,8 +21,8 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 - Added SmartHomeShop App cloud firmware variants for UltimateSensor Mini V2 WiFi, Ethernet, LD2450, and optional LD2460 firmware families.
 - Fixed UltimateSensor Mini V2 USB logging by routing the ESPHome logger to UART0 and setting the ESP32-C6 flash size explicitly.
+- Added LD2450 zone target count IDs for Mini V2 cloud zone sync.
 - Fixed GitHub Release note extraction so dated changelog headings publish the matching customer-facing notes.
-- Aligned Mini V1 cloud payload keys for zone target counts and SPS30 PM size.
 
 
 ## [UltimateSensor Mini V2 1.1] - 2026-05-31
