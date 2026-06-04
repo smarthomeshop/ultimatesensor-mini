@@ -1,0 +1,33 @@
+# UltimateSensor cloud PM support.
+# Complete variants update these globals before the main cloud payload is sent.
+
+script:
+  - id: cloud_update_pm_globals
+    mode: single
+    then:
+      - lambda: |-
+          bool has_data = false;
+          if (id(PM_2_5).has_state() && !isnan(id(PM_2_5).state)) has_data = true;
+          if (id(PM_10_0).has_state() && !isnan(id(PM_10_0).state)) has_data = true;
+
+          if (!has_data) {
+            return;
+          }
+
+          id(cloud_has_pm) = true;
+
+          if (id(PM_1_0).has_state() && !isnan(id(PM_1_0).state)) id(cloud_pm_1_0) = id(PM_1_0).state;
+          if (id(PM_2_5).has_state() && !isnan(id(PM_2_5).state)) id(cloud_pm_2_5) = id(PM_2_5).state;
+          if (id(PM_4_0).has_state() && !isnan(id(PM_4_0).state)) id(cloud_pm_4_0) = id(PM_4_0).state;
+          if (id(PM_10_0).has_state() && !isnan(id(PM_10_0).state)) id(cloud_pm_10_0) = id(PM_10_0).state;
+          if (id(PMC_0_5).has_state() && !isnan(id(PMC_0_5).state)) id(cloud_pmc_0_5) = id(PMC_0_5).state;
+          if (id(PMC_1_0).has_state() && !isnan(id(PMC_1_0).state)) id(cloud_pmc_1_0) = id(PMC_1_0).state;
+          if (id(PMC_2_5).has_state() && !isnan(id(PMC_2_5).state)) id(cloud_pmc_2_5) = id(PMC_2_5).state;
+          if (id(PMC_4_0).has_state() && !isnan(id(PMC_4_0).state)) id(cloud_pmc_4_0) = id(PMC_4_0).state;
+          if (id(PMC_10_0).has_state() && !isnan(id(PMC_10_0).state)) id(cloud_pmc_10_0) = id(PMC_10_0).state;
+          if (id(pm_size).has_state() && !isnan(id(pm_size).state)) id(cloud_pm_size) = id(pm_size).state;
+
+interval:
+  - interval: 60s
+    then:
+      - script.execute: cloud_update_pm_globals

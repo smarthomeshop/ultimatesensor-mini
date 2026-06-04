@@ -65,11 +65,11 @@ esp32_ble:
 # Enable improv over BLE for initial WiFi provisioning
 esp32_improv:
   authorizer: none
-  next_url: "https://app.smarthomeshop.io/setup/welcome?device={{device_name}}&ip={{ip_address}}&cloud=${cloud_enabled}&hw=${ultimatesensor_mini_hardware_version}"
+  next_url: "https://api.smarthomeshop.io/setup/welcome?device={{device_name}}&ip={{ip_address}}&cloud=${cloud_enabled}&hw=${ultimatesensor_mini_hardware_version}"
 
 # Enable improv over serial for USB provisioning
 improv_serial:
-  next_url: "https://app.smarthomeshop.io/setup/welcome?device={{device_name}}&ip={{ip_address}}&cloud=${cloud_enabled}&hw=${ultimatesensor_mini_hardware_version}"
+  next_url: "https://api.smarthomeshop.io/setup/welcome?device={{device_name}}&ip={{ip_address}}&cloud=${cloud_enabled}&hw=${ultimatesensor_mini_hardware_version}"
 
 # Start up script
 script:

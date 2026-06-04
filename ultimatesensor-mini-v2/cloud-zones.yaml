@@ -1,0 +1,16 @@
+# UltimateSensor V2 LD2450 cloud zone support.
+
+script:
+  - id: cloud_update_zone_globals
+    mode: single
+    then:
+      - lambda: |-
+          id(cloud_has_zones) = true;
+          if (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state)) id(cloud_zone1_count) = (int) id(zone1_target_count).state;
+          if (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state)) id(cloud_zone2_count) = (int) id(zone2_target_count).state;
+          if (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state)) id(cloud_zone3_count) = (int) id(zone3_target_count).state;
+
+interval:
+  - interval: 30s
+    then:
+      - script.execute: cloud_update_zone_globals

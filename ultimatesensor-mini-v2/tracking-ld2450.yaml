@@ -83,6 +83,7 @@ sensor:
         name: "Tracking Target 3 Resolution"
     zone_1:
       target_count:
+        id: zone1_target_count
         name: "Tracking Zone 1 Target Count"
       still_target_count:
         name: "Tracking Zone 1 Still Target Count"
@@ -90,6 +91,7 @@ sensor:
         name: "Tracking Zone 1 Moving Target Count"
     zone_2:
       target_count:
+        id: zone2_target_count
         name: "Tracking Zone 2 Target Count"
       still_target_count:
         name: "Tracking Zone 2 Still Target Count"
@@ -97,6 +99,7 @@ sensor:
         name: "Tracking Zone 2 Moving Target Count"
     zone_3:
       target_count:
+        id: zone3_target_count
         name: "Tracking Zone 3 Target Count"
       still_target_count:
         name: "Tracking Zone 3 Still Target Count"

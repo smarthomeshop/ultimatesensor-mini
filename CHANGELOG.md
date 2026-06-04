@@ -6,7 +6,21 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Added SmartHomeShop App cloud firmware variants for UltimateSensor Mini V2 WiFi, Ethernet, LD2450, and optional LD2460 firmware families.
+- Fixed UltimateSensor Mini V2 USB logging by routing the ESPHome logger to UART0 and setting the ESP32-C6 flash size explicitly.
+- Fixed GitHub Release note extraction so dated changelog headings publish the matching customer-facing notes.
+- Aligned Mini V1 cloud payload keys for zone target counts and SPS30 PM size.
+
+## [UltimateSensor Mini V2 1.1] - 2026-05-31
+
+- Added optional UltimateSensor Mini V2 LD2460 upgrade firmware variants for customers replacing the LD2450 module while keeping LD2412 installed.
+- Split UltimateSensor Mini V2 tracking radar support into standard LD2450 packages and optional LD2460 upgrade firmware packages.
+- Documented the Mini V2 LD2460 upgrade policy and pin mapping for WiFi and Ethernet firmware variants.
+
+## [UltimateSensor Mini V1 2.36] - 2026-05-31
+
+- Added four-way firmware switching for UltimateSensor Mini V1 with dedicated Home Assistant `Firmware Variant` and `Firmware Update` controls.
+- Added SmartHomeShop App cloud firmware variants for UltimateSensor Mini V1 Basic and Complete, including cloud registration, sensor sync, and cloud manifests.
 
 ## [UltimateSensor Mini V2 1.0] - 2026-05-30
 
@@ -21,10 +35,6 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 
 - Fix boot audio playback by compiling all speaker media player codecs.
-- Added UltimateSensor Mini V2 firmware variants for WiFi and W5500 Ethernet with standard LD2412 + LD2450 tracking.
-- Added optional UltimateSensor Mini V2 LD2460 upgrade firmware variants for customers replacing the LD2450 module while keeping LD2412 installed.
-- Added four-way firmware switching for UltimateSensor Mini V1 with dedicated Home Assistant `Firmware Variant` and `Firmware Update` controls.
-- Added SmartHomeShop App cloud firmware variants for UltimateSensor Mini V1 Basic and Complete, including cloud registration, sensor sync, and cloud manifests.
 
 
 ## [UltimateSensor Mini Beta V1 2.35-beta.36] - 2026-04-21

@@ -1,0 +1,20 @@
+# UltimateSensor Mini V2 Ethernet Basic LD2460 Cloud Configuration
+
+substitutions:
+  device_name: ultimatesensor-mini-v2
+  friendly_name: "UltimateSensor Mini V2"
+  ultimatesensor_mini_hardware_version: "V2-Basic-LD2460"
+  ultimatesensor_mini_connection_type: "Ethernet"
+  wifi_fast_connect: "false"
+  cloud_mac_sensor_id: ethernet_mac_address
+  cloud_ip_sensor_id: ethernet_ip_address
+
+packages:
+  base: !include base.yaml
+  tracking: !include tracking-ld2460.yaml
+  net: !include ethernet.yaml
+  cloud: !include cloud.yaml
+
+dashboard_import:
+  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud.yaml@main
+  import_full_config: false

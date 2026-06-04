@@ -640,6 +640,142 @@ jobs:
       version_file: base.yaml
       version_key: ultimatesensor_mini_software_version
 
+  publish-ultimatesensor-mini-v2-wifi-basic-cloud:
+    name: Publish UltimateSensor Mini V2 WiFi Basic Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-wifi-basic-cloud.yaml
+      name: UltimateSensor Mini V2 WiFi Basic Cloud
+      manifest_filename: ultimatesensor-mini-v2-wifi-basic-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-wifi-basic-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-wifi-complete-cloud:
+    name: Publish UltimateSensor Mini V2 WiFi Complete Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-wifi-complete-cloud.yaml
+      name: UltimateSensor Mini V2 WiFi Complete Cloud
+      manifest_filename: ultimatesensor-mini-v2-wifi-complete-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-wifi-complete-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-ethernet-basic-cloud:
+    name: Publish UltimateSensor Mini V2 Ethernet Basic Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-basic-cloud.yaml
+      name: UltimateSensor Mini V2 Ethernet Basic Cloud
+      manifest_filename: ultimatesensor-mini-v2-ethernet-basic-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-ethernet-basic-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-ethernet-complete-cloud:
+    name: Publish UltimateSensor Mini V2 Ethernet Complete Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-complete-cloud.yaml
+      name: UltimateSensor Mini V2 Ethernet Complete Cloud
+      manifest_filename: ultimatesensor-mini-v2-ethernet-complete-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-ethernet-complete-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-wifi-basic-ld2460-cloud:
+    name: Publish UltimateSensor Mini V2 WiFi Basic LD2460 Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-wifi-basic-ld2460-cloud.yaml
+      name: UltimateSensor Mini V2 WiFi Basic LD2460 Cloud
+      manifest_filename: ultimatesensor-mini-v2-wifi-basic-ld2460-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-wifi-basic-ld2460-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-wifi-complete-ld2460-cloud:
+    name: Publish UltimateSensor Mini V2 WiFi Complete LD2460 Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-wifi-complete-ld2460-cloud.yaml
+      name: UltimateSensor Mini V2 WiFi Complete LD2460 Cloud
+      manifest_filename: ultimatesensor-mini-v2-wifi-complete-ld2460-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-wifi-complete-ld2460-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud:
+    name: Publish UltimateSensor Mini V2 Ethernet Basic LD2460 Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud.yaml
+      name: UltimateSensor Mini V2 Ethernet Basic LD2460 Cloud
+      manifest_filename: ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
+  publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud:
+    name: Publish UltimateSensor Mini V2 Ethernet Complete LD2460 Cloud
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.v2_build == 'true'
+    uses: ./.github/workflows/esphome-build.yml
+    with:
+      files: ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud.yaml
+      name: UltimateSensor Mini V2 Ethernet Complete LD2460 Cloud
+      manifest_filename: ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud-manifest.json
+      clean: false
+      esphome_version: latest
+      directory_name: ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud
+      project_version: ${{ needs.detect-changes.outputs.v2_version }}
+      base_path: ultimatesensor-mini-v2
+      version_file: base.yaml
+      version_key: ultimatesensor_mini_software_version
+
   create-releases:
     name: Create GitHub releases
     needs: [detect-changes]
@@ -669,7 +805,7 @@ jobs:
             fi
 
             awk -v heading="$heading" '
-              $0 == heading { found=1; next }
+              index($0, heading) == 1 { found=1; next }
               found && /^## \[/ { exit }
               found { print }
             ' CHANGELOG.md > release-notes.txt
@@ -681,6 +817,9 @@ jobs:
                 found { print }
               ' CHANGELOG.md > release-notes.txt
             fi
+
+            sed -i '/^- Add customer-facing firmware notes here before merging a PR\.$/d' release-notes.txt
+            sed -i '/^- Add customer-facing changes here before the next release is published\.$/d' release-notes.txt
 
             if [[ ! -s release-notes.txt ]]; then
               printf '%s\n\n%s\n' \
