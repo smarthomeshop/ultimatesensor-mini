@@ -2,7 +2,7 @@
 # Shared hardware and sensor stack for ESP32-C6 based V2 variants.
 
 substitutions:
-  ultimatesensor_mini_software_version: "1.1"
+  ultimatesensor_mini_software_version: "1.2"
   log_level: "INFO"
   scd41_temperature_offset: "13.2"
   scd41_humidity_offset: "3.0"
