@@ -5,7 +5,7 @@ substitutions:
   friendly_name: "UltimateSensor Mini V2"
   ultimatesensor_mini_hardware_version: "V2-Complete-LD2460"
   ultimatesensor_mini_connection_type: "WiFi"
-  wifi_fast_connect: "true"
+  wifi_fast_connect: "false"
   cloud_mac_sensor_id: wifi_mac_address
   cloud_ip_sensor_id: wifi_ip_address
 

@@ -18,8 +18,6 @@ wifi:
 
 captive_portal:
 
-improv_serial:
-
 output:
   - platform: gpio
     id: w5500_reset_hold

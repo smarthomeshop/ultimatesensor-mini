@@ -4,6 +4,7 @@
 substitutions:
   ultimatesensor_mini_software_version: "1.2"
   log_level: "INFO"
+  logger_baud_rate: "0"
   scd41_temperature_offset: "13.2"
   scd41_humidity_offset: "3.0"
 
@@ -24,8 +25,9 @@ esp32:
 
 logger:
   level: ${log_level}
-  baud_rate: 115200
-  hardware_uart: UART0
+  # ESP32-C6 has two hardware UARTs. Mini V2 uses both for LD2412 and LD2450/LD2460,
+  # so production firmware must not reserve UART0 for serial logging.
+  baud_rate: ${logger_baud_rate}
 
 api:
   actions:
