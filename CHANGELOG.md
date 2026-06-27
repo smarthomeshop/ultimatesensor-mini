@@ -6,7 +6,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Changed the UltimateSensor Mini V2 WiFi onboarding hotspot password to match the V1 onboarding password.
 
 ## [UltimateSensor Mini V2 1.4] - 2026-06-04
 

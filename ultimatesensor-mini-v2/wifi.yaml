@@ -14,7 +14,7 @@ wifi:
   fast_connect: ${wifi_fast_connect}
   ap:
     ssid: ${device_name}
-    password: ${device_name}
+    password: ultimatesensor-mini
 
 captive_portal:
 
