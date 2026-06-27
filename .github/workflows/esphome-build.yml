@@ -129,6 +129,9 @@ jobs:
     name: Publish new firmware and website to GitHub Pages
     runs-on: ubuntu-latest
     needs: [build]
+    concurrency:
+      group: ${{ github.repository }}-gh-pages-deploy
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
