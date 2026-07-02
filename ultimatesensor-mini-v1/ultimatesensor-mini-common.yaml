@@ -43,9 +43,17 @@ esphome:
             condition:
               wifi.connected
             timeout: 30s
-        - script.execute: play_stream
-        # Disable Bluetooth after WiFi is connected to save memory
-        - ble.disable:
+        - if:
+            condition:
+              wifi.connected:
+            then:
+              - script.execute: play_stream
+              # Disable Bluetooth after WiFi is connected to save memory.
+              - ble.disable:
+            else:
+              - logger.log:
+                  level: WARN
+                  format: "WiFi not connected after boot timeout; skipping boot sound and keeping provisioning active"
 
 # External components (removed LD2450)
 esp32:
