@@ -53,7 +53,7 @@ esphome:
             else:
               - logger.log:
                   level: WARN
-                  format: "WiFi not connected after boot timeout; skipping boot sound and keeping provisioning active"
+                  format: "WiFi not connected after 30s; skipping boot sound and keeping provisioning active"
 
 # External components (removed LD2450)
 esp32:
