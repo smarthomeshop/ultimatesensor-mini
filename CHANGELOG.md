@@ -6,7 +6,13 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 2.38] - 2026-07-02
+
+
 - Fixed UltimateSensor Mini V1 boot audio so local cloud tests can disable the boot sound and firmware skips the boot sound when WiFi is not connected.
+
 
 ## [UltimateSensor Mini V2 1.5] - 2026-06-27
 
