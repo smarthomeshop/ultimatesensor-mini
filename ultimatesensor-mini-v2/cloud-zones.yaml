@@ -11,6 +11,6 @@ script:
           if (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state)) id(cloud_zone3_count) = (int) id(zone3_target_count).state;
 
 interval:
-  - interval: 30s
+  - interval: 10s
     then:
       - script.execute: cloud_update_zone_globals

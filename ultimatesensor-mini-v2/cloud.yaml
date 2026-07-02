@@ -8,6 +8,7 @@ substitutions:
   cloud_api_url: "https://api.smarthomeshop.io"
   cloud_api_version: "v1"
   cloud_sync_interval: "60s"
+  cloud_presence_sync_interval: "10s"
   cloud_mac_sensor_id: wifi_mac_address
   cloud_ip_sensor_id: wifi_ip_address
 
@@ -60,6 +61,10 @@ globals:
     type: int
     restore_value: false
     initial_value: "0"
+  - id: cloud_last_presence_signature
+    type: int
+    restore_value: false
+    initial_value: "-1"
 
   - id: cloud_has_pm
     type: bool
@@ -211,6 +216,16 @@ script:
             lambda: "return id(${cloud_ip_sensor_id}).has_state();"
           timeout: 30s
 
+      - if:
+          condition:
+            lambda: "return !id(${cloud_mac_sensor_id}).has_state() || id(${cloud_mac_sensor_id}).state.empty();"
+          then:
+            - logger.log:
+                level: WARN
+                format: "MAC address not available, aborting registration"
+            - lambda: "id(cloud_is_registering) = false;"
+            - script.stop: cloud_register
+
       - http_request.post:
           url: "${cloud_api_url}/api/${cloud_api_version}/devices/register"
           request_headers:
@@ -306,7 +321,9 @@ script:
               root["nox_index"] = id(nox_index).state;
             }
 
-            root["occupancy"] = id(occupancy).state;
+            if (id(occupancy).has_state()) {
+              root["occupancy"] = id(occupancy).state;
+            }
 
             if (id(cloud_has_zones)) {
               if (id(cloud_zone1_count) >= 0) root["zone1_target_count"] = id(cloud_zone1_count);
@@ -360,10 +377,42 @@ script:
           id(cloud_sync_failures) = 0;
           id(cloud_has_pm) = false;
           id(cloud_has_zones) = false;
+          id(cloud_last_presence_signature) = -1;
       - delay: 5s
       - script.execute: cloud_register
 
+  - id: cloud_send_presence_if_changed
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              int signature = id(occupancy).state ? 1 : 0;
+              if (id(cloud_has_zones)) {
+                signature = signature * 31 + id(cloud_zone1_count);
+                signature = signature * 31 + id(cloud_zone2_count);
+                signature = signature * 31 + id(cloud_zone3_count);
+                signature = signature * 31 + id(cloud_zone4_count);
+              }
+              return signature == id(cloud_last_presence_signature);
+          then:
+            - script.stop: cloud_send_presence_if_changed
+      - lambda: |-
+          int signature = id(occupancy).state ? 1 : 0;
+          if (id(cloud_has_zones)) {
+            signature = signature * 31 + id(cloud_zone1_count);
+            signature = signature * 31 + id(cloud_zone2_count);
+            signature = signature * 31 + id(cloud_zone3_count);
+            signature = signature * 31 + id(cloud_zone4_count);
+          }
+          id(cloud_last_presence_signature) = signature;
+      - script.execute: cloud_send_batch
+
 interval:
+  - interval: ${cloud_presence_sync_interval}
+    then:
+      - script.execute: cloud_send_presence_if_changed
+
   - interval: ${cloud_sync_interval}
     then:
       - script.execute: cloud_send_batch

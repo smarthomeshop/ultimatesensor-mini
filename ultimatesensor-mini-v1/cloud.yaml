@@ -14,6 +14,7 @@ substitutions:
   cloud_api_url: "https://api.smarthomeshop.io"
   cloud_api_version: "v1"
   cloud_sync_interval: "60s"
+  cloud_presence_sync_interval: "10s"
 
 esphome:
   on_boot:
@@ -75,6 +76,16 @@ globals:
     type: uint32_t
     restore_value: true
     initial_value: "0"
+
+  - id: cloud_last_presence_signature
+    type: int
+    restore_value: false
+    initial_value: "-1"
+
+  - id: cloud_do_update_requested
+    type: bool
+    restore_value: false
+    initial_value: "false"
 
   - id: cloud_has_pm
     type: bool
@@ -222,6 +233,16 @@ script:
             lambda: "return id(ip_address).has_state();"
           timeout: 30s
 
+      - if:
+          condition:
+            lambda: "return !id(mac_address).has_state() || id(mac_address).state.empty();"
+          then:
+            - logger.log:
+                level: WARN
+                format: "MAC address not available, aborting registration"
+            - lambda: "id(cloud_is_registering) = false;"
+            - script.stop: cloud_register
+
       - logger.log:
           level: INFO
           format: "Registering device with MAC: %s"
@@ -357,11 +378,21 @@ script:
               root["illuminance_lux"] = id(illuminance).state;
             }
 
-            root["occupancy"] = id(occupancy_state).state;
-            root["zone1_target_count"] = (int) id(zone1_target_count).state;
-            root["zone2_target_count"] = (int) id(zone2_target_count).state;
-            root["zone3_target_count"] = (int) id(zone3_target_count).state;
-            root["zone4_target_count"] = (int) id(zone4_target_count).state;
+            if (id(occupancy_state).has_state()) {
+              root["occupancy"] = id(occupancy_state).state;
+            }
+            if (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state)) {
+              root["zone1_target_count"] = (int) id(zone1_target_count).state;
+            }
+            if (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state)) {
+              root["zone2_target_count"] = (int) id(zone2_target_count).state;
+            }
+            if (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state)) {
+              root["zone3_target_count"] = (int) id(zone3_target_count).state;
+            }
+            if (id(zone4_target_count).has_state() && !isnan(id(zone4_target_count).state)) {
+              root["zone4_target_count"] = (int) id(zone4_target_count).state;
+            }
 
             if (id(wifi_signal_sensor).has_state() && !isnan(id(wifi_signal_sensor).state)) {
               root["wifi_signal_dbm"] = id(wifi_signal_sensor).state;
@@ -398,6 +429,14 @@ script:
                     }
 
                     ESP_LOGD("cloud", "Batch sync successful");
+
+                    json::parse_json(body, [](JsonObject root) -> bool {
+                      if (root["do_update"].is<bool>() && root["do_update"].as<bool>()) {
+                        ESP_LOGI("cloud", "Cloud requested a firmware update");
+                        id(cloud_do_update_requested) = true;
+                      }
+                      return true;
+                    });
                   } else if (response->status_code == 401) {
                     ESP_LOGW("cloud", "Token invalid/expired, re-registering");
                     id(cloud_is_registered) = false;
@@ -422,6 +461,20 @@ script:
                         green: 0%
                         blue: 100%
                         flash_length: 100ms
+
+              - if:
+                  condition:
+                    lambda: "return id(cloud_do_update_requested);"
+                  then:
+                    - lambda: "id(cloud_do_update_requested) = false;"
+                    - logger.log:
+                        level: INFO
+                        format: "Checking firmware manifest for cloud-requested update"
+                    - update.check:
+                        id: firmware_update
+                    - delay: 15s
+                    - update.perform:
+                        id: firmware_update
           on_error:
             then:
               - lambda: |-
@@ -443,13 +496,49 @@ script:
           id(cloud_sync_failures) = 0;
           id(cloud_first_sync_timestamp) = 0;
           id(cloud_has_pm) = false;
+          id(cloud_last_presence_signature) = -1;
       - logger.log:
           level: INFO
           format: "Cloud registration reset complete"
       - delay: 5s
       - script.execute: cloud_register
 
+  - id: cloud_send_presence_if_changed
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              int signature = id(occupancy_state).state ? 1 : 0;
+              signature = signature * 31 + (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state) ? (int) id(zone1_target_count).state : -1);
+              signature = signature * 31 + (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state) ? (int) id(zone2_target_count).state : -1);
+              signature = signature * 31 + (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state) ? (int) id(zone3_target_count).state : -1);
+              signature = signature * 31 + (id(zone4_target_count).has_state() && !isnan(id(zone4_target_count).state) ? (int) id(zone4_target_count).state : -1);
+              return signature == id(cloud_last_presence_signature);
+          then:
+            - script.stop: cloud_send_presence_if_changed
+      - lambda: |-
+          int signature = id(occupancy_state).state ? 1 : 0;
+          signature = signature * 31 + (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state) ? (int) id(zone1_target_count).state : -1);
+          signature = signature * 31 + (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state) ? (int) id(zone2_target_count).state : -1);
+          signature = signature * 31 + (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state) ? (int) id(zone3_target_count).state : -1);
+          signature = signature * 31 + (id(zone4_target_count).has_state() && !isnan(id(zone4_target_count).state) ? (int) id(zone4_target_count).state : -1);
+          id(cloud_last_presence_signature) = signature;
+      - script.execute: cloud_send_batch
+
 interval:
+  - interval: ${cloud_presence_sync_interval}
+    then:
+      - if:
+          condition:
+            wifi.connected:
+          then:
+            - script.execute: cloud_send_presence_if_changed
+
   - interval: ${cloud_sync_interval}
     then:
-      - script.execute: cloud_send_batch
+      - if:
+          condition:
+            wifi.connected:
+          then:
+            - script.execute: cloud_send_batch
