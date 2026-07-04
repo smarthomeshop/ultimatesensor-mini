@@ -1,6 +1,6 @@
 {
   "name": "UltimateSensor Mini Beta Complete",
-  "version": "2.36-beta.45",
+  "version": "2.36-beta.61",
   "home_assistant_domain": "esphome",
   "new_install_skip_erase": false,
   "builds": [
@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-S3",
       "ota": {
         "path": "beta-ultimatesensor-mini-complete/ultimatesensor-mini-beta-esp32s3.ota.bin",
-        "md5": "6426e44b790748e32022b4617446ff94"
+        "md5": "6304430afce0961a25889691cc91befb"
       },
       "parts": [
         {
