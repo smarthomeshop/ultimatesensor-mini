@@ -5,10 +5,15 @@
 
 substitutions:
   project_main_version: "2"
-  project_version: "2.35-beta.36"
+  project_version: "2.35-beta.37"
   log_level: "DEBUG"
   wifi_fast_connect: "true"
   wake_word: "okay_nabu"
+
+# Shared SmartHomeShop LD2450 polygon zones layer (zones, entry lines,
+# people counting + panel push API). Radar base config is defined below.
+packages:
+  ld2450_polygon_zones: github://smarthomeshop/ld2450/packages/ld2450-polygon-zones.yaml@main
 
 esphome:
   name: ${device_name}
@@ -403,6 +408,39 @@ sensor:
       name: "Radar Moving Target Count"
       filters:
         - throttle: 1s
+    target_1:
+      x:
+        id: radar_target1_x
+        name: "Target 1 X"
+        filters:
+          - throttle: 250ms
+      y:
+        id: radar_target1_y
+        name: "Target 1 Y"
+        filters:
+          - throttle: 250ms
+    target_2:
+      x:
+        id: radar_target2_x
+        name: "Target 2 X"
+        filters:
+          - throttle: 250ms
+      y:
+        id: radar_target2_y
+        name: "Target 2 Y"
+        filters:
+          - throttle: 250ms
+    target_3:
+      x:
+        id: radar_target3_x
+        name: "Target 3 X"
+        filters:
+          - throttle: 250ms
+      y:
+        id: radar_target3_y
+        name: "Target 3 Y"
+        filters:
+          - throttle: 250ms
     zone_1:
       target_count:
         id: zone_1_target_count
