@@ -514,11 +514,13 @@ sensor:
     temperature:
       name: "Temperature"
       id: scd41_temperature
+      accuracy_decimals: 1
       filters:
         - lambda: return x + id(scd41_temperature_offset).state;
     humidity:
       name: "Humidity"
       id: scd41_humidity
+      accuracy_decimals: 0
       filters:
         - lambda: return x + id(scd41_humidity_offset).state;
     measurement_mode: low_power_periodic

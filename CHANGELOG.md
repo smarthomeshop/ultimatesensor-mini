@@ -7,6 +7,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+- Fixed UltimateSensor Mini V1 beta temperature and humidity readings showing long unrounded decimals after applying the calibration offset.
 
 ## [UltimateSensor Mini Beta V1 2.36-beta.61] - 2026-07-04
 
