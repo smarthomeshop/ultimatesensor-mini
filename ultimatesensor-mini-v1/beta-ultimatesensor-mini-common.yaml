@@ -5,7 +5,7 @@
 
 substitutions:
   project_main_version: "2"
-  project_version: "2.35-beta.37"
+  project_version: "2.35-beta.36"
   log_level: "DEBUG"
   wifi_fast_connect: "true"
   wake_word: "okay_nabu"
