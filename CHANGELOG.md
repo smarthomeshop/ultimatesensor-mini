@@ -8,6 +8,12 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 - Add customer-facing firmware notes here before merging a PR.
 
+## [UltimateSensor Mini V1 Beta 2.35-beta.37] - 2026-07-04
+
+
+- Added polygon detection zones, exclusion zones and entry lines with people counting to the UltimateSensor Mini V1 beta firmware via the shared smarthomeshop/ld2450 packages, including the SmartHomeShop panel push API.
+- Added per-target X/Y coordinate sensors to the UltimateSensor Mini V1 beta firmware for live target tracking in the SmartHomeShop panel.
+
 ## [UltimateSensor Mini V1 2.38] - 2026-07-02
 
 
