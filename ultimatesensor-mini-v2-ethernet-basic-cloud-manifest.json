@@ -1,6 +1,6 @@
 {
   "name": "UltimateSensor Mini V2 Ethernet Basic Cloud",
-  "version": "1.5",
+  "version": "1.6",
   "home_assistant_domain": "esphome",
   "new_install_skip_erase": false,
   "builds": [
@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-C6",
       "ota": {
         "path": "ultimatesensor-mini-v2-ethernet-basic-cloud/ultimatesensor-mini-v2-esp32c6.ota.bin",
-        "md5": "65d2fe9189bc0331abafa32854d9a9cd"
+        "md5": "a043f7b9041701fd102c8f49c3b6f601"
       },
       "parts": [
         {
