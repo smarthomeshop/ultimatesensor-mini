@@ -7,8 +7,13 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V2 1.6] - 2026-07-07
+
+
 - Fixed UltimateSensor Mini V2 temperature and humidity readings: the SCD41 self-heating offset was accidentally applied twice with opposite signs, so devices reported the raw self-heated temperature (roughly 9-13 °C too high) and an over-corrected, far too high humidity. This also skewed the VOC/NOx compensation inputs.
 - Added "Temperature Offset" and "Humidity Offset" controls to UltimateSensor Mini V2 in Home Assistant for per-device fine-tuning on top of the built-in self-heating compensation.
+
 
 ## [UltimateSensor Mini V1 2.40] - 2026-07-07
 
