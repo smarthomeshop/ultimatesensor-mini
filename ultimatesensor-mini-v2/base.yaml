@@ -5,8 +5,10 @@ substitutions:
   ultimatesensor_mini_software_version: "1.5"
   log_level: "INFO"
   logger_baud_rate: "0"
+  # Self-heating compensation, subtracted inside the SCD41 itself (the sensor
+  # also re-compensates humidity for this internally). Per-device fine-tuning
+  # is done with the "Temperature Offset" / "Humidity Offset" numbers in HA.
   scd41_temperature_offset: "13.2"
-  scd41_humidity_offset: "3.0"
 
 esphome:
   name: ${device_name}
@@ -103,13 +105,15 @@ sensor:
     temperature:
       id: scd41_temperature
       name: "SCD41 Temperature"
+      accuracy_decimals: 1
       filters:
-        - lambda: return x + ${scd41_temperature_offset};
+        - lambda: return x + id(scd41_temperature_correction).state;
     humidity:
       id: scd41_humidity
       name: "SCD41 Humidity"
+      accuracy_decimals: 0
       filters:
-        - lambda: return x + ${scd41_humidity_offset};
+        - lambda: return x + id(scd41_humidity_correction).state;
     measurement_mode: low_power_periodic
     automatic_self_calibration: true
     update_interval: 30s
@@ -181,6 +185,34 @@ binary_sensor:
       - delayed_off: !lambda return id(occupancy_off_delay).state * 1000;
 
 number:
+  - platform: template
+    name: "Temperature Offset"
+    id: scd41_temperature_correction
+    entity_category: config
+    unit_of_measurement: "°C"
+    min_value: -50.0
+    max_value: 50.0
+    step: 0.1
+    initial_value: 0
+    restore_value: true
+    optimistic: true
+    update_interval: never
+    mode: box
+
+  - platform: template
+    name: "Humidity Offset"
+    id: scd41_humidity_correction
+    entity_category: config
+    unit_of_measurement: "%"
+    min_value: -50.0
+    max_value: 50.0
+    step: 0.1
+    initial_value: 0
+    restore_value: true
+    optimistic: true
+    update_interval: never
+    mode: box
+
   - platform: template
     id: occupancy_off_delay
     name: "Occupancy Off Delay"
