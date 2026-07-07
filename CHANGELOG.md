@@ -7,6 +7,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+- Renamed the UltimateSensor Mini V1 "Boot sound" switch to "Boot sound & animation": turning it off now also skips the white boot LED animation on the front and back lights, so the device boots completely silent and dark.
 
 ## [UltimateSensor Mini V1 2.39] - 2026-07-07
 
