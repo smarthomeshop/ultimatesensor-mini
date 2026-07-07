@@ -12,7 +12,9 @@ substitutions:
   default_network: "WiFi Basic (local)"
   cloud_enabled: "false"
   boot_sound_enabled: "true"
-  boot_sound_url: "https://smarthomeshop.io/products/ultimatesensor-mini/v1/audio/boot1.mp3"
+  # Served from this repo so firmware builds only depend on GitHub, which is
+  # already required for the remote packages.
+  boot_sound_url: "https://raw.githubusercontent.com/smarthomeshop/ultimatesensor-mini/main/ultimatesensor-mini-v1/audio/boot1.mp3"
   
 # Esphome start
 esphome:
@@ -105,15 +107,18 @@ script:
     then:
       - if:
           condition:
-            lambda: |-
-              return std::string("${boot_sound_enabled}") == "true" && !std::string("${boot_sound_url}").empty();
+            and:
+              - lambda: |-
+                  return std::string("${boot_sound_enabled}") == "true";
+              - switch.is_on: boot_sound_switch
           then:
             - media_player.volume_set:
                 id: media_player_main
                 volume: 50%
-            - media_player.play_media:
+            - media_player.speaker.play_on_device_media_file:
                 id: media_player_main
-                media_url: "${boot_sound_url}"
+                media_file: boot_sound_file
+                announcement: true
             # Wait 3 seconds to load media
             - delay: 3s
           else:
@@ -230,6 +235,11 @@ media_player:
     id: media_player_main
     name: US Mini Media Player
     codec_support_enabled: ALL
+    files:
+      # Downloaded at compile time and embedded in the firmware, so playback
+      # never depends on the device being able to reach smarthomeshop.io.
+      - id: boot_sound_file
+        file: "${boot_sound_url}"
     announcement_pipeline:
       speaker: i2s_speaker_output
       num_channels: 1
@@ -794,6 +804,13 @@ ld2450:
 
 # Enable wake word switch
 switch:
+  - platform: template
+    id: boot_sound_switch
+    name: "Boot sound"
+    icon: "mdi:volume-high"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
   - platform: template
     id: use_wake_word
     name: Use wake word
