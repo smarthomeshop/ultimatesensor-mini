@@ -7,8 +7,13 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 2.39] - 2026-07-07
+
+
 - Fixed UltimateSensor Mini V1 boot sound playback by embedding the sound in the firmware instead of streaming it from smarthomeshop.io at boot. On networks that block that download, the firmware endlessly retried the URL, flooding the logs with "Failed to open URL" errors and keeping the red status LED flashing (#37).
 - Added a "Boot sound" switch to UltimateSensor Mini V1 so the boot sound can be turned off from Home Assistant without reflashing.
+
 
 ## [UltimateSensor Mini Beta V1 2.37-beta.62] - 2026-07-04
 
