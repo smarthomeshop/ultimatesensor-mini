@@ -1,6 +1,6 @@
 {
   "name": "UltimateSensor Mini V2 Ethernet Complete LD2460 Cloud",
-  "version": "1.6",
+  "version": "1.7",
   "home_assistant_domain": "esphome",
   "new_install_skip_erase": false,
   "builds": [
@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-C6",
       "ota": {
         "path": "ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud/ultimatesensor-mini-v2-esp32c6.ota.bin",
-        "md5": "f6d781e919268b8608991d916fdff35c"
+        "md5": "82e8c17465564589480840740f1a8fbd"
       },
       "parts": [
         {
