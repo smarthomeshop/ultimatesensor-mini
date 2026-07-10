@@ -2,7 +2,7 @@
 # Shared hardware and sensor stack for ESP32-C6 based V2 variants.
 
 substitutions:
-  ultimatesensor_mini_software_version: "1.6"
+  ultimatesensor_mini_software_version: "1.7"
   log_level: "INFO"
   logger_baud_rate: "0"
   # Self-heating compensation, subtracted inside the SCD41 itself (the sensor
