@@ -7,12 +7,16 @@ substitutions:
   ultimatesensor_mini_hardware_version: "V2-Complete-LD2460"
   ultimatesensor_mini_connection_type: "Ethernet"
   wifi_fast_connect: "false"
+  default_network: "Ethernet Complete (local)"
+  tracking_suffix: "-ld2460"
+  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-v2-ethernet-complete-ld2460-manifest.json"
 
 packages:
   base: !include base.yaml
   tracking: !include tracking-ld2460.yaml
   net: !include ethernet.yaml
   variant: !include complete.yaml
+  firmware: !include firmware-selector.yaml
 
 dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-complete-ld2460.yaml@main

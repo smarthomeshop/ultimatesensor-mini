@@ -1,0 +1,74 @@
+# UltimateSensor Mini V2 firmware variant selector package.
+#
+# Mirrors the V1 firmware_selector (same select id, script id and option
+# naming) so the SmartHomeShop setup portal firmware bridge can drive it.
+#
+# Each variant config sets these substitutions:
+#   default_network      - the option label matching the flashed variant
+#   tracking_suffix      - "" for LD2450 hardware, "-ld2460" for LD2460
+#   update_manifest_url  - the OTA manifest of the flashed variant
+#
+# The radar chip is fixed hardware, so switching variants always stays
+# within the same tracking family via ${tracking_suffix}. The selector
+# only changes the OTA manifest source; installing the other variant
+# still happens through the (disabled by default) update entity.
+
+substitutions:
+  manifest_base_url: "https://smarthomeshop.github.io/ultimatesensor-mini"
+  default_network: "WiFi Complete (local)"
+  tracking_suffix: ""
+  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-v2-wifi-complete-manifest.json"
+
+ota:
+  - platform: http_request
+    id: ota_http_request
+
+http_request:
+  useragent: ultimatesensor-mini-esphome
+  verify_ssl: false
+  timeout: 10s
+
+update:
+  - platform: http_request
+    name: "${friendly_name} Firmware"
+    id: firmware_update
+    source: ${update_manifest_url}
+    disabled_by_default: true
+
+script:
+  - id: sync_selected_firmware_source
+    then:
+      - lambda: |-
+          const std::string option = id(firmware_selector).current_option();
+          std::string url = "${manifest_base_url}/ultimatesensor-mini-v2-";
+          url += option.find("Ethernet") != std::string::npos ? "ethernet-" : "wifi-";
+          url += option.find("Complete") != std::string::npos ? "complete" : "basic";
+          url += "${tracking_suffix}";
+          if (option.find("cloud") != std::string::npos)
+            url += "-cloud";
+          url += "-manifest.json";
+          ESP_LOGI("main", "OTA updates set to use %s (%s)", option.c_str(), url.c_str());
+          id(firmware_update).set_source_url(url);
+
+select:
+  - platform: template
+    id: firmware_selector
+    name: "${friendly_name} Firmware Variant"
+    icon: "mdi:network"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    options:
+      - "WiFi Basic (local)"
+      - "WiFi Complete (local)"
+      - "WiFi Basic + SmartHomeShop App (cloud)"
+      - "WiFi Complete + SmartHomeShop App (cloud)"
+      - "Ethernet Basic (local)"
+      - "Ethernet Complete (local)"
+      - "Ethernet Basic + SmartHomeShop App (cloud)"
+      - "Ethernet Complete + SmartHomeShop App (cloud)"
+    initial_option: ${default_network}
+    on_value:
+      then:
+        - script.execute: sync_selected_firmware_source
+        - update.check:

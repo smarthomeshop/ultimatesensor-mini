@@ -1,0 +1,27 @@
+# UltimateSensor Mini V2 Thread Complete (LD2460) Configuration
+# Includes the SPS30 particulate matter sensor.
+# For devices upgraded with the optional LD2460 tracking module.
+# Local / Home Assistant only: connects through your Thread border router,
+# no WiFi and no SmartHomeShop cloud. See thread.yaml for details.
+#
+# Before installing: replace the thread_dataset placeholder below with the
+# Active dataset TLVs of your Thread network (Home Assistant -> Settings ->
+# Devices & Services -> Thread -> Configure -> information icon).
+# The first install must be done over USB.
+
+substitutions:
+  device_name: ultimatesensor-mini-v2
+  friendly_name: "UltimateSensor Mini V2"
+  ultimatesensor_mini_hardware_version: "V2-Complete"
+  ultimatesensor_mini_connection_type: "Thread"
+  thread_dataset: "PASTE_YOUR_THREAD_DATASET_TLVS_HERE"
+
+packages:
+  base: !include base.yaml
+  tracking: !include tracking-ld2460.yaml
+  variant: !include complete.yaml
+  net: !include thread.yaml
+
+dashboard_import:
+  package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v2/ultimatesensor-mini-v2-thread-complete-ld2460.yaml@main
+  import_full_config: false

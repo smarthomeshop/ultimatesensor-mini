@@ -8,6 +8,9 @@ substitutions:
   wifi_fast_connect: "false"
   cloud_mac_sensor_id: ethernet_mac_address
   cloud_ip_sensor_id: ethernet_ip_address
+  default_network: "Ethernet Basic + SmartHomeShop App (cloud)"
+  tracking_suffix: ""
+  update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-v2-ethernet-basic-cloud-manifest.json"
 
 packages:
   base: !include base.yaml
@@ -15,6 +18,7 @@ packages:
   net: !include ethernet.yaml
   cloud: !include cloud.yaml
   zones: !include cloud-zones.yaml
+  firmware: !include firmware-selector.yaml
 
 dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v2/ultimatesensor-mini-v2-ethernet-basic-cloud.yaml@main

@@ -9,12 +9,12 @@ esphome:
         - output.turn_on: w5500_reset_hold
 
 wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+  # Production firmware must not contain compile-time WiFi credentials.
+  # Web-flashed devices start their fallback AP and are configured by the portal/improv.
   fast_connect: ${wifi_fast_connect}
   ap:
     ssid: ${device_name}
-    password: ultimatesensor-mini
+    password: ultimatesensor-mini-v2
 
 captive_portal:
 

@@ -1,0 +1,44 @@
+# UltimateSensor Mini V2 Thread network package.
+#
+# Local / Home Assistant only: the device joins your existing Thread mesh
+# through a Thread border router (for example Home Assistant with a
+# SkyConnect / Connect ZBT-1 or another OpenThread border router) and is
+# reachable over IPv6 via the native ESPHome API. There is no WiFi, no
+# fallback AP and no SmartHomeShop cloud in this variant.
+#
+# The Thread network credentials come from the ${thread_dataset} TLV
+# substitution, which you copy from Home Assistant:
+#   Settings -> Devices & Services -> Thread -> Configure (cogwheel)
+#   -> information icon on your network -> Active dataset TLVs.
+#
+# Ethernet power is disabled and W5500 reset is held active, matching the
+# WiFi firmware behaviour for boards with the Ethernet module present.
+
+esphome:
+  on_boot:
+    - priority: 800
+      then:
+        - switch.turn_off: eth_power
+        - output.turn_on: w5500_reset_hold
+
+network:
+  enable_ipv6: true
+
+openthread:
+  tlv: ${thread_dataset}
+
+output:
+  - platform: gpio
+    id: w5500_reset_hold
+    pin:
+      number: GPIO13
+      inverted: true
+
+switch:
+  - platform: gpio
+    id: eth_power
+    pin:
+      number: GPIO2
+      inverted: true
+    restore_mode: ALWAYS_OFF
+    internal: true
