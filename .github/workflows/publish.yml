@@ -810,7 +810,7 @@ jobs:
               found { print }
             ' CHANGELOG.md > release-notes.txt
 
-            if [[ ! -s release-notes.txt ]]; then
+            if ! grep -q '[^[:space:]]' release-notes.txt; then
               awk '
                 $0 == "## [Unreleased]" { found=1; next }
                 found && /^## \[/ { exit }
@@ -821,7 +821,7 @@ jobs:
             sed -i '/^- Add customer-facing firmware notes here before merging a PR\.$/d' release-notes.txt
             sed -i '/^- Add customer-facing changes here before the next release is published\.$/d' release-notes.txt
 
-            if [[ ! -s release-notes.txt ]]; then
+            if ! grep -q '[^[:space:]]' release-notes.txt; then
               printf '%s\n\n%s\n' \
                 "Customer-facing firmware notes live in CHANGELOG.md." \
                 "Changelog: https://github.com/${GITHUB_REPOSITORY}/blob/main/CHANGELOG.md" \

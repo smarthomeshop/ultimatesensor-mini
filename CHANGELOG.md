@@ -8,12 +8,23 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 - Add customer-facing firmware notes here before merging a PR.
 
+## [UltimateSensor Mini V2 1.7] - 2026-07-10
+
+- Removed compile-time placeholder WiFi credentials from UltimateSensor Mini V2 WiFi firmware so website-flashed devices no longer try to connect to a placeholder WiFi network.
+- Changed the UltimateSensor Mini V2 fallback hotspot password to `ultimatesensor-mini-v2`, matching the fallback hotspot SSID.
+- Added a Firmware Variant selector and firmware update entity to all UltimateSensor Mini V2 configurations, matching the existing V1 selector. Switching between WiFi/Ethernet, Basic/Complete and local/cloud variants now points the built-in updater at the right firmware, and it automatically stays on the LD2450 or LD2460 tracking family that matches the installed hardware.
+- Added local/Home Assistant Thread firmware variants for UltimateSensor Mini V2 installations that join an existing Thread network through a border router.
+- Changed cloud firmware status LED behaviour so cloud-only devices blink while offline or not set up, then turn the status LED off once online instead of blinking because Home Assistant API is not connected.
+
+## [UltimateSensor Mini V1 2.41] - 2026-07-10
+
+- Changed cloud firmware status LED behaviour so cloud-only devices blink while offline or not set up, then turn the status LED off once online instead of blinking because Home Assistant API is not connected.
+
 ## [UltimateSensor Mini V2 1.6] - 2026-07-07
 
 
 - Fixed UltimateSensor Mini V2 temperature and humidity readings: the SCD41 self-heating offset was accidentally applied twice with opposite signs, so devices reported the raw self-heated temperature (roughly 9-13 °C too high) and an over-corrected, far too high humidity. This also skewed the VOC/NOx compensation inputs.
 - Added "Temperature Offset" and "Humidity Offset" controls to UltimateSensor Mini V2 in Home Assistant for per-device fine-tuning on top of the built-in self-heating compensation.
-- Added a Firmware Variant selector and firmware update entity to all UltimateSensor Mini V2 configurations, matching the existing V1 selector. Switching between WiFi/Ethernet, Basic/Complete and local/cloud variants now points the built-in updater at the right firmware, and it automatically stays on the LD2450 or LD2460 tracking family that matches the installed hardware.
 
 
 ## [UltimateSensor Mini V1 2.40] - 2026-07-07
