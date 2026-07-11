@@ -1,6 +1,9 @@
 # UltimateSensor Mini for Home Assistant / ESPHome
 
-![UltimateSensor Mini](images/ultimatesensor-mini-inaction-shop.png)
+<p align="center">
+  <img src="images/ultimatesensor-mini-inaction-shop.png" alt="UltimateSensor Mini V1" width="360">
+  <img src="ultimatesensor-mini-v2/images/ultimatesensor-mini-v2-front.png" alt="UltimateSensor Mini V2" width="360">
+</p>
 
 UltimateSensor Mini is a compact all-in-one ESPHome room sensor for Home Assistant. It measures air quality, occupancy, light, temperature, humidity, and optionally particulate matter, with fully local operation by default and optional SmartHomeShop App cloud firmware variants.
 

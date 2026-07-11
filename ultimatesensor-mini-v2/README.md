@@ -1,5 +1,7 @@
 # UltimateSensor Mini V2 ESPHome Firmware
 
+![UltimateSensor Mini V2](images/ultimatesensor-mini-v2-front.png)
+
 UltimateSensor Mini V2 is sold as standard hardware with LD2412 + LD2450. The optional LD2460 is an upgrade module: customers remove/replace the LD2450 module, install the LD2460 module, and flash one of the `*-ld2460.yaml` firmware variants.
 
 Leave the LD2412 installed. It remains the close-range/still-presence fallback and makes occupancy more reliable together with either LD2450 or LD2460.
