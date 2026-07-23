@@ -3,7 +3,7 @@
 
 substitutions:
   project_main_version: "2"
-  project_version: "2.41"
+  project_version: "2.42"
   log_level: "INFO"
   basic_manifest_url: ${update_manifest_url}
   complete_manifest_url: ${update_manifest_url}
