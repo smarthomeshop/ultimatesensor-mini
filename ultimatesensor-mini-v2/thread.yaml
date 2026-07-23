@@ -27,6 +27,14 @@ network:
 openthread:
   tlv: ${thread_dataset}
 
+uart:
+  - id: uart_ld2412
+    tx_pin: GPIO21
+    rx_pin: GPIO20
+    baud_rate: 115200
+    parity: NONE
+    stop_bits: 1
+
 output:
   - platform: gpio
     id: w5500_reset_hold

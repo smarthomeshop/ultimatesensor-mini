@@ -311,6 +311,9 @@ script:
             if (id(scd41_humidity).has_state() && !isnan(id(scd41_humidity).state)) {
               root["humidity_pct"] = id(scd41_humidity).state;
             }
+            if (id(cpu_temperature).has_state() && !isnan(id(cpu_temperature).state)) {
+              root["cpu_temperature_c"] = id(cpu_temperature).state;
+            }
             if (id(illuminance).has_state() && !isnan(id(illuminance).state)) {
               root["illuminance_lux"] = id(illuminance).state;
             }
@@ -444,3 +447,9 @@ interval:
   - interval: ${cloud_sync_interval}
     then:
       - script.execute: cloud_send_batch
+
+# Cloud-only customers may never connect Home Assistant. Without this the
+# native API reboots the device every 15 minutes ("No clients; rebooting"),
+# so disable the no-client reboot on cloud firmware.
+api:
+  reboot_timeout: 0s

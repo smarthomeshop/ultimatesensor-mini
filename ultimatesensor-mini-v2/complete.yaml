@@ -17,27 +17,51 @@ sensor:
     pm_1_0:
       id: PM_1_0
       name: "PM <1um Weight concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 10
     pm_2_5:
       id: PM_2_5
       name: "PM <2.5um Weight concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 11
     pm_4_0:
       id: PM_4_0
       name: "PM <4um Weight concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 12
     pm_10_0:
       id: PM_10_0
       name: "PM <10um Weight concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 13
     pmc_0_5:
       id: PMC_0_5
       name: "PM <0.5um Number concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 14
     pmc_1_0:
       id: PMC_1_0
       name: "PM <1um Number concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 15
     pmc_2_5:
       id: PMC_2_5
       name: "PM <2.5um Number concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 16
     pmc_4_0:
       id: PMC_4_0
       name: "PM <4um Number concentration"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 17
     pmc_10_0:
       id: PMC_10_0
       name: "PM <10um Number concentration"

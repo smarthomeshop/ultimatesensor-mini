@@ -19,6 +19,7 @@ substitutions:
 packages:
   base: !include base.yaml
   tracking: !include tracking-ld2460.yaml
+  buses: !include buses-ld2460.yaml
   variant: !include complete.yaml
   net: !include thread.yaml
 

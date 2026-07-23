@@ -11,9 +11,9 @@ Leave the LD2412 installed. It remains the close-range/still-presence fallback a
 | Package | Purpose |
 | --- | --- |
 | `base.yaml` | Shared ESP32-C6 hardware, sensors, API, OTA, web server, status LEDs, LD2412, and combined occupancy logic |
-| `tracking-ld2450.yaml` | Standard factory tracking package for LD2450 on GPIO18/GPIO19 |
-| `tracking-ld2460.yaml` | Optional upgrade tracking package for LD2460 on GPIO4/GPIO5 via `smarthomeshop/ld2460` |
-| `wifi.yaml` | WiFi firmware network stack, captive portal, BLE Improv, WiFi diagnostics, W5500 held off/reset |
+| `tracking-ld2450.yaml` | Product pin wrapper for shared LD2450 tracking and Room Designer zones on GPIO18/GPIO19 |
+| `tracking-ld2460.yaml` | Product pin wrapper for shared LD2460 tracking and Room Designer zones on GPIO4/GPIO5 |
+| `wifi.yaml` | WiFi network stack, ESPHome captive portal, BLE Improv, WiFi diagnostics, W5500 held off/reset |
 | `ethernet.yaml` | W5500 Ethernet firmware network stack and Ethernet diagnostics |
 | `complete.yaml` | SPS30 particulate matter sensor and PM idle controls |
 
@@ -39,7 +39,7 @@ LD2460 upgrade variants are only for devices where the LD2450 module has been re
 
 ESPHome Ethernet and WiFi are kept as separate firmware variants. The WiFi variants keep the W5500 powered off and held in reset. The Ethernet variants power the W5500 and expose Ethernet network info sensors.
 
-Mini V2 WiFi firmware uses BLE Improv plus captive portal for onboarding. Serial Improv is intentionally not included on ESP32-C6 because both available hardware UARTs are reserved for LD2412 and LD2450/LD2460.
+Mini V2 WiFi firmware uses the SmartHomeShop branded setup portal on top of the ESPHome captive portal. The page configures WiFi, Home Assistant, SmartHomeShop App cloud, and the firmware choice between WiFi/Ethernet and Basic/Complete. BLE Improv remains available as an alternative provisioning method. Serial Improv is intentionally not included on ESP32-C6 because ESPHome requires the serial logger for it and both hardware UARTs are reserved for LD2412 and LD2450/LD2460.
 
 ## Radar Policy
 
@@ -48,7 +48,18 @@ Mini V2 WiFi firmware uses BLE Improv plus captive portal for onboarding. Serial
 - Do not remove LD2412 for normal installs. It is the reliable presence fallback.
 - `Occupancy` is always `LD2412 presence OR tracking radar presence`.
 - The standard LD2450 firmware exposes Bluetooth/configuration controls for the LD2450.
-- The LD2460 firmware uses the external component package from `github://smarthomeshop/ld2460/tracking-ld2460.yaml@v0.1.1`.
+- LD2450 tracking and zones are maintained centrally in `smarthomeshop/ld2450`.
+- LD2460 tracking and zones are maintained centrally in `smarthomeshop/ld2460`.
+- These local tracking files only select the correct product pins and shared packages.
+
+## Room Designer Compatibility
+
+| Tracking radar | Live targets | Room Designer writeback | Zone engine |
+| --- | --- | --- | --- |
+| LD2450 | 3 targets | Yes | 4 polygon zones, 2 exclusions, 2 entry lines |
+| LD2460 | 5 targets | Yes | 4 polygon zones, 2 exclusions, 2 entry lines |
+
+Both variants expose the same Home Assistant entity and action contract. LD2460 target coordinates are converted from meters to the millimeters used by Room Designer and the on-device zone engine.
 
 ## Pin Map
 

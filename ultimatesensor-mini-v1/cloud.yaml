@@ -570,3 +570,9 @@ interval:
             wifi.connected:
           then:
             - script.execute: cloud_send_batch
+
+# Cloud-only customers may never connect Home Assistant. Without this the
+# native API reboots the device every 15 minutes ("No clients; rebooting"),
+# so disable the no-client reboot on cloud firmware.
+api:
+  reboot_timeout: 0s

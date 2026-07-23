@@ -45,6 +45,14 @@ ota:
 
 web_server:
   port: 80
+  version: 3
+  sorting_groups:
+    - id: sorting_group_air_quality
+      name: "Air Quality"
+      sorting_weight: 10
+    - id: sorting_group_presence
+      name: "Presence"
+      sorting_weight: 20
 
 status_led:
   pin: GPIO23
@@ -72,14 +80,6 @@ i2c:
     scan: true
     frequency: 100kHz
 
-uart:
-  - id: uart_ld2412
-    tx_pin: GPIO21
-    rx_pin: GPIO20
-    baud_rate: 115200
-    parity: NONE
-    stop_bits: 1
-
 ld2412:
   id: ld2412_radar
   uart_id: uart_ld2412
@@ -102,15 +102,24 @@ sensor:
     co2:
       id: scd41_co2
       name: "SCD41 CO2"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 1
     temperature:
       id: scd41_temperature
       name: "SCD41 Temperature"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 2
       accuracy_decimals: 1
       filters:
         - lambda: return x + id(scd41_temperature_correction).state;
     humidity:
       id: scd41_humidity
       name: "SCD41 Humidity"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 3
       accuracy_decimals: 0
       filters:
         - lambda: return x + id(scd41_humidity_correction).state;
@@ -122,6 +131,9 @@ sensor:
   - platform: bh1750
     id: illuminance
     name: "BH1750 Illuminance"
+    web_server:
+      sorting_group_id: sorting_group_air_quality
+      sorting_weight: 6
     address: 0x23
     update_interval: 60s
 
@@ -130,9 +142,15 @@ sensor:
     voc:
       id: voc_index
       name: "VOC Index"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 4
     nox:
       id: nox_index
       name: "NOx Index"
+      web_server:
+        sorting_group_id: sorting_group_air_quality
+        sorting_weight: 5
     compensation:
       humidity_source: scd41_humidity
       temperature_source: scd41_temperature
@@ -142,14 +160,29 @@ sensor:
     ld2412_id: ld2412_radar
     moving_distance:
       name: "LD2412 Moving Distance"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 6
     still_distance:
       name: "LD2412 Still Distance"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 7
     moving_energy:
       name: "LD2412 Moving Energy"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 8
     still_energy:
       name: "LD2412 Still Energy"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 9
     detection_distance:
       name: "LD2412 Detection Distance"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 5
     light:
       name: "LD2412 Light"
 
@@ -164,12 +197,21 @@ binary_sensor:
     has_target:
       id: ld2412_presence
       name: "LD2412 Presence"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 2
       device_class: occupancy
     has_moving_target:
       name: "LD2412 Moving Target"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 3
       device_class: motion
     has_still_target:
       name: "LD2412 Still Target"
+      web_server:
+        sorting_group_id: sorting_group_presence
+        sorting_weight: 4
       device_class: occupancy
     dynamic_background_correction_status:
       name: "LD2412 Dynamic Background Correction"
@@ -178,6 +220,9 @@ binary_sensor:
   - platform: template
     id: occupancy
     name: "Occupancy"
+    web_server:
+      sorting_group_id: sorting_group_presence
+      sorting_weight: 1
     device_class: occupancy
     lambda: |-
       return id(ld2412_presence).state || id(tracking_presence).state;

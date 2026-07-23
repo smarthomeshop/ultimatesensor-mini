@@ -7,4 +7,9 @@ substitutions:
   ld2460_rx_pin: GPIO5
 
 packages:
-  ld2460_tracking: github://smarthomeshop/ld2460/tracking-ld2460.yaml@v0.1.1
+  ld2460:
+    url: https://github.com/smarthomeshop/ld2460
+    ref: v0.1.1
+    files:
+      - tracking-ld2460.yaml
+    refresh: 1d

@@ -6,7 +6,22 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+### UltimateSensor Mini V1
+
+- Rebuilt the V1 local and SmartHomeShop App cloud firmware variants with the current shared cloud configuration.
+- Cloud-only firmware no longer reboots every 15 minutes when Home Assistant is not connected.
+- The V1 firmware remains WiFi-only and keeps its existing microphone, speaker, media player, LD2450 tracking and optional SPS30 variant behaviour.
+
+### UltimateSensor Mini V2
+
+- Rebuilt all V2 firmware families: WiFi, Ethernet, Basic, Complete, SmartHomeShop App cloud, standard LD2450 and optional LD2460 upgrade variants.
+- Added the final hardware UART mappings: LD2412 remains on GPIO21/GPIO20; LD2450 uses GPIO18/GPIO19; LD2460 upgrade firmware uses GPIO4/GPIO5.
+- Standard V2 hardware continues to use LD2412 plus LD2450. LD2460 firmware is only for devices where LD2450 has physically been replaced, while LD2412 remains installed.
+- Moved V2 tracking integration to the shared SmartHomeShop LD2450 and LD2460 packages so tracking, zones and upgrade behaviour stay consistent across firmware variants.
+- Added the SmartHomeShop branded setup portal to all V2 WiFi variants, including WiFi onboarding, Home Assistant and cloud choices, and the firmware selector for WiFi/Ethernet and Basic/Complete variants.
+- Kept the ESPHome captive portal and BLE Improv provisioning available. Serial Improv remains disabled on V2 because both ESP32-C6 hardware UARTs are reserved for the radar modules.
+- Added V2 web-server sorting groups for Air Quality and Presence, including SPS30 measurements in Complete firmware.
+- Added CPU temperature to the cloud telemetry payload and corrected V2 cloud zone count IDs for the shared tracking package.
 
 ## [UltimateSensor Mini V2 1.7] - 2026-07-10
 

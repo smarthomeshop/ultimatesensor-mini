@@ -14,6 +14,7 @@ substitutions:
 packages:
   base: !include base.yaml
   tracking: !include tracking-ld2460.yaml
+  buses: !include buses-ld2460.yaml
   net: !include ethernet.yaml
   firmware: !include firmware-selector.yaml
 

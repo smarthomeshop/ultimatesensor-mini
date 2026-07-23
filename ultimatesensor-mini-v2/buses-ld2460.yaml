@@ -1,0 +1,10 @@
+# Final UART map for the optional LD2460 upgrade hardware.
+# LD2412 remains installed; LD2460 replaces LD2450 on the second bus.
+
+uart:
+  - id: uart_ld2412
+    tx_pin: GPIO21
+    rx_pin: GPIO20
+    baud_rate: 115200
+    parity: NONE
+    stop_bits: 1

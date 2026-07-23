@@ -6,9 +6,9 @@ script:
     then:
       - lambda: |-
           id(cloud_has_zones) = true;
-          if (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state)) id(cloud_zone1_count) = (int) id(zone1_target_count).state;
-          if (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state)) id(cloud_zone2_count) = (int) id(zone2_target_count).state;
-          if (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state)) id(cloud_zone3_count) = (int) id(zone3_target_count).state;
+          if (id(poly_zone_1_count).has_state() && !isnan(id(poly_zone_1_count).state)) id(cloud_zone1_count) = (int) id(poly_zone_1_count).state;
+          if (id(poly_zone_2_count).has_state() && !isnan(id(poly_zone_2_count).state)) id(cloud_zone2_count) = (int) id(poly_zone_2_count).state;
+          if (id(poly_zone_3_count).has_state() && !isnan(id(poly_zone_3_count).state)) id(cloud_zone3_count) = (int) id(poly_zone_3_count).state;
 
 interval:
   - interval: 10s
