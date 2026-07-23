@@ -412,6 +412,18 @@ jobs:
             fi
           fi
 
+          # Create a release tag even when the current version was deliberately
+          # kept (for example after recovering a deleted release tag).
+          if [[ "${{ steps.changes.outputs.v1 }}" == "true" && ! "${{ steps.versions.outputs.v1_version }}" =~ ^dev- ]]; then
+            create_tag "ultimatesensor-mini-v1-${{ steps.versions.outputs.v1_version }}"
+          fi
+          if [[ "${{ steps.changes.outputs.beta }}" == "true" && ! "${{ steps.versions.outputs.beta_version }}" =~ ^dev- ]]; then
+            create_tag "beta-ultimatesensor-mini-v1-${{ steps.versions.outputs.beta_version }}"
+          fi
+          if [[ "${{ steps.changes.outputs.v2 }}" == "true" && ! "${{ steps.versions.outputs.v2_version }}" =~ ^dev- ]]; then
+            create_tag "ultimatesensor-mini-v2-${{ steps.versions.outputs.v2_version }}"
+          fi
+
   publish-ultimatesensor-mini-basic:
     name: Publish UltimateSensor Mini Basic
     needs: [detect-changes]
@@ -776,8 +788,8 @@ jobs:
       version_file: base.yaml
       version_key: ultimatesensor_mini_software_version
 
-  create-releases:
-    name: Create GitHub releases
+  deploy-pages:
+    name: Deploy firmware and manifests to GitHub Pages
     needs:
       - detect-changes
       - publish-ultimatesensor-mini-basic
@@ -804,7 +816,7 @@ jobs:
       - publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud
     if: >-
       always() &&
-      github.event_name == 'push' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       github.ref == 'refs/heads/main' &&
       needs.detect-changes.result == 'success' &&
       needs.publish-ultimatesensor-mini-basic.result != 'failure' &&
@@ -851,6 +863,38 @@ jobs:
       needs.publish-ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud.result != 'cancelled' &&
       needs.publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud.result != 'failure' &&
       needs.publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud.result != 'cancelled'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.repository }}-gh-pages-deploy
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - name: Collect firmware payloads
+        uses: actions/download-artifact@v4
+        with:
+          pattern: gh-pages-*
+          path: output
+          merge-multiple: true
+
+      - name: Deploy firmware
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: output
+          clean: false
+          force: false
+          attempt-limit: 30
+
+  create-releases:
+    name: Create GitHub releases
+    needs: [detect-changes, deploy-pages]
+    if: >-
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.detect-changes.result == 'success' &&
+      needs.deploy-pages.result == 'success'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

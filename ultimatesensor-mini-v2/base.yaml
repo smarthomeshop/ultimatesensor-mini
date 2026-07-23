@@ -2,6 +2,7 @@
 # Shared hardware and sensor stack for ESP32-C6 based V2 variants.
 
 substitutions:
+  # Production V2 releases are built for the complete WiFi/Ethernet matrix.
   ultimatesensor_mini_software_version: "1.8"
   log_level: "INFO"
   logger_baud_rate: "0"
