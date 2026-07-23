@@ -192,6 +192,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
 
           IS_SCHEDULED="${{ github.event_name == 'schedule' }}"
           VERSION_FILE="ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml"
