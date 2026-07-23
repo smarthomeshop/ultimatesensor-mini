@@ -48,6 +48,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 - Kept the ESPHome captive portal and BLE Improv provisioning available. Serial Improv remains disabled on V2 because both ESP32-C6 hardware UARTs are reserved for the radar modules.
 - Added V2 web-server sorting groups for Air Quality and Presence, including SPS30 measurements in Complete firmware.
 - Added CPU temperature to the cloud telemetry payload and corrected V2 cloud zone count IDs for the shared tracking package.
+- Fixed the V2 LD2450 integration wrapper so it uses the shared package's `tracking_radar` and `tracking_presence` IDs without redefining them, allowing all V2 LD2450 WiFi, Ethernet and cloud builds to compile.
 
 
 ## [UltimateSensor Mini V2 1.7] - 2026-07-10

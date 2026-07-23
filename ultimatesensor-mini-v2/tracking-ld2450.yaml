@@ -18,13 +18,5 @@ packages:
       - packages/ld2450-polygon-zones.yaml
     refresh: 1d
 
-# The shared LD2450 package intentionally keeps its entities generic. Expose
-# one internal presence ID for the Mini occupancy combiner.
-binary_sensor:
-  - platform: ld2450
-    ld2450_id: ld2450_radar
-    has_target:
-      id: tracking_presence
-      name: "Tracking Presence"
-      device_class: occupancy
-      internal: true
+# The shared LD2450 package already defines the radar component and the
+# stable tracking_presence entity used by the Mini occupancy combiner.

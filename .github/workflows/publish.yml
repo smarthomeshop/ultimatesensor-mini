@@ -778,8 +778,79 @@ jobs:
 
   create-releases:
     name: Create GitHub releases
-    needs: [detect-changes]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs:
+      - detect-changes
+      - publish-ultimatesensor-mini-basic
+      - publish-ultimatesensor-mini-complete
+      - publish-ultimatesensor-mini-basic-cloud
+      - publish-ultimatesensor-mini-complete-cloud
+      - publish-ultimatesensor-mini-beta-basic
+      - publish-ultimatesensor-mini-beta-complete
+      - publish-ultimatesensor-mini-v2-wifi-basic
+      - publish-ultimatesensor-mini-v2-wifi-complete
+      - publish-ultimatesensor-mini-v2-ethernet-basic
+      - publish-ultimatesensor-mini-v2-ethernet-complete
+      - publish-ultimatesensor-mini-v2-wifi-basic-ld2460
+      - publish-ultimatesensor-mini-v2-wifi-complete-ld2460
+      - publish-ultimatesensor-mini-v2-ethernet-basic-ld2460
+      - publish-ultimatesensor-mini-v2-ethernet-complete-ld2460
+      - publish-ultimatesensor-mini-v2-wifi-basic-cloud
+      - publish-ultimatesensor-mini-v2-wifi-complete-cloud
+      - publish-ultimatesensor-mini-v2-ethernet-basic-cloud
+      - publish-ultimatesensor-mini-v2-ethernet-complete-cloud
+      - publish-ultimatesensor-mini-v2-wifi-basic-ld2460-cloud
+      - publish-ultimatesensor-mini-v2-wifi-complete-ld2460-cloud
+      - publish-ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud
+      - publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud
+    if: >-
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.detect-changes.result == 'success' &&
+      needs.publish-ultimatesensor-mini-basic.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-basic.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-complete.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-complete.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-basic-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-basic-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-complete-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-complete-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-beta-basic.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-beta-basic.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-beta-complete.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-beta-complete.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic-ld2460.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic-ld2460.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete-ld2460.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete-ld2460.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic-ld2460.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic-ld2460.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete-ld2460.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete-ld2460.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic-ld2460-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-basic-ld2460-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete-ld2460-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-wifi-complete-ld2460-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-basic-ld2460-cloud.result != 'cancelled' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud.result != 'failure' &&
+      needs.publish-ultimatesensor-mini-v2-ethernet-complete-ld2460-cloud.result != 'cancelled'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
