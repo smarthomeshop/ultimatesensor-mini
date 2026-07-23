@@ -130,7 +130,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     concurrency:
-      group: ${{ github.repository }}-gh-pages-deploy-${{ inputs.directory_name }}
+      # Every variant deploys to the same gh-pages branch. Serialize these
+      # pushes so parallel firmware jobs cannot overwrite each other's files.
+      group: ${{ github.repository }}-gh-pages-deploy
       cancel-in-progress: false
     permissions:
       contents: write
