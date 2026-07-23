@@ -198,8 +198,6 @@ jobs:
           BETA_VERSION_FILE="ultimatesensor-mini-v1/beta-ultimatesensor-mini-common.yaml"
           V2_VERSION_FILE="ultimatesensor-mini-v2/base.yaml"
 
-          git fetch --tags --force >/dev/null 2>&1 || true
-
           update_version() {
             local current_version
 
@@ -258,7 +256,7 @@ jobs:
           V2_CURRENT=$(grep "ultimatesensor_mini_software_version:" "$V2_VERSION_FILE" 2>/dev/null | head -1 | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "1.0")
           if [[ "$IS_SCHEDULED" == "true" || "${GITHUB_REF_TYPE}" == "tag" || "${{ steps.changes.outputs.v2 }}" != "true" ]]; then
             V2_VERSION="$V2_CURRENT"
-          elif ! git rev-parse -q --verify "refs/tags/ultimatesensor-mini-v2-${V2_CURRENT}" >/dev/null; then
+          elif ! git ls-remote --exit-code --tags origin "refs/tags/ultimatesensor-mini-v2-${V2_CURRENT}" >/dev/null 2>&1; then
             V2_VERSION="$V2_CURRENT"
             echo "No release tag found for ultimatesensor-mini-v2-${V2_CURRENT} - keeping version: $V2_VERSION"
           elif [[ "$V2_CURRENT" =~ ^([0-9]+)\.([0-9]+)(.*)$ ]]; then
