@@ -870,6 +870,10 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Collect firmware payloads
         uses: actions/download-artifact@v4
         with:
@@ -958,6 +962,6 @@ jobs:
             create_release "beta-ultimatesensor-mini-v1-${{ needs.detect-changes.outputs.beta_version }}" "UltimateSensor Mini Beta V1 ${{ needs.detect-changes.outputs.beta_version }}"
           fi
 
-          if [[ "${{ needs.detect-changes.outputs.v2_changed }}" == "true" && ! "${{ needs.detect-changes.outputs.v2_version }}" =~ ^dev- ]]; then
+          if [[ ! "${{ needs.detect-changes.outputs.v2_version }}" =~ ^dev- ]] && gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/ultimatesensor-mini-v2-${{ needs.detect-changes.outputs.v2_version }}" >/dev/null 2>&1; then
             create_release "ultimatesensor-mini-v2-${{ needs.detect-changes.outputs.v2_version }}" "UltimateSensor Mini V2 ${{ needs.detect-changes.outputs.v2_version }}"
           fi
