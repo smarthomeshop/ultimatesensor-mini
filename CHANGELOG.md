@@ -49,6 +49,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 - Added V2 web-server sorting groups for Air Quality and Presence, including SPS30 measurements in Complete firmware.
 - Added CPU temperature to the cloud telemetry payload and corrected V2 cloud zone count IDs for the shared tracking package.
 - Fixed the V2 LD2450 integration wrapper so it uses the shared package's `tracking_radar` and `tracking_presence` IDs without redefining them, allowing all V2 LD2450 WiFi, Ethernet and cloud builds to compile.
+- Removed the duplicate local LD2450 UART declaration so the shared package owns GPIO18/GPIO19 exactly once across every standard LD2450 variant.
 
 
 ## [UltimateSensor Mini V2 1.7] - 2026-07-10
