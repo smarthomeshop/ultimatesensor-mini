@@ -51,6 +51,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 - Fixed the V2 LD2450 integration wrapper so it uses the shared package's `tracking_radar` and `tracking_presence` IDs without redefining them, allowing all V2 LD2450 WiFi, Ethernet and cloud builds to compile.
 - Removed the duplicate local LD2450 UART declaration so the shared package owns GPIO18/GPIO19 exactly once across every standard LD2450 variant.
 - Published the complete V2 firmware matrix and manifests atomically, so WiFi, Ethernet, LD2450 and LD2460 variants are released together.
+- The production pipeline publishes V1 and V2 firmware separately from the optional beta track.
 
 
 ## [UltimateSensor Mini V2 1.7] - 2026-07-10

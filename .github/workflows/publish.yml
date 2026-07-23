@@ -171,7 +171,7 @@ jobs:
             echo "v1=false" >> "$GITHUB_OUTPUT"
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
             echo "beta=false" >> "$GITHUB_OUTPUT"
-            echo "beta_build=true" >> "$GITHUB_OUTPUT"
+            echo "beta_build=false" >> "$GITHUB_OUTPUT"
             echo "v2=false" >> "$GITHUB_OUTPUT"
             echo "v2_build=true" >> "$GITHUB_OUTPUT"
             exit 0
