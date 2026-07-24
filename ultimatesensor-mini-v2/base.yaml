@@ -10,7 +10,7 @@ substitutions:
   # Self-heating compensation, subtracted inside the SCD41 itself (the sensor
   # also re-compensates humidity for this internally). Per-device fine-tuning
   # is done with the "Temperature Offset" / "Humidity Offset" numbers in HA.
-  scd41_temperature_offset: "13.2"
+  scd41_temperature_offset: "10.2"
 
 esphome:
   name: ${device_name}
