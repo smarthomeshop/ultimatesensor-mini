@@ -9,6 +9,11 @@ substitutions:
   log_level: "DEBUG"
   wifi_fast_connect: "true"
   wake_word: "okay_nabu"
+  boot_sound_enabled: "true"
+  boot_sound_volume: "50%"
+  boot_sound_duration: "10s"
+  # Embedded at compile time, so playback never depends on the network.
+  boot_sound_file: "audio/boot1.mp3"
 
 # Shared SmartHomeShop LD2450 polygon zones layer (zones, entry lines,
 # people counting + panel push API). Radar base config is defined below.
@@ -24,6 +29,10 @@ esphome:
     build_flags: -DBOARD_HAS_PSRAM
     board_build.flash_mode: dio
     board_upload.maximum_size: 16777216
+  on_boot:
+    - priority: -100
+      then:
+        - script.execute: play_boot_sound
   project:
     name: "smarthomeshop.ultimatesensor_mini_beta"
     version: ${project_version}
@@ -123,6 +132,28 @@ i2c:
   frequency: 100kHz
 
 script:
+  # Plays the SmartHomeShop start-up sound once the device has booted, so a
+  # customer hears that the sensor is alive. Can be turned off per device with
+  # the "Boot Sound" switch.
+  - id: play_boot_sound
+    mode: restart
+    then:
+      - if:
+          condition:
+            and:
+              - switch.is_on: boot_sound_switch
+              - lambda: |-
+                  return std::string("${boot_sound_enabled}") == "true";
+          then:
+            - media_player.volume_set:
+                id: media_player_01
+                volume: ${boot_sound_volume}
+            - media_player.speaker.play_on_device_media_file:
+                id: media_player_01
+                media_file: boot_sound_file
+                announcement: true
+            - delay: ${boot_sound_duration}
+
   - id: reset_led
     then:
       - if:
@@ -231,6 +262,9 @@ media_player:
   - platform: speaker
     id: media_player_01
     name: "Media Player"
+    files:
+      - id: boot_sound_file
+        file: "${boot_sound_file}"
     media_pipeline:
       speaker: media_spk_resampling_input
       num_channels: 1
@@ -605,6 +639,14 @@ number:
     mode: box
 
 switch:
+  - platform: template
+    id: boot_sound_switch
+    name: "Boot Sound"
+    icon: mdi:volume-high
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+
   - platform: template
     name: "Enable Voice Assistant"
     id: use_wake_word
