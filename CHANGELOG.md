@@ -6,7 +6,13 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V2 1.9] - 2026-07-24
+
+
 - V2: Corrected the default SCD41 temperature self-heating compensation from `13.2` to `10.2` °C for all WiFi, Ethernet, Basic, Complete, cloud and LD2460 firmware variants.
+
 
 ## [UltimateSensor Mini V1 2.42] - 2026-07-23
 

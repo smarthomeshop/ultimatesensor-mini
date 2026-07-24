@@ -4,7 +4,7 @@
 substitutions:
   # Production V2 releases cover the complete WiFi/Ethernet matrix and keep
   # the two radar buses isolated.
-  ultimatesensor_mini_software_version: "1.8"
+  ultimatesensor_mini_software_version: "1.9"
   log_level: "INFO"
   logger_baud_rate: "0"
   # Self-heating compensation, subtracted inside the SCD41 itself (the sensor
