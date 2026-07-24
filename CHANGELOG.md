@@ -8,6 +8,8 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 - Add customer-facing firmware notes here before merging a PR.
 
+- Restored the start-up sound on the UltimateSensor Mini beta firmware, so the sensor confirms out loud that it has booted. The sound can be turned off per device with the new Boot Sound switch.
+
 ## [UltimateSensor Mini V2 1.9] - 2026-07-24
 
 
