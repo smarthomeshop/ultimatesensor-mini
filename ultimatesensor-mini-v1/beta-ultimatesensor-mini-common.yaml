@@ -148,11 +148,21 @@ script:
             - media_player.volume_set:
                 id: media_player_01
                 volume: ${boot_sound_volume}
+            # The Mini has a single front LED, so a slow pulse is the visual
+            # cue here instead of the sweep used on the 3-LED UltimateSensor.
+            - light.turn_on:
+                id: rgb_front_led
+                brightness: 80%
+                red: 0%
+                green: 0%
+                blue: 100%
+                effect: "Slow Pulse"
             - media_player.speaker.play_on_device_media_file:
                 id: media_player_01
                 media_file: boot_sound_file
                 announcement: true
             - delay: ${boot_sound_duration}
+            - script.execute: reset_led
 
   - id: reset_led
     then:
