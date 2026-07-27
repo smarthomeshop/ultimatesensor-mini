@@ -42,6 +42,10 @@ UltimateSensor Mini combines multiple room sensors on one ESP32 device. The ESPH
 
 The Complete firmware adds particulate matter measurements for PM1.0, PM2.5, PM4.0 and PM10. The Basic firmware uses the same shared configuration without particulate matter sensing. V2 is sold standard with LD2412 + LD2450. Customers who buy the optional LD2460 upgrade remove/replace the LD2450 module and flash a dedicated `LD2460` firmware variant while leaving LD2412 installed.
 
+Mini V1 hardware supports only its onboard LD2450. LD2412 and LD2460 are not
+supported by the Mini V1 PCB. V1 production firmware includes on-device wake
+word recognition and the shared LD2450 polygon-zone tracking platform.
+
 ## Key Features
 
 - CO2 sensing
@@ -51,7 +55,7 @@ The Complete firmware adds particulate matter measurements for PM1.0, PM2.5, PM4
 - LD2412 close-range mmWave presence sensing on V2
 - LD2450 mmWave occupancy and target tracking as the standard V2 tracking radar
 - Optional LD2460 target tracking upgrade firmware for V2
-- Microphone, speaker, and Home Assistant Voice Assistant support on V1
+- Microphone, speaker, local wake word, and Home Assistant Voice Assistant support on V1
 - RGB front and back lights
 - WiFi onboarding with captive portal and Improv where available
 - Ethernet with PoE support for V2
@@ -69,7 +73,8 @@ The Complete firmware adds particulate matter measurements for PM1.0, PM2.5, PM4
 
 ## Variants
 
-We publish local, cloud, and beta firmware variants for V1 hardware. V2 has separate WiFi/Ethernet and LD2450/LD2460 firmware variants.
+We publish local and cloud firmware variants for V1 hardware. V2 has separate
+WiFi/Ethernet and LD2450/LD2460 firmware variants.
 
 | Hardware | Variant | Description |
 |----------|---------|-------------|
@@ -77,8 +82,6 @@ We publish local, cloud, and beta firmware variants for V1 hardware. V2 has sepa
 | V1 (ESP32-S3) | Complete | Full firmware with PM1.0, PM2.5, PM4.0 and PM10 measurements |
 | V1 (ESP32-S3) | Basic Cloud | SmartHomeShop App cloud sync firmware without particulate matter measurements |
 | V1 (ESP32-S3) | Complete Cloud | SmartHomeShop App cloud sync firmware with PM1.0, PM2.5, PM4.0 and PM10 measurements |
-| V1 (ESP32-S3) | Beta Basic | Experimental local wake word firmware without particulate matter measurements |
-| V1 (ESP32-S3) | Beta Complete | Experimental local wake word firmware with particulate matter measurements |
 | V2 (ESP32-C6) | WiFi Basic | Standard LD2412 + LD2450 firmware without particulate matter measurements |
 | V2 (ESP32-C6) | WiFi Complete | Standard LD2412 + LD2450 firmware with particulate matter measurements |
 | V2 (ESP32-C6) | Ethernet Basic | Standard LD2412 + LD2450 firmware without particulate matter measurements |
@@ -104,6 +107,12 @@ We publish local, cloud, and beta firmware variants for V1 hardware. V2 has sepa
 | Uptime | Device uptime |
 
 ## Getting Started
+
+> **Required V1 migration:** customers upgrading from V1 firmware 2.42 or
+> earlier must flash the new V1 firmware once over USB-C at
+> [smarthomeshop.io/firmware](https://smarthomeshop.io/firmware). Do not perform
+> this framework migration through OTA. After the USB-C migration, normal OTA
+> updates work again.
 
 1. Power the UltimateSensor Mini with USB-C.
 2. Flash the desired firmware with the web flasher or ESPHome CLI.
@@ -133,9 +142,6 @@ ultimatesensor-mini/
 │   ├── sps30.yaml
 │   ├── cloud.yaml
 │   ├── cloud-pm.yaml
-│   ├── beta-ultimatesensor-mini-common.yaml
-│   ├── beta-ultimatesensor-mini-basic.yaml
-│   ├── beta-ultimatesensor-mini-complete.yaml
 │   └── default_16MB.csv
 ├── ultimatesensor-mini-v2/          # V2 ESP32-C6 ESPHome configurations
 │   ├── base.yaml                    # Shared sensors, LD2412, occupancy logic, API, OTA
@@ -160,8 +166,6 @@ Pre-built firmware manifests are published on the `gh-pages` branch.
 - V1 Complete: `ultimatesensor-mini-complete-manifest.json`
 - V1 Basic Cloud: `ultimatesensor-mini-basic-cloud-manifest.json`
 - V1 Complete Cloud: `ultimatesensor-mini-complete-cloud-manifest.json`
-- V1 Beta Basic: `beta-ultimatesensor-mini-basic-manifest.json`
-- V1 Beta Complete: `beta-ultimatesensor-mini-complete-manifest.json`
 - V2 WiFi Basic: `ultimatesensor-mini-v2-wifi-basic-manifest.json`
 - V2 WiFi Complete: `ultimatesensor-mini-v2-wifi-complete-manifest.json`
 - V2 Ethernet Basic: `ultimatesensor-mini-v2-ethernet-basic-manifest.json`

@@ -381,17 +381,17 @@ script:
             if (id(occupancy_state).has_state()) {
               root["occupancy"] = id(occupancy_state).state;
             }
-            if (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state)) {
-              root["zone1_target_count"] = (int) id(zone1_target_count).state;
+            if (id(poly_zone_1_count).has_state() && !isnan(id(poly_zone_1_count).state)) {
+              root["zone1_target_count"] = (int) id(poly_zone_1_count).state;
             }
-            if (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state)) {
-              root["zone2_target_count"] = (int) id(zone2_target_count).state;
+            if (id(poly_zone_2_count).has_state() && !isnan(id(poly_zone_2_count).state)) {
+              root["zone2_target_count"] = (int) id(poly_zone_2_count).state;
             }
-            if (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state)) {
-              root["zone3_target_count"] = (int) id(zone3_target_count).state;
+            if (id(poly_zone_3_count).has_state() && !isnan(id(poly_zone_3_count).state)) {
+              root["zone3_target_count"] = (int) id(poly_zone_3_count).state;
             }
-            if (id(zone4_target_count).has_state() && !isnan(id(zone4_target_count).state)) {
-              root["zone4_target_count"] = (int) id(zone4_target_count).state;
+            if (id(poly_zone_4_count).has_state() && !isnan(id(poly_zone_4_count).state)) {
+              root["zone4_target_count"] = (int) id(poly_zone_4_count).state;
             }
 
             if (id(wifi_signal_sensor).has_state() && !isnan(id(wifi_signal_sensor).state)) {
@@ -455,7 +455,7 @@ script:
                     lambda: "return id(cloud_last_sync_success);"
                   then:
                     - light.turn_on:
-                        id: rgb_front_light
+                        id: rgb_front_led
                         brightness: 50%
                         red: 0%
                         green: 0%
@@ -510,19 +510,19 @@ script:
           condition:
             lambda: |-
               int signature = id(occupancy_state).state ? 1 : 0;
-              signature = signature * 31 + (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state) ? (int) id(zone1_target_count).state : -1);
-              signature = signature * 31 + (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state) ? (int) id(zone2_target_count).state : -1);
-              signature = signature * 31 + (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state) ? (int) id(zone3_target_count).state : -1);
-              signature = signature * 31 + (id(zone4_target_count).has_state() && !isnan(id(zone4_target_count).state) ? (int) id(zone4_target_count).state : -1);
+              signature = signature * 31 + (id(poly_zone_1_count).has_state() && !isnan(id(poly_zone_1_count).state) ? (int) id(poly_zone_1_count).state : -1);
+              signature = signature * 31 + (id(poly_zone_2_count).has_state() && !isnan(id(poly_zone_2_count).state) ? (int) id(poly_zone_2_count).state : -1);
+              signature = signature * 31 + (id(poly_zone_3_count).has_state() && !isnan(id(poly_zone_3_count).state) ? (int) id(poly_zone_3_count).state : -1);
+              signature = signature * 31 + (id(poly_zone_4_count).has_state() && !isnan(id(poly_zone_4_count).state) ? (int) id(poly_zone_4_count).state : -1);
               return signature == id(cloud_last_presence_signature);
           then:
             - script.stop: cloud_send_presence_if_changed
       - lambda: |-
           int signature = id(occupancy_state).state ? 1 : 0;
-          signature = signature * 31 + (id(zone1_target_count).has_state() && !isnan(id(zone1_target_count).state) ? (int) id(zone1_target_count).state : -1);
-          signature = signature * 31 + (id(zone2_target_count).has_state() && !isnan(id(zone2_target_count).state) ? (int) id(zone2_target_count).state : -1);
-          signature = signature * 31 + (id(zone3_target_count).has_state() && !isnan(id(zone3_target_count).state) ? (int) id(zone3_target_count).state : -1);
-          signature = signature * 31 + (id(zone4_target_count).has_state() && !isnan(id(zone4_target_count).state) ? (int) id(zone4_target_count).state : -1);
+          signature = signature * 31 + (id(poly_zone_1_count).has_state() && !isnan(id(poly_zone_1_count).state) ? (int) id(poly_zone_1_count).state : -1);
+          signature = signature * 31 + (id(poly_zone_2_count).has_state() && !isnan(id(poly_zone_2_count).state) ? (int) id(poly_zone_2_count).state : -1);
+          signature = signature * 31 + (id(poly_zone_3_count).has_state() && !isnan(id(poly_zone_3_count).state) ? (int) id(poly_zone_3_count).state : -1);
+          signature = signature * 31 + (id(poly_zone_4_count).has_state() && !isnan(id(poly_zone_4_count).state) ? (int) id(poly_zone_4_count).state : -1);
           id(cloud_last_presence_signature) = signature;
       - script.execute: cloud_send_batch
 
