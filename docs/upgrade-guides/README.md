@@ -6,9 +6,9 @@ platform.
 
 ## Guides
 
-- [UltimateSensor Mini V1 2.42/beta to production 2.43](mini-v1-2-42-to-2-43-usb-nl.md)
-  is ready for the V1 2.43 production release after the firmware has passed the
-  release checklist in that document.
+- [Universal V1 products LD2450 update email](v1-products-ld2450-update-en.md)
+  covers both UltimateSensor Mini V1 2.43 and UltimateSensor V1 1.13, including
+  their different USB-C and OTA installation paths.
 
 ## Important release distinction
 
