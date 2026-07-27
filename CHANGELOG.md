@@ -7,6 +7,10 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 2.43] - 2026-07-27
+
+
 - UltimateSensor Mini V1 production now uses the former beta runtime: ESP-IDF,
   on-device wake-word recognition, embedded boot audio and the shared native
   LD2450 tracking platform with polygon zones, exclusions, entry lines and
@@ -20,6 +24,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
   users should select a normal V1 production variant during the USB-C
   installation.
 - V1 cloud telemetry now reports the new polygon-zone target counts.
+
 
 ## [UltimateSensor Mini Beta V1 2.38-beta.86] - 2026-07-25
 
