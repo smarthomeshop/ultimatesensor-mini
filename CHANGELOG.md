@@ -8,7 +8,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 - Add customer-facing firmware notes here before merging a PR.
 
-## [UltimateSensor Mini V1 2.43] - 2026-07-27
+## [UltimateSensor Mini V1 3.0] - 2026-07-27
 
 
 - UltimateSensor Mini V1 production now uses the former beta runtime: ESP-IDF,

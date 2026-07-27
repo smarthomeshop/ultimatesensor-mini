@@ -22,7 +22,7 @@ afterwards.
 
 ### UltimateSensor Mini V1
 
-Firmware **2.43 was released on July 27, 2026**. Install it once via USB-C at
+Firmware **3.0 was released on July 27, 2026**. Install it once via USB-C at
 [smarthomeshop.io/firmware](https://smarthomeshop.io/firmware).
 
 **Do not install this specific Mini V1 update through Home Assistant or OTA.**
@@ -57,7 +57,7 @@ SmartHomeShop
 
 Before sending this email, verify that:
 
-- all four Mini V1 2.43 firmware variants are available;
+- all four Mini V1 3.0 firmware variants are available;
 - UltimateSensor V1 1.13 is available through its firmware update;
 - a real Mini V1 running 2.42 has been upgraded successfully via USB-C;
 - WiFi, Home Assistant, sensors, audio and LD2450 tracking work after the Mini

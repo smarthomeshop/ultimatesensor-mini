@@ -218,6 +218,12 @@ jobs:
               return
             fi
 
+            if ! git ls-remote --exit-code --tags origin "refs/tags/ultimatesensor-mini-v1-${current_version}" >/dev/null 2>&1; then
+              echo "v1_version=${current_version}" >> "$GITHUB_OUTPUT"
+              echo "No release tag found for ultimatesensor-mini-v1-${current_version} - keeping version: $current_version"
+              return
+            fi
+
             if [[ "$current_version" =~ ^([0-9]+)\.([0-9]+)(.*)$ ]]; then
               MAJOR="${BASH_REMATCH[1]}"
               MINOR="${BASH_REMATCH[2]}"
