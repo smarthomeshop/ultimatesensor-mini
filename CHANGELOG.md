@@ -6,7 +6,14 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Fixed Voice Assistant sometimes remaining in Speech output after the first
+  command, leaving the green LED on and preventing the local wake word from
+  being detected again.
+- Removed the unbounded media-player wait from the Voice Assistant completion
+  path and now restart wake-word detection after both successful and failed
+  voice requests.
+- Added a 60-second recovery watchdog that stops a stalled voice/audio pipeline
+  and restores local wake-word detection automatically.
 
 ## [UltimateSensor Mini V1 3.0] - 2026-07-27
 
