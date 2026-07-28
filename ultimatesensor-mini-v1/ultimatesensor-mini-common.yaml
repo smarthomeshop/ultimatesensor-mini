@@ -5,7 +5,7 @@
 
 substitutions:
   project_main_version: "3"
-  project_version: "3.1"
+  project_version: "3.2"
   log_level: "INFO"
   wifi_fast_connect: "true"
   basic_manifest_url: ${update_manifest_url}
@@ -19,6 +19,7 @@ substitutions:
   boot_sound_volume: "50%"
   boot_sound_duration: "10s"
   voice_assistant_watchdog_timeout: "60s"
+  voice_assistant_resume_timeout: "30s"
   # Embedded at compile time, so playback never depends on the network.
   boot_sound_file: "audio/boot1.mp3"
 # Mini V1 hardware has one LD2450 on these fixed UART pins.
@@ -193,14 +194,53 @@ script:
   - id: start_wake_word
     mode: restart
     then:
+      # on_end is emitted before streamed TTS has necessarily released the
+      # Voice Assistant and speaker pipelines. Wait for their actual states.
+      - wait_until:
+          condition:
+            and:
+              - not:
+                  voice_assistant.is_running:
+              - not:
+                  media_player.is_announcing:
+                    id: media_player_01
+              - speaker.is_stopped:
+                  id: speaker_id
+          timeout: ${voice_assistant_resume_timeout}
       - if:
           condition:
             and:
               - switch.is_on: use_wake_word
               - not:
                   voice_assistant.is_running:
+              - not:
+                  media_player.is_announcing:
+                    id: media_player_01
+              - speaker.is_stopped:
+                  id: speaker_id
           then:
-            - micro_wake_word.start:
+            - if:
+                condition:
+                  not:
+                    micro_wake_word.is_running:
+                then:
+                  - micro_wake_word.start:
+            - wait_until:
+                condition:
+                  micro_wake_word.is_running:
+                timeout: 5s
+            - if:
+                condition:
+                  not:
+                    micro_wake_word.is_running:
+                then:
+                  - logger.log:
+                      level: WARN
+                      format: "Wake-word detection did not restart"
+          else:
+            - logger.log:
+                level: WARN
+                format: "Audio pipeline did not become idle; watchdog will retry wake-word detection"
       - script.execute: reset_led
 
   - id: stop_wake_word
@@ -219,16 +259,23 @@ script:
           condition:
             and:
               - switch.is_on: use_wake_word
-              - voice_assistant.is_running:
+              - or:
+                  - voice_assistant.is_running:
+                  - not:
+                      micro_wake_word.is_running:
           then:
             - logger.log:
                 level: WARN
-                format: "Voice Assistant did not finish; restarting wake-word detection"
+                format: "Voice Assistant recovery watchdog is restarting wake-word detection"
             - voice_assistant.stop:
             - media_player.stop:
                 id: media_player_01
                 announcement: true
-            - delay: 500ms
+            - delay: 250ms
+            - speaker.stop:
+                id: speaker_id
+            - micro_wake_word.stop:
+            - delay: 250ms
             - script.execute: start_wake_word
 
 light:
@@ -339,7 +386,6 @@ micro_wake_word:
     - model: okay_nabu
     - model: hey_jarvis
   on_wake_word_detected:
-    - micro_wake_word.stop:
     - light.turn_on:
         id: rgb_front_led
         blue: 0%
@@ -398,7 +444,9 @@ voice_assistant:
         effect: "Slow Pulse"
 
   on_end:
-    - delay: 300ms
+    - script.execute: start_wake_word
+
+  on_idle:
     - script.execute: start_wake_word
 
   on_error:
