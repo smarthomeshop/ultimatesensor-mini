@@ -6,6 +6,11 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 3.2] - 2026-07-28
+
+
 - Fixed the remaining Mini V1 Voice Assistant issue where Assist returned to
   idle after one command but on-device wake-word detection did not reliably
   start again.
@@ -15,6 +20,7 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 - Removed the redundant manual Micro Wake Word stop during detection, added an
   idle-state retry and expanded the recovery watchdog to also recover when
   Voice Assistant is idle but wake-word detection is not running.
+
 
 ## [UltimateSensor Mini V1 3.1] - 2026-07-28
 
