@@ -33,6 +33,11 @@ logger:
   # so production firmware must not reserve UART0 for serial logging.
   baud_rate: ${logger_baud_rate}
 
+preferences:
+  # Persist calibration and tracking settings promptly after a user changes
+  # them, while still batching writes to limit flash wear.
+  flash_write_interval: 10s
+
 api:
   actions:
     - action: set_ambient_pressure
