@@ -6,11 +6,17 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V2 1.10] - 2026-07-30
+
+
 ### UltimateSensor Mini V2
 
 - Calibration, tracking and other persisted settings are now written to flash
   within 10 seconds instead of the default one-minute delay, reducing the
   chance of recently changed settings being lost during a power interruption.
+
 
 ## [UltimateSensor Mini V1 3.3] - 2026-07-30
 
