@@ -6,7 +6,11 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Fixed Mini V1 temperature offset reverting to its default after every reboot
+  or power cycle.
+- Calibration, tracking and other persisted settings are now written to flash
+  within 10 seconds instead of the default one-minute delay, reducing the
+  chance of recently changed settings being lost during a power interruption.
 
 ## [UltimateSensor Mini V1 3.2] - 2026-07-28
 

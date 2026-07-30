@@ -112,6 +112,11 @@ wifi:
 captive_portal:
 improv_serial:
 
+preferences:
+  # Configuration changes are rare; flush them promptly so a later power loss
+  # does not revert calibration and tracking settings to their defaults.
+  flash_write_interval: 10s
+
 globals:
   - id: init_in_progress
     type: bool
@@ -530,6 +535,7 @@ number:
   - platform: template
     name: "Temperature Offset"
     id: scd41_temperature_offset
+    restore_value: true
     initial_value: 2.3
     min_value: -50.0
     max_value: 50.0
