@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-C6",
       "ota": {
         "path": "ultimatesensor-mini-v2-ethernet-basic-ld2460/ultimatesensor-mini-v2-esp32c6.ota.bin",
-        "md5": "edf7bf66cc2922ee51a97537f2acb772"
+        "md5": "b41dc2309fc8d163b26a4bcf05579cd2"
       },
       "parts": [
         {
