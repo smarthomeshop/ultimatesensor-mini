@@ -5,7 +5,7 @@
 
 substitutions:
   project_main_version: "3"
-  project_version: "3.2"
+  project_version: "3.3"
   log_level: "INFO"
   wifi_fast_connect: "true"
   basic_manifest_url: ${update_manifest_url}
