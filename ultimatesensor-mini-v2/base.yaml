@@ -209,6 +209,7 @@ binary_sensor:
         sorting_weight: 2
       device_class: occupancy
     has_moving_target:
+      id: ld2412_moving_target
       name: "LD2412 Moving Target"
       web_server:
         sorting_group_id: sorting_group_presence

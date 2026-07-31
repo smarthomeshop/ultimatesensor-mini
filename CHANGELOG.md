@@ -7,6 +7,19 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 ## [Unreleased]
 
 - Add customer-facing firmware notes here before merging a PR.
+- Mini V2 LD2460 upgrade firmware now includes the shared polygon zones,
+  exclusion zones, entry lines and people-counting package used by
+  UltimateSensor V2.
+- Mini V2 now includes optional automatic LED lighting: a white motion light,
+  warm scheduled night light, and orange/red CO2 warning flashes. All
+  automatic lighting features default to off and retain their settings after
+  a restart.
+- Mini V2 SmartHomeShop App firmware now supports cloud configuration and
+  acknowledgement for the same LED lighting settings.
+- Fixed Mini V2 Thread firmware defining the LD2412 UART twice, so Thread
+  variants use the same valid radar bus package as WiFi and Ethernet.
+- Fixed LD2450 target coordinates retaining an old value after a target leaves;
+  unavailable target updates now bypass throttling in Mini V1 beta and Mini V2.
 
 ## [UltimateSensor Mini V1 3.4] - 2026-07-31
 

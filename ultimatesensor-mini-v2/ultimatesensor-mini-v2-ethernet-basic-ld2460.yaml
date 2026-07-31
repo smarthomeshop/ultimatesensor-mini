@@ -16,6 +16,7 @@ packages:
   tracking: !include tracking-ld2460.yaml
   buses: !include buses-ld2460.yaml
   net: !include ethernet.yaml
+  lighting: !include led-lighting.yaml
   firmware: !include firmware-selector.yaml
 
 dashboard_import:

@@ -8,6 +8,7 @@ substitutions:
   ld2450_target_name_prefix: "Tracking "
   ld2450_zone_name_prefix: "Tracking "
   ld2450_hardware_name_prefix: "Tracking "
+  tracking_motion_sensor_id: tracking_moving_target
 
 packages:
   ld2450:

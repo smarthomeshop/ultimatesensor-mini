@@ -16,6 +16,7 @@ Leave the LD2412 installed. It remains the close-range/still-presence fallback a
 | `wifi.yaml` | WiFi network stack, ESPHome captive portal, BLE Improv, WiFi diagnostics, W5500 held off/reset |
 | `ethernet.yaml` | W5500 Ethernet firmware network stack and Ethernet diagnostics |
 | `complete.yaml` | SPS30 particulate matter sensor and PM idle controls |
+| `led-lighting.yaml` | Persistent local controls for motion light, night light, and CO2 warning flashes |
 
 ## Firmware Variants
 
@@ -84,6 +85,9 @@ Both variants expose the same Home Assistant entity and action contract. LD2460 
 
 - Basic variants omit `complete.yaml`.
 - Complete variants include `complete.yaml`, which adds the SPS30 at I2C address `0x69`.
-- SCD41 default temperature offset is `13.2` based on the local V2 test YAML.
+- Automatic LED lighting defaults to off. Local firmware exposes persistent
+  Home Assistant controls; cloud firmware receives the same settings from the
+  SmartHomeShop App.
+- SCD41 default temperature offset is `10.2`, calibrated for the production Mini V2 enclosure.
 - SCD41 default humidity offset is `3.0` based on the local V2 test YAML.
 - GPIO4/GPIO5 are ESP32-C6 strapping pins. The schematic uses them for LD2460; make sure the LD2460 UART does not pull boot levels into an invalid state.

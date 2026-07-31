@@ -22,6 +22,7 @@ packages:
   buses: !include buses-ld2460.yaml
   variant: !include complete.yaml
   net: !include thread.yaml
+  lighting: !include led-lighting.yaml
 
 dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v2/ultimatesensor-mini-v2-thread-complete-ld2460.yaml@main

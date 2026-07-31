@@ -30,6 +30,7 @@ packages:
   tracking: !include tracking-ld2450.yaml
   buses: !include buses-ld2450.yaml
   net: !include wifi.yaml
+  lighting: !include led-lighting.yaml
   variant: !include complete.yaml
   firmware: !include firmware-selector.yaml
   setup_portal: github://smarthomeshop/setup-portal/packages/setup-portal.yaml@main

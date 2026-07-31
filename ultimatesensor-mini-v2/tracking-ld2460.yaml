@@ -5,11 +5,14 @@
 substitutions:
   ld2460_tx_pin: GPIO4
   ld2460_rx_pin: GPIO5
+  # LD2460 reports target presence but does not classify moving/still targets.
+  tracking_motion_sensor_id: tracking_presence
 
 packages:
   ld2460:
     url: https://github.com/smarthomeshop/ld2460
-    ref: v0.1.1
+    ref: main
     files:
       - tracking-ld2460.yaml
+      - packages/ld2460-polygon-zones.yaml
     refresh: 1d

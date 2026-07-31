@@ -459,34 +459,46 @@ sensor:
         id: radar_target1_x
         name: "Target 1 X"
         filters:
-          - throttle: 250ms
+          - throttle_with_priority:
+              timeout: 250ms
+              value: nan
       y:
         id: radar_target1_y
         name: "Target 1 Y"
         filters:
-          - throttle: 250ms
+          - throttle_with_priority:
+              timeout: 250ms
+              value: nan
     target_2:
       x:
         id: radar_target2_x
         name: "Target 2 X"
         filters:
-          - throttle: 250ms
+          - throttle_with_priority:
+              timeout: 250ms
+              value: nan
       y:
         id: radar_target2_y
         name: "Target 2 Y"
         filters:
-          - throttle: 250ms
+          - throttle_with_priority:
+              timeout: 250ms
+              value: nan
     target_3:
       x:
         id: radar_target3_x
         name: "Target 3 X"
         filters:
-          - throttle: 250ms
+          - throttle_with_priority:
+              timeout: 250ms
+              value: nan
       y:
         id: radar_target3_y
         name: "Target 3 Y"
         filters:
-          - throttle: 250ms
+          - throttle_with_priority:
+              timeout: 250ms
+              value: nan
     zone_1:
       target_count:
         id: zone_1_target_count

@@ -1,0 +1,304 @@
+# Persistent automatic LED controls for non-cloud UltimateSensor Mini V2 firmware.
+
+globals:
+  - id: local_led_automation_ready
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: local_led_runtime_state
+    type: int
+    restore_value: false
+    initial_value: "-1"
+  - id: local_co2_alert_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: local_last_co2_alert_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: local_last_co2_alert_severity
+    type: int
+    restore_value: false
+    initial_value: "0"
+
+esphome:
+  on_boot:
+    - priority: -50
+      then:
+        - delay: 5s
+        - lambda: |-
+            id(local_led_automation_ready) = true;
+            id(local_led_runtime_state) = -1;
+
+switch:
+  - platform: template
+    id: local_led_enabled
+    name: "Automatic LED Lighting"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_motion_light_enabled
+    name: "Motion Light"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_night_light_enabled
+    name: "Night Light"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_co2_alert_enabled
+    name: "CO2 LED Warning"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - lambda: |-
+          id(local_last_co2_alert_ms) = 0;
+          id(local_last_co2_alert_severity) = 0;
+
+number:
+  - platform: template
+    id: local_motion_light_brightness
+    name: "Motion Light Brightness"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 70
+    min_value: 1
+    max_value: 100
+    step: 1
+    unit_of_measurement: "%"
+    mode: box
+    on_value:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_night_light_brightness
+    name: "Night Light Brightness"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 10
+    min_value: 1
+    max_value: 100
+    step: 1
+    unit_of_measurement: "%"
+    mode: box
+    on_value:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_night_light_start_hour
+    name: "Night Light Start Hour"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 22
+    min_value: 0
+    max_value: 23
+    step: 1
+    unit_of_measurement: "h"
+    mode: box
+    on_value:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_night_light_end_hour
+    name: "Night Light End Hour"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 7
+    min_value: 0
+    max_value: 23
+    step: 1
+    unit_of_measurement: "h"
+    mode: box
+    on_value:
+      - lambda: "id(local_led_runtime_state) = -1;"
+  - platform: template
+    id: local_co2_warning_ppm
+    name: "CO2 Warning Threshold"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 1000
+    min_value: 400
+    max_value: 5000
+    step: 50
+    unit_of_measurement: "ppm"
+    mode: box
+    on_value:
+      - lambda: |-
+          id(local_last_co2_alert_ms) = 0;
+          id(local_last_co2_alert_severity) = 0;
+  - platform: template
+    id: local_co2_critical_ppm
+    name: "CO2 Critical Threshold"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 1500
+    min_value: 500
+    max_value: 10000
+    step: 50
+    unit_of_measurement: "ppm"
+    mode: box
+    on_value:
+      - lambda: |-
+          id(local_last_co2_alert_ms) = 0;
+          id(local_last_co2_alert_severity) = 0;
+  - platform: template
+    id: local_co2_alert_cooldown_minutes
+    name: "CO2 Alert Cooldown"
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    initial_value: 5
+    min_value: 1
+    max_value: 1440
+    step: 1
+    unit_of_measurement: "min"
+    mode: box
+
+time:
+  - platform: homeassistant
+    id: local_led_homeassistant_time
+  - platform: sntp
+    id: local_led_sntp_time
+    timezone: "Europe/Amsterdam"
+    servers:
+      - "pool.ntp.org"
+      - "time.google.com"
+
+script:
+  - id: local_flash_co2_alert
+    mode: single
+    parameters:
+      critical: bool
+    then:
+      - lambda: |-
+          id(local_co2_alert_active) = true;
+          id(local_led_runtime_state) = critical ? 4 : 3;
+      - repeat:
+          count: 3
+          then:
+            - if:
+                condition:
+                  lambda: |-
+                    return id(local_led_enabled).state
+                      && id(local_co2_alert_enabled).state;
+                then:
+                  - light.turn_on:
+                      id: rgb_status_led
+                      brightness: 100%
+                      red: 100%
+                      green: !lambda "return critical ? 0.0f : 0.35f;"
+                      blue: 0%
+                      effect: none
+            - delay: 250ms
+            - light.turn_off: rgb_status_led
+            - delay: 250ms
+      - lambda: |-
+          id(local_co2_alert_active) = false;
+          id(local_led_runtime_state) = -1;
+
+interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          if (!id(local_led_automation_ready) || id(local_co2_alert_active)) {
+            return;
+          }
+
+          if (!id(local_led_enabled).state) {
+            if (id(local_led_runtime_state) != 0) {
+              id(rgb_status_led).turn_off().perform();
+              id(local_led_runtime_state) = 0;
+            }
+            return;
+          }
+
+          int co2_severity = 0;
+          if (id(local_co2_alert_enabled).state
+              && id(scd41_co2).has_state()
+              && !isnan(id(scd41_co2).state)) {
+            if (id(scd41_co2).state >= id(local_co2_critical_ppm).state) {
+              co2_severity = 2;
+            } else if (id(scd41_co2).state >= id(local_co2_warning_ppm).state) {
+              co2_severity = 1;
+            }
+          }
+
+          const bool severity_increased = co2_severity > id(local_last_co2_alert_severity);
+          id(local_last_co2_alert_severity) = co2_severity;
+
+          if (co2_severity == 0) {
+            id(local_last_co2_alert_ms) = 0;
+          } else {
+            const uint32_t cooldown_ms =
+              (uint32_t) id(local_co2_alert_cooldown_minutes).state * 60000UL;
+            const uint32_t elapsed_ms = millis() - id(local_last_co2_alert_ms);
+            if (id(local_last_co2_alert_ms) == 0
+                || elapsed_ms >= cooldown_ms
+                || severity_increased) {
+              id(local_last_co2_alert_ms) = millis();
+              id(local_flash_co2_alert).execute(co2_severity == 2);
+              return;
+            }
+          }
+
+          const bool motion =
+            id(ld2412_moving_target).state
+            || id(${tracking_motion_sensor_id}).state;
+
+          if (motion && id(local_motion_light_enabled).state) {
+            if (id(local_led_runtime_state) != 2) {
+              auto call = id(rgb_status_led).turn_on();
+              call.set_brightness(id(local_motion_light_brightness).state / 100.0f);
+              call.set_rgb(1.0f, 1.0f, 1.0f);
+              call.set_effect("none");
+              call.perform();
+              id(local_led_runtime_state) = 2;
+            }
+            return;
+          }
+
+          const auto homeassistant_now = id(local_led_homeassistant_time).now();
+          const auto now = homeassistant_now.is_valid()
+            ? homeassistant_now
+            : id(local_led_sntp_time).now();
+          bool night = false;
+          if (now.is_valid()) {
+            const int hour = now.hour;
+            const int start = (int) id(local_night_light_start_hour).state;
+            const int end = (int) id(local_night_light_end_hour).state;
+            night = start == end
+              || (start < end && hour >= start && hour < end)
+              || (start > end && (hour >= start || hour < end));
+          }
+
+          if (id(occupancy).state && night && id(local_night_light_enabled).state) {
+            if (id(local_led_runtime_state) != 1) {
+              auto call = id(rgb_status_led).turn_on();
+              call.set_brightness(id(local_night_light_brightness).state / 100.0f);
+              call.set_rgb(1.0f, 0.45f, 0.08f);
+              call.set_effect("none");
+              call.perform();
+              id(local_led_runtime_state) = 1;
+            }
+            return;
+          }
+
+          if (id(local_led_runtime_state) != 0) {
+            id(rgb_status_led).turn_off().perform();
+            id(local_led_runtime_state) = 0;
+          }

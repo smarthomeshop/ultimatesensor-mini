@@ -27,6 +27,12 @@ esphome:
               lambda: "return !id(cloud_is_registered);"
             then:
               - script.execute: cloud_register
+    - priority: -50
+      then:
+        - delay: 5s
+        - lambda: |-
+            id(cloud_led_automation_ready) = true;
+            id(cloud_led_runtime_state) = -1;
 
 time:
   - platform: sntp
@@ -65,6 +71,102 @@ globals:
     type: int
     restore_value: false
     initial_value: "-1"
+  - id: cloud_configuration_syncing
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_configuration_boot_sync_done
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_led_configuration_version
+    type: uint32_t
+    restore_value: true
+    initial_value: "0"
+  - id: cloud_desired_configuration_version
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: cloud_led_enabled
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: cloud_motion_light_enabled
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: cloud_motion_light_brightness
+    type: int
+    restore_value: true
+    initial_value: "70"
+  - id: cloud_night_light_enabled
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: cloud_night_light_brightness
+    type: int
+    restore_value: true
+    initial_value: "10"
+  - id: cloud_night_light_start_hour
+    type: int
+    restore_value: true
+    initial_value: "22"
+  - id: cloud_night_light_end_hour
+    type: int
+    restore_value: true
+    initial_value: "7"
+  - id: cloud_co2_alert_enabled
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: cloud_co2_warning_ppm
+    type: int
+    restore_value: true
+    initial_value: "1000"
+  - id: cloud_co2_critical_ppm
+    type: int
+    restore_value: true
+    initial_value: "1500"
+  - id: cloud_co2_alert_cooldown_minutes
+    type: int
+    restore_value: true
+    initial_value: "5"
+  - id: cloud_configuration_ack_version
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: cloud_configuration_ack_applied
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_configuration_ack_error
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+  - id: cloud_led_alert_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_last_co2_alert_ms
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: cloud_last_co2_alert_severity
+    type: int
+    restore_value: false
+    initial_value: "0"
+  - id: cloud_led_runtime_state
+    type: int
+    restore_value: false
+    initial_value: "-1"
+  - id: cloud_led_automation_ready
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_last_network_connected
+    type: bool
+    restore_value: false
+    initial_value: "false"
 
   - id: cloud_has_pm
     type: bool
@@ -218,7 +320,9 @@ script:
 
       - if:
           condition:
-            lambda: "return !id(${cloud_mac_sensor_id}).has_state() || id(${cloud_mac_sensor_id}).state.empty();"
+            lambda: |-
+              return !id(${cloud_mac_sensor_id}).has_state()
+                || id(${cloud_mac_sensor_id}).state.empty();
           then:
             - logger.log:
                 level: WARN
@@ -238,6 +342,7 @@ script:
             root["firmware_version"] = "${ultimatesensor_mini_software_version}";
             root["product"] = "ultimatesensor-mini";
             root["local_ip"] = id(${cloud_ip_sensor_id}).state;
+            root["configuration_protocol_version"] = 1;
           capture_response: true
           max_response_buffer_size: 512
           on_response:
@@ -252,6 +357,10 @@ script:
                         id(cloud_device_token) = root["token"].as<std::string>();
                         id(cloud_is_registered) = true;
                         id(cloud_sync_failures) = 0;
+                        if (root["configuration_version"].is<uint32_t>()) {
+                          id(cloud_desired_configuration_version) =
+                            root["configuration_version"].as<uint32_t>();
+                        }
                         return true;
                       }
                       return false;
@@ -259,6 +368,11 @@ script:
                   } else {
                     id(cloud_sync_failures)++;
                   }
+              - if:
+                  condition:
+                    lambda: "return id(cloud_is_registered) && !id(cloud_configuration_syncing);"
+                  then:
+                    - script.execute: cloud_sync_configuration
           on_error:
             then:
               - lambda: |-
@@ -350,12 +464,20 @@ script:
 
             root["firmware_version"] = "${ultimatesensor_mini_software_version}";
             root["hardware_version"] = "${ultimatesensor_mini_hardware_version}";
+            root["configuration_protocol_version"] = 1;
           on_response:
             then:
               - lambda: |-
                   if (response->status_code == 200) {
                     id(cloud_last_sync_success) = true;
                     id(cloud_sync_failures) = 0;
+                    json::parse_json(body, [](JsonObject root) -> bool {
+                      if (root["configuration_version"].is<uint32_t>()) {
+                        id(cloud_desired_configuration_version) =
+                          root["configuration_version"].as<uint32_t>();
+                      }
+                      return true;
+                    });
                   } else if (response->status_code == 401) {
                     id(cloud_is_registered) = false;
                     id(cloud_device_token) = "";
@@ -363,11 +485,248 @@ script:
                   } else {
                     id(cloud_sync_failures)++;
                   }
+              - if:
+                  condition:
+                    lambda: |-
+                      return id(cloud_is_registered)
+                        && !id(cloud_configuration_syncing)
+                        && (
+                          !id(cloud_configuration_boot_sync_done)
+                          || id(cloud_desired_configuration_version)
+                            != id(cloud_led_configuration_version)
+                        );
+                  then:
+                    - script.execute: cloud_sync_configuration
           on_error:
             then:
               - lambda: |-
                   id(cloud_last_sync_success) = false;
                   id(cloud_sync_failures)++;
+
+  - id: cloud_sync_configuration
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return !network::is_connected()
+                || !id(cloud_is_registered)
+                || id(cloud_device_token).empty()
+                || id(cloud_configuration_syncing);
+          then:
+            - script.stop: cloud_sync_configuration
+      - lambda: |-
+          id(cloud_configuration_syncing) = true;
+          id(cloud_configuration_ack_version) = 0;
+          id(cloud_configuration_ack_applied) = false;
+          id(cloud_configuration_ack_error) = "";
+      - http_request.get:
+          url: "${cloud_api_url}/api/${cloud_api_version}/devices/configuration"
+          request_headers:
+            Authorization: !lambda |-
+              static std::string auth;
+              auth = "Bearer ";
+              auth += id(cloud_device_token);
+              return auth.c_str();
+            User-Agent: "UltimateSensorMini/${ultimatesensor_mini_software_version}"
+            Accept: "application/json"
+          capture_response: true
+          max_response_buffer_size: 2048
+          on_response:
+            then:
+              - lambda: |-
+                  id(cloud_configuration_syncing) = false;
+
+                  if (response->status_code != 200) {
+                    return;
+                  }
+
+                  const bool parsed = json::parse_json(body, [](JsonObject root) -> bool {
+                    if (!root["configuration_version"].is<uint32_t>()
+                        || !root["configuration"].is<JsonObject>()) {
+                      id(cloud_configuration_ack_error) = "Invalid configuration envelope";
+                      return false;
+                    }
+
+                    const uint32_t version = root["configuration_version"].as<uint32_t>();
+                    JsonObject configuration = root["configuration"].as<JsonObject>();
+                    id(cloud_configuration_ack_version) = version;
+                    id(cloud_desired_configuration_version) = version;
+
+                    const bool valid_types =
+                      configuration["led_enabled"].is<bool>()
+                      && configuration["motion_light_enabled"].is<bool>()
+                      && configuration["motion_light_brightness"].is<int>()
+                      && configuration["night_light_enabled"].is<bool>()
+                      && configuration["night_light_brightness"].is<int>()
+                      && configuration["night_light_start_hour"].is<int>()
+                      && configuration["night_light_end_hour"].is<int>()
+                      && configuration["co2_alert_enabled"].is<bool>()
+                      && configuration["co2_warning_ppm"].is<int>()
+                      && configuration["co2_critical_ppm"].is<int>()
+                      && configuration["co2_alert_cooldown_minutes"].is<int>();
+
+                    if (!valid_types) {
+                      id(cloud_configuration_ack_error) =
+                        "Missing or invalid LED configuration setting";
+                      return false;
+                    }
+
+                    const int motion_brightness =
+                      configuration["motion_light_brightness"].as<int>();
+                    const int night_brightness =
+                      configuration["night_light_brightness"].as<int>();
+                    const int night_start =
+                      configuration["night_light_start_hour"].as<int>();
+                    const int night_end =
+                      configuration["night_light_end_hour"].as<int>();
+                    const int co2_warning =
+                      configuration["co2_warning_ppm"].as<int>();
+                    const int co2_critical =
+                      configuration["co2_critical_ppm"].as<int>();
+                    const int co2_cooldown =
+                      configuration["co2_alert_cooldown_minutes"].as<int>();
+
+                    const bool valid_values =
+                      motion_brightness >= 1 && motion_brightness <= 100
+                      && night_brightness >= 1 && night_brightness <= 100
+                      && night_start >= 0 && night_start <= 23
+                      && night_end >= 0 && night_end <= 23
+                      && co2_warning >= 400 && co2_warning <= 5000
+                      && co2_critical >= 500 && co2_critical <= 10000
+                      && co2_critical > co2_warning
+                      && co2_cooldown >= 1 && co2_cooldown <= 1440;
+
+                    if (!valid_values) {
+                      id(cloud_configuration_ack_error) =
+                        "Configuration values are outside the supported range";
+                      return false;
+                    }
+
+                    id(cloud_led_enabled) = configuration["led_enabled"].as<bool>();
+                    id(cloud_motion_light_enabled) =
+                      configuration["motion_light_enabled"].as<bool>();
+                    id(cloud_motion_light_brightness) = motion_brightness;
+                    id(cloud_night_light_enabled) =
+                      configuration["night_light_enabled"].as<bool>();
+                    id(cloud_night_light_brightness) = night_brightness;
+                    id(cloud_night_light_start_hour) = night_start;
+                    id(cloud_night_light_end_hour) = night_end;
+                    id(cloud_co2_alert_enabled) =
+                      configuration["co2_alert_enabled"].as<bool>();
+                    id(cloud_co2_warning_ppm) = co2_warning;
+                    id(cloud_co2_critical_ppm) = co2_critical;
+                    id(cloud_co2_alert_cooldown_minutes) = co2_cooldown;
+                    id(cloud_led_configuration_version) = version;
+                    id(cloud_configuration_ack_applied) = true;
+                    id(cloud_configuration_ack_error) = "";
+                    id(cloud_led_runtime_state) = -1;
+                    id(cloud_last_co2_alert_ms) = 0;
+                    id(cloud_last_co2_alert_severity) = 0;
+
+                    return true;
+                  });
+
+                  if (!parsed && id(cloud_configuration_ack_version) == 0) {
+                    id(cloud_configuration_ack_error) = "Unable to parse configuration";
+                  }
+              - if:
+                  condition:
+                    lambda: "return id(cloud_configuration_ack_version) > 0;"
+                  then:
+                    - script.execute: cloud_ack_configuration
+          on_error:
+            then:
+              - lambda: "id(cloud_configuration_syncing) = false;"
+
+  - id: cloud_ack_configuration
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return !network::is_connected()
+                || !id(cloud_is_registered)
+                || id(cloud_device_token).empty()
+                || id(cloud_configuration_ack_version) == 0;
+          then:
+            - script.stop: cloud_ack_configuration
+      - http_request.post:
+          url: "${cloud_api_url}/api/${cloud_api_version}/devices/configuration/acknowledge"
+          request_headers:
+            Content-Type: "application/json"
+            Authorization: !lambda |-
+              static std::string auth;
+              auth = "Bearer ";
+              auth += id(cloud_device_token);
+              return auth.c_str();
+            User-Agent: "UltimateSensorMini/${ultimatesensor_mini_software_version}"
+            Accept: "application/json"
+          json: |-
+            root["type"] = "configuration_applied";
+            root["device_id"] = id(cloud_device_id);
+            root["configuration_version"] = id(cloud_configuration_ack_version);
+            root["applied"] = id(cloud_configuration_ack_applied);
+
+            JsonObject configuration = root["configuration"].to<JsonObject>();
+            configuration["led_enabled"] = id(cloud_led_enabled);
+            configuration["motion_light_enabled"] = id(cloud_motion_light_enabled);
+            configuration["motion_light_brightness"] = id(cloud_motion_light_brightness);
+            configuration["night_light_enabled"] = id(cloud_night_light_enabled);
+            configuration["night_light_brightness"] = id(cloud_night_light_brightness);
+            configuration["night_light_start_hour"] = id(cloud_night_light_start_hour);
+            configuration["night_light_end_hour"] = id(cloud_night_light_end_hour);
+            configuration["co2_alert_enabled"] = id(cloud_co2_alert_enabled);
+            configuration["co2_warning_ppm"] = id(cloud_co2_warning_ppm);
+            configuration["co2_critical_ppm"] = id(cloud_co2_critical_ppm);
+            configuration["co2_alert_cooldown_minutes"] =
+              id(cloud_co2_alert_cooldown_minutes);
+
+            if (!id(cloud_configuration_ack_error).empty()) {
+              root["error"] = id(cloud_configuration_ack_error);
+            }
+          capture_response: true
+          max_response_buffer_size: 256
+          on_response:
+            then:
+              - if:
+                  condition:
+                    lambda: |-
+                      return response->status_code == 200
+                        && id(cloud_configuration_ack_applied);
+                  then:
+                    - lambda: "id(cloud_configuration_boot_sync_done) = true;"
+
+  - id: cloud_flash_co2_alert
+    mode: single
+    parameters:
+      critical: bool
+    then:
+      - lambda: |-
+          id(cloud_led_alert_active) = true;
+          id(cloud_led_runtime_state) = critical ? 4 : 3;
+      - repeat:
+          count: 3
+          then:
+            - if:
+                condition:
+                  lambda: |-
+                    return id(cloud_led_enabled)
+                      && id(cloud_co2_alert_enabled);
+                then:
+                  - light.turn_on:
+                      id: rgb_status_led
+                      brightness: 100%
+                      red: 100%
+                      green: !lambda "return critical ? 0.0f : 0.35f;"
+                      blue: 0%
+                      effect: none
+            - delay: 250ms
+            - light.turn_off: rgb_status_led
+            - delay: 250ms
+      - lambda: |-
+          id(cloud_led_alert_active) = false;
+          id(cloud_led_runtime_state) = -1;
 
   - id: cloud_reset
     mode: single
@@ -381,6 +740,7 @@ script:
           id(cloud_has_pm) = false;
           id(cloud_has_zones) = false;
           id(cloud_last_presence_signature) = -1;
+          id(cloud_configuration_boot_sync_done) = false;
       - delay: 5s
       - script.execute: cloud_register
 
@@ -423,6 +783,99 @@ output:
     id: cloud_status_led_output
 
 interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          if (!id(cloud_led_automation_ready)) {
+            return;
+          }
+
+          if (id(cloud_led_alert_active)) {
+            return;
+          }
+
+          if (!id(cloud_led_enabled)) {
+            if (id(cloud_led_runtime_state) != 0) {
+              id(rgb_status_led).turn_off().perform();
+              id(cloud_led_runtime_state) = 0;
+            }
+            return;
+          }
+
+          int co2_severity = 0;
+          if (id(cloud_co2_alert_enabled)
+              && id(scd41_co2).has_state()
+              && !isnan(id(scd41_co2).state)) {
+            if (id(scd41_co2).state >= id(cloud_co2_critical_ppm)) {
+              co2_severity = 2;
+            } else if (id(scd41_co2).state >= id(cloud_co2_warning_ppm)) {
+              co2_severity = 1;
+            }
+          }
+
+          const bool severity_increased =
+            co2_severity > id(cloud_last_co2_alert_severity);
+          id(cloud_last_co2_alert_severity) = co2_severity;
+
+          if (co2_severity == 0) {
+            id(cloud_last_co2_alert_ms) = 0;
+          } else {
+            const uint32_t cooldown_ms =
+              (uint32_t) id(cloud_co2_alert_cooldown_minutes) * 60000UL;
+            const uint32_t elapsed_ms = millis() - id(cloud_last_co2_alert_ms);
+            if (id(cloud_last_co2_alert_ms) == 0
+                || elapsed_ms >= cooldown_ms
+                || severity_increased) {
+              id(cloud_last_co2_alert_ms) = millis();
+              id(cloud_flash_co2_alert).execute(co2_severity == 2);
+              return;
+            }
+          }
+
+          const bool motion =
+            id(ld2412_moving_target).state
+            || id(${tracking_motion_sensor_id}).state;
+
+          if (motion && id(cloud_motion_light_enabled)) {
+            if (id(cloud_led_runtime_state) != 2) {
+              auto call = id(rgb_status_led).turn_on();
+              call.set_brightness(id(cloud_motion_light_brightness) / 100.0f);
+              call.set_rgb(1.0f, 1.0f, 1.0f);
+              call.set_effect("none");
+              call.perform();
+              id(cloud_led_runtime_state) = 2;
+            }
+            return;
+          }
+
+          const auto now = id(sntp_cloud_time).now();
+          bool night = false;
+          if (now.is_valid()) {
+            const int hour = now.hour;
+            const int start = id(cloud_night_light_start_hour);
+            const int end = id(cloud_night_light_end_hour);
+            night = start == end
+              || (start < end && hour >= start && hour < end)
+              || (start > end && (hour >= start || hour < end));
+          }
+
+          if (id(occupancy).state && night && id(cloud_night_light_enabled)) {
+            if (id(cloud_led_runtime_state) != 1) {
+              auto call = id(rgb_status_led).turn_on();
+              call.set_brightness(id(cloud_night_light_brightness) / 100.0f);
+              call.set_rgb(1.0f, 0.45f, 0.08f);
+              call.set_effect("none");
+              call.perform();
+              id(cloud_led_runtime_state) = 1;
+            }
+            return;
+          }
+
+          if (id(cloud_led_runtime_state) != 0) {
+            id(rgb_status_led).turn_off().perform();
+            id(cloud_led_runtime_state) = 0;
+          }
+
   - interval: 500ms
     then:
       - lambda: |-
@@ -440,6 +893,18 @@ interval:
               id(cloud_status_led_output).turn_off();
             }
           }
+  - interval: 10s
+    then:
+      - lambda: |-
+          const bool connected = network::is_connected();
+          if (connected && !id(cloud_last_network_connected)) {
+            id(cloud_configuration_boot_sync_done) = false;
+            if (id(cloud_is_registered) && !id(cloud_configuration_syncing)) {
+              id(cloud_sync_configuration).execute();
+            }
+          }
+          id(cloud_last_network_connected) = connected;
+
   - interval: ${cloud_presence_sync_interval}
     then:
       - script.execute: cloud_send_presence_if_changed
@@ -447,6 +912,10 @@ interval:
   - interval: ${cloud_sync_interval}
     then:
       - script.execute: cloud_send_batch
+
+  - interval: 6h
+    then:
+      - script.execute: cloud_sync_configuration
 
 # Cloud-only customers may never connect Home Assistant. Without this the
 # native API reboots the device every 15 minutes ("No clients; rebooting"),

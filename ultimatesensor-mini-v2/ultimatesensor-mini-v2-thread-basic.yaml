@@ -20,6 +20,7 @@ packages:
   tracking: !include tracking-ld2450.yaml
   buses: !include buses-ld2450.yaml
   net: !include thread.yaml
+  lighting: !include led-lighting.yaml
 
 dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v2/ultimatesensor-mini-v2-thread-basic.yaml@main
