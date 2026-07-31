@@ -6,12 +6,29 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 3.4] - 2026-07-31
+
+
 ### UltimateSensor Mini V1
 
 - Fixed adopted ESPHome Dashboard configurations failing to compile because
   `audio/boot1.mp3` was not present next to the customer's YAML file. The boot
   sound is now downloaded from the product repository while compiling and
   remains embedded in the firmware for fully local playback.
+
+
+## [UltimateSensor Mini Beta V1 2.39-beta.93] - 2026-07-31
+
+
+### UltimateSensor Mini V1
+
+- Fixed adopted ESPHome Dashboard configurations failing to compile because
+  `audio/boot1.mp3` was not present next to the customer's YAML file. The boot
+  sound is now downloaded from the product repository while compiling and
+  remains embedded in the firmware for fully local playback.
+
 
 ## [UltimateSensor Mini V2 1.10] - 2026-07-30
 
