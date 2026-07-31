@@ -13,7 +13,9 @@ substitutions:
   boot_sound_volume: "50%"
   boot_sound_duration: "10s"
   # Embedded at compile time, so playback never depends on the network.
-  boot_sound_file: "audio/boot1.mp3"
+  # Downloaded while compiling and then embedded in the firmware, so adopted
+  # dashboard configs do not need a local audio directory.
+  boot_sound_file: "https://raw.githubusercontent.com/smarthomeshop/ultimatesensor-mini/main/ultimatesensor-mini-v1/audio/boot1.mp3"
 
 # Shared SmartHomeShop LD2450 polygon zones layer (zones, entry lines,
 # people counting + panel push API). Radar base config is defined below.

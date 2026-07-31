@@ -20,8 +20,9 @@ substitutions:
   boot_sound_duration: "10s"
   voice_assistant_watchdog_timeout: "60s"
   voice_assistant_resume_timeout: "30s"
-  # Embedded at compile time, so playback never depends on the network.
-  boot_sound_file: "audio/boot1.mp3"
+  # Downloaded while compiling and then embedded in the firmware, so playback
+  # never depends on the network and adopted dashboard configs need no file.
+  boot_sound_file: "https://raw.githubusercontent.com/smarthomeshop/ultimatesensor-mini/main/ultimatesensor-mini-v1/audio/boot1.mp3"
 # Mini V1 hardware has one LD2450 on these fixed UART pins.
   ld2450_uart_tx_pin: GPIO13
   ld2450_uart_rx_pin: GPIO14
