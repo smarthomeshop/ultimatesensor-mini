@@ -1,6 +1,6 @@
 {
   "name": "UltimateSensor Mini V2 WiFi Complete LD2460 Cloud",
-  "version": "1.10",
+  "version": "1.11",
   "home_assistant_domain": "esphome",
   "new_install_skip_erase": false,
   "builds": [
@@ -8,7 +8,7 @@
       "chipFamily": "ESP32-C6",
       "ota": {
         "path": "ultimatesensor-mini-v2-wifi-complete-ld2460-cloud/ultimatesensor-mini-v2-esp32c6.ota.bin",
-        "md5": "a49d84978919be472ae520fb9e4fadcd"
+        "md5": "53a4750a589cb1395e5de6911920d02f"
       },
       "parts": [
         {
