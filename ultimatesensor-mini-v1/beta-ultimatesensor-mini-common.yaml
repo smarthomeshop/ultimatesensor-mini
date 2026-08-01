@@ -4,7 +4,7 @@
 
 substitutions:
   project_main_version: "2"
-  project_version: "2.40-beta.94"
+  project_version: "2.41-beta.95"
   project_name: "smarthomeshop.ultimatesensor_mini_beta"
   log_level: "DEBUG"
   cloud_enabled: "false"

@@ -6,12 +6,40 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 3.5] - 2026-08-01
+
+
 - Added explicit wall-mounting and radar-model metadata for Room Designer to
   Mini V1 LD2450 and every Mini V2 LD2450/LD2460 firmware variant.
 - Mini V1 beta now uses the same production LD2450 component, polygon zones,
   entry lines, people counting and stale-target handling as regular Mini V1.
 - Removed the duplicated legacy LD2450 and SPS30 implementation from the Mini
   V1 beta compatibility builds.
+
+
+## [UltimateSensor Mini Beta V1 2.41-beta.95] - 2026-08-01
+
+
+- Added explicit wall-mounting and radar-model metadata for Room Designer to
+  Mini V1 LD2450 and every Mini V2 LD2450/LD2460 firmware variant.
+- Mini V1 beta now uses the same production LD2450 component, polygon zones,
+  entry lines, people counting and stale-target handling as regular Mini V1.
+- Removed the duplicated legacy LD2450 and SPS30 implementation from the Mini
+  V1 beta compatibility builds.
+
+
+## [UltimateSensor Mini V2 1.12] - 2026-08-01
+
+
+- Added explicit wall-mounting and radar-model metadata for Room Designer to
+  Mini V1 LD2450 and every Mini V2 LD2450/LD2460 firmware variant.
+- Mini V1 beta now uses the same production LD2450 component, polygon zones,
+  entry lines, people counting and stale-target handling as regular Mini V1.
+- Removed the duplicated legacy LD2450 and SPS30 implementation from the Mini
+  V1 beta compatibility builds.
+
 
 ## [UltimateSensor Mini Beta V1 2.40-beta.94] - 2026-07-31
 
