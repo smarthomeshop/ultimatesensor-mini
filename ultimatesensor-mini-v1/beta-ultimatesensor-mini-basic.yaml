@@ -7,6 +7,7 @@ substitutions:
   ultimatesensor_mini_hardware_version: "V1-Beta-Basic"
   wifi_fast_connect: "true"
   update_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/beta-ultimatesensor-mini-basic-manifest.json"
+  default_network: "WiFi Basic (local)"
 
 packages:
   common: !include beta-ultimatesensor-mini-common.yaml

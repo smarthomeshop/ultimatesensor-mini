@@ -4,6 +4,7 @@
 # https://github.com/HA-TB303/ultimatesensor_mini
 
 substitutions:
+  project_name: "smarthomeshop.ultimatesensor_mini"
   project_main_version: "3"
   project_version: "3.4"
   log_level: "INFO"
@@ -37,6 +38,8 @@ packages:
       - packages/ld2450-base.yaml
       - packages/ld2450-polygon-zones.yaml
     refresh: 1d
+  radar_mounting: github://smarthomeshop/radar-mounting/packages/mounting/wall.yaml@v1.0.0
+  radar_profile: github://smarthomeshop/radar-mounting/packages/radars/ld2450.yaml@v1.0.0
 
 esphome:
   name: ${device_name}
@@ -53,7 +56,7 @@ esphome:
       then:
         - script.execute: play_boot_sound
   project:
-    name: "smarthomeshop.ultimatesensor_mini"
+    name: ${project_name}
     version: ${project_version}
     on_update:
       then:

@@ -18,6 +18,8 @@ packages:
       - packages/ld2450-base.yaml
       - packages/ld2450-polygon-zones.yaml
     refresh: 1d
+  radar_mounting: github://smarthomeshop/radar-mounting/packages/mounting/wall.yaml@v1.0.0
+  radar_profile: github://smarthomeshop/radar-mounting/packages/radars/ld2450.yaml@v1.0.0
 
 # The shared LD2450 package already defines the radar component and the
 # stable tracking_presence entity used by the Mini occupancy combiner.
