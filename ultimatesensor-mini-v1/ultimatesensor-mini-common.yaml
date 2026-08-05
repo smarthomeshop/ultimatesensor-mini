@@ -27,10 +27,12 @@ substitutions:
 # Mini V1 hardware has one LD2450 on these fixed UART pins.
   ld2450_uart_tx_pin: GPIO13
   ld2450_uart_rx_pin: GPIO14
+  tracking_motion_sensor_id: tracking_moving_target
 
 # Mini V1 supports LD2450 only. The shared package owns the UART, radar,
 # entities, polygon zones, entry lines, people counting and panel API.
 packages:
+  lighting: !include led-lighting.yaml
   ld2450:
     url: https://github.com/smarthomeshop/ld2450
     ref: main

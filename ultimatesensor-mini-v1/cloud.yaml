@@ -33,14 +33,6 @@ esphome:
                   format: "Device not registered, starting auto-registration..."
               - script.execute: cloud_register
 
-time:
-  - platform: sntp
-    id: sntp_time
-    timezone: "Europe/Amsterdam"
-    servers:
-      - "pool.ntp.org"
-      - "time.google.com"
-
 globals:
   - id: cloud_device_token
     type: std::string
@@ -262,6 +254,7 @@ script:
             if (id(ip_address).has_state()) {
               root["local_ip"] = id(ip_address).state;
             }
+            root["configuration_protocol_version"] = 1;
           capture_response: true
           max_response_buffer_size: 512
           on_response:
@@ -357,7 +350,7 @@ script:
           max_response_buffer_size: 256
           json: |-
             root["device_id"] = id(cloud_device_id);
-            root["timestamp"] = id(sntp_time).now().timestamp;
+            root["timestamp"] = id(local_led_sntp_time).now().timestamp;
 
             if (id(scd41_co2).has_state() && !isnan(id(scd41_co2).state)) {
               root["co2_ppm"] = id(scd41_co2).state;
@@ -416,6 +409,7 @@ script:
 
             root["firmware_version"] = "${project_version}";
             root["hardware_version"] = "${ultimatesensor_mini_hardware_version}";
+            root["configuration_protocol_version"] = 1;
           on_response:
             then:
               - lambda: |-
@@ -424,7 +418,7 @@ script:
                     id(cloud_sync_failures) = 0;
 
                     if (id(cloud_first_sync_timestamp) == 0) {
-                      id(cloud_first_sync_timestamp) = id(sntp_time).now().timestamp;
+                      id(cloud_first_sync_timestamp) = id(local_led_sntp_time).now().timestamp;
                       ESP_LOGI("cloud", "First sync timestamp recorded");
                     }
 

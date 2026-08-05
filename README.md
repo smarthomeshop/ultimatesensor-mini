@@ -49,6 +49,7 @@ word recognition and the shared LD2450 polygon-zone tracking platform.
 ## Key Features
 
 - CO2 sensing
+- Optional automatic motion light, scheduled night light, and CO2 warning light
 - Temperature and humidity sensing
 - Ambient light measurement in lux
 - VOC and NOx air-quality indices

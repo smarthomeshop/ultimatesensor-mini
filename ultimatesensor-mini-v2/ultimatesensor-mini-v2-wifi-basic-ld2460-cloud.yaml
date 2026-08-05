@@ -31,6 +31,7 @@ packages:
   buses: !include buses-ld2460.yaml
   net: !include wifi.yaml
   cloud: !include cloud.yaml
+  cloud_lighting_entities: !include cloud-lighting-entities.yaml
   firmware: !include firmware-selector.yaml
   setup_portal: github://smarthomeshop/setup-portal/packages/setup-portal.yaml@main
   setup_portal_bridge: github://smarthomeshop/setup-portal/packages/firmware-selector-bridge.yaml@main

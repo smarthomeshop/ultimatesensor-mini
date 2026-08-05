@@ -19,6 +19,7 @@ packages:
   net: !include ethernet.yaml
   variant: !include complete.yaml
   cloud: !include cloud.yaml
+  cloud_lighting_entities: !include cloud-lighting-entities.yaml
   cloud_pm: !include cloud-pm.yaml
   firmware: !include firmware-selector.yaml
 

@@ -18,6 +18,7 @@ packages:
   buses: !include buses-ld2460.yaml
   net: !include ethernet.yaml
   cloud: !include cloud.yaml
+  cloud_lighting_entities: !include cloud-lighting-entities.yaml
   firmware: !include firmware-selector.yaml
 
 dashboard_import:

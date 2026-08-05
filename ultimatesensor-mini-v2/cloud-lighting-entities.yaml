@@ -1,0 +1,173 @@
+# Home Assistant/web controls backed by the existing cloud lighting state.
+
+switch:
+  - platform: template
+    id: cloud_led_enabled_control
+    name: "Automatic LED Lighting"
+    entity_category: config
+    lambda: "return id(cloud_led_enabled);"
+    turn_on_action:
+      - lambda: |-
+          id(cloud_led_enabled) = true;
+          id(cloud_led_runtime_state) = -1;
+    turn_off_action:
+      - lambda: |-
+          id(cloud_led_enabled) = false;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_motion_light_enabled_control
+    name: "Motion Light"
+    entity_category: config
+    lambda: "return id(cloud_motion_light_enabled);"
+    turn_on_action:
+      - lambda: |-
+          id(cloud_motion_light_enabled) = true;
+          id(cloud_led_runtime_state) = -1;
+    turn_off_action:
+      - lambda: |-
+          id(cloud_motion_light_enabled) = false;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_night_light_enabled_control
+    name: "Night Light"
+    entity_category: config
+    lambda: "return id(cloud_night_light_enabled);"
+    turn_on_action:
+      - lambda: |-
+          id(cloud_night_light_enabled) = true;
+          id(cloud_led_runtime_state) = -1;
+    turn_off_action:
+      - lambda: |-
+          id(cloud_night_light_enabled) = false;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_co2_alert_enabled_control
+    name: "CO2 LED Warning"
+    entity_category: config
+    lambda: "return id(cloud_co2_alert_enabled);"
+    turn_on_action:
+      - lambda: |-
+          id(cloud_co2_alert_enabled) = true;
+          id(cloud_last_co2_alert_ms) = 0;
+          id(cloud_last_co2_alert_severity) = 0;
+    turn_off_action:
+      - lambda: |-
+          id(cloud_co2_alert_enabled) = false;
+          id(cloud_last_co2_alert_ms) = 0;
+          id(cloud_last_co2_alert_severity) = 0;
+
+number:
+  - platform: template
+    id: cloud_motion_light_brightness_control
+    name: "Motion Light Brightness"
+    entity_category: config
+    lambda: "return id(cloud_motion_light_brightness);"
+    update_interval: 1s
+    min_value: 1
+    max_value: 100
+    step: 1
+    unit_of_measurement: "%"
+    mode: box
+    set_action:
+      - lambda: |-
+          id(cloud_motion_light_brightness) = (int) x;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_night_light_brightness_control
+    name: "Night Light Brightness"
+    entity_category: config
+    lambda: "return id(cloud_night_light_brightness);"
+    update_interval: 1s
+    min_value: 1
+    max_value: 100
+    step: 1
+    unit_of_measurement: "%"
+    mode: box
+    set_action:
+      - lambda: |-
+          id(cloud_night_light_brightness) = (int) x;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_night_light_start_hour_control
+    name: "Night Light Start Hour"
+    entity_category: config
+    lambda: "return id(cloud_night_light_start_hour);"
+    update_interval: 1s
+    min_value: 0
+    max_value: 23
+    step: 1
+    unit_of_measurement: "h"
+    mode: box
+    set_action:
+      - lambda: |-
+          id(cloud_night_light_start_hour) = (int) x;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_night_light_end_hour_control
+    name: "Night Light End Hour"
+    entity_category: config
+    lambda: "return id(cloud_night_light_end_hour);"
+    update_interval: 1s
+    min_value: 0
+    max_value: 23
+    step: 1
+    unit_of_measurement: "h"
+    mode: box
+    set_action:
+      - lambda: |-
+          id(cloud_night_light_end_hour) = (int) x;
+          id(cloud_led_runtime_state) = -1;
+
+  - platform: template
+    id: cloud_co2_warning_ppm_control
+    name: "CO2 Warning Threshold"
+    entity_category: config
+    lambda: "return id(cloud_co2_warning_ppm);"
+    update_interval: 1s
+    min_value: 400
+    max_value: 5000
+    step: 50
+    unit_of_measurement: "ppm"
+    mode: box
+    set_action:
+      - lambda: |-
+          id(cloud_co2_warning_ppm) = (int) x;
+          id(cloud_last_co2_alert_ms) = 0;
+          id(cloud_last_co2_alert_severity) = 0;
+
+  - platform: template
+    id: cloud_co2_critical_ppm_control
+    name: "CO2 Critical Threshold"
+    entity_category: config
+    lambda: "return id(cloud_co2_critical_ppm);"
+    update_interval: 1s
+    min_value: 500
+    max_value: 10000
+    step: 50
+    unit_of_measurement: "ppm"
+    mode: box
+    set_action:
+      - lambda: |-
+          id(cloud_co2_critical_ppm) = (int) x;
+          id(cloud_last_co2_alert_ms) = 0;
+          id(cloud_last_co2_alert_severity) = 0;
+
+  - platform: template
+    id: cloud_co2_alert_cooldown_control
+    name: "CO2 Alert Cooldown"
+    entity_category: config
+    lambda: "return id(cloud_co2_alert_cooldown_minutes);"
+    update_interval: 1s
+    min_value: 1
+    max_value: 1440
+    step: 1
+    unit_of_measurement: "min"
+    mode: box
+    set_action:
+      - lambda: "id(cloud_co2_alert_cooldown_minutes) = (int) x;"

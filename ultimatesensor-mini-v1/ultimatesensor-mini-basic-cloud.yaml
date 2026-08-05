@@ -17,6 +17,7 @@ substitutions:
 packages:
   common: !include ultimatesensor-mini-common.yaml
   cloud: !include cloud.yaml
+  cloud_lighting: !include cloud-lighting.yaml
 
 dashboard_import:
   package_import_url: github://smarthomeshop/ultimatesensor-mini/ultimatesensor-mini-v1/ultimatesensor-mini-basic-cloud.yaml@main

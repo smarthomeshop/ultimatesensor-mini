@@ -18,6 +18,7 @@ packages:
   common: !include ultimatesensor-mini-common.yaml
   sps30: !include sps30.yaml
   cloud: !include cloud.yaml
+  cloud_lighting: !include cloud-lighting.yaml
   cloud_pm: !include cloud-pm.yaml
 
 dashboard_import:

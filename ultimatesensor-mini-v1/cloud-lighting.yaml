@@ -1,0 +1,253 @@
+# SmartHomeShop App synchronization for the persistent Mini V1 LED controls.
+
+globals:
+  - id: cloud_lighting_syncing
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_lighting_configuration_version
+    type: uint32_t
+    restore_value: true
+    initial_value: "0"
+  - id: cloud_lighting_ack_version
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+  - id: cloud_lighting_ack_applied
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_lighting_ack_error
+    type: std::string
+    restore_value: false
+    initial_value: '""'
+
+esphome:
+  on_boot:
+    - priority: -100
+      then:
+        - delay: 20s
+        - script.execute: cloud_sync_lighting_configuration
+
+script:
+  - id: cloud_sync_lighting_configuration
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return !network::is_connected()
+                || !id(cloud_is_registered)
+                || id(cloud_device_token).empty()
+                || id(cloud_lighting_syncing);
+          then:
+            - script.stop: cloud_sync_lighting_configuration
+      - lambda: |-
+          id(cloud_lighting_syncing) = true;
+          id(cloud_lighting_ack_version) = 0;
+          id(cloud_lighting_ack_applied) = false;
+          id(cloud_lighting_ack_error) = "";
+      - http_request.get:
+          url: "${cloud_api_url}/api/${cloud_api_version}/devices/configuration"
+          request_headers:
+            Authorization: !lambda |-
+              static std::string auth;
+              auth = "Bearer ";
+              auth += id(cloud_device_token);
+              return auth.c_str();
+            User-Agent: "UltimateSensorMini/${project_version}"
+            Accept: "application/json"
+          capture_response: true
+          max_response_buffer_size: 2048
+          on_response:
+            then:
+              - lambda: |-
+                  id(cloud_lighting_syncing) = false;
+
+                  if (response->status_code != 200) {
+                    return;
+                  }
+
+                  const bool parsed = json::parse_json(body, [](JsonObject root) -> bool {
+                    if (!root["configuration_version"].is<uint32_t>()
+                        || !root["configuration"].is<JsonObject>()) {
+                      id(cloud_lighting_ack_error) = "Invalid configuration envelope";
+                      return false;
+                    }
+
+                    const uint32_t version = root["configuration_version"].as<uint32_t>();
+                    JsonObject configuration = root["configuration"].as<JsonObject>();
+
+                    if (version == id(cloud_lighting_configuration_version)) {
+                      return true;
+                    }
+
+                    id(cloud_lighting_ack_version) = version;
+
+                    const bool valid_types =
+                      configuration["led_enabled"].is<bool>()
+                      && configuration["motion_light_enabled"].is<bool>()
+                      && configuration["motion_light_brightness"].is<int>()
+                      && configuration["night_light_enabled"].is<bool>()
+                      && configuration["night_light_brightness"].is<int>()
+                      && configuration["night_light_start_hour"].is<int>()
+                      && configuration["night_light_end_hour"].is<int>()
+                      && configuration["co2_alert_enabled"].is<bool>()
+                      && configuration["co2_warning_ppm"].is<int>()
+                      && configuration["co2_critical_ppm"].is<int>()
+                      && configuration["co2_alert_cooldown_minutes"].is<int>();
+
+                    if (!valid_types) {
+                      id(cloud_lighting_ack_error) =
+                        "Missing or invalid LED configuration setting";
+                      return false;
+                    }
+
+                    const int motion_brightness =
+                      configuration["motion_light_brightness"].as<int>();
+                    const int night_brightness =
+                      configuration["night_light_brightness"].as<int>();
+                    const int night_start =
+                      configuration["night_light_start_hour"].as<int>();
+                    const int night_end =
+                      configuration["night_light_end_hour"].as<int>();
+                    const int co2_warning =
+                      configuration["co2_warning_ppm"].as<int>();
+                    const int co2_critical =
+                      configuration["co2_critical_ppm"].as<int>();
+                    const int co2_cooldown =
+                      configuration["co2_alert_cooldown_minutes"].as<int>();
+
+                    const bool valid_values =
+                      motion_brightness >= 1 && motion_brightness <= 100
+                      && night_brightness >= 1 && night_brightness <= 100
+                      && night_start >= 0 && night_start <= 23
+                      && night_end >= 0 && night_end <= 23
+                      && co2_warning >= 400 && co2_warning <= 5000
+                      && co2_critical >= 500 && co2_critical <= 10000
+                      && co2_critical > co2_warning
+                      && co2_cooldown >= 1 && co2_cooldown <= 1440;
+
+                    if (!valid_values) {
+                      id(cloud_lighting_ack_error) =
+                        "Configuration values are outside the supported range";
+                      return false;
+                    }
+
+                    const bool led_enabled = configuration["led_enabled"].as<bool>();
+                    const bool motion_enabled =
+                      configuration["motion_light_enabled"].as<bool>();
+                    const bool night_enabled =
+                      configuration["night_light_enabled"].as<bool>();
+                    const bool co2_enabled =
+                      configuration["co2_alert_enabled"].as<bool>();
+
+                    led_enabled ? id(local_led_enabled).turn_on()
+                                : id(local_led_enabled).turn_off();
+                    motion_enabled ? id(local_motion_light_enabled).turn_on()
+                                   : id(local_motion_light_enabled).turn_off();
+                    night_enabled ? id(local_night_light_enabled).turn_on()
+                                  : id(local_night_light_enabled).turn_off();
+                    co2_enabled ? id(local_co2_alert_enabled).turn_on()
+                                : id(local_co2_alert_enabled).turn_off();
+
+                    auto motion_call = id(local_motion_light_brightness).make_call();
+                    motion_call.set_value(motion_brightness);
+                    motion_call.perform();
+                    auto night_call = id(local_night_light_brightness).make_call();
+                    night_call.set_value(night_brightness);
+                    night_call.perform();
+                    auto start_call = id(local_night_light_start_hour).make_call();
+                    start_call.set_value(night_start);
+                    start_call.perform();
+                    auto end_call = id(local_night_light_end_hour).make_call();
+                    end_call.set_value(night_end);
+                    end_call.perform();
+                    auto warning_call = id(local_co2_warning_ppm).make_call();
+                    warning_call.set_value(co2_warning);
+                    warning_call.perform();
+                    auto critical_call = id(local_co2_critical_ppm).make_call();
+                    critical_call.set_value(co2_critical);
+                    critical_call.perform();
+                    auto cooldown_call = id(local_co2_alert_cooldown_minutes).make_call();
+                    cooldown_call.set_value(co2_cooldown);
+                    cooldown_call.perform();
+
+                    id(cloud_lighting_configuration_version) = version;
+                    id(cloud_lighting_ack_applied) = true;
+                    id(cloud_lighting_ack_error) = "";
+                    id(local_led_runtime_state) = -1;
+                    id(local_last_co2_alert_ms) = 0;
+                    id(local_last_co2_alert_severity) = 0;
+                    return true;
+                  });
+
+                  if (!parsed && id(cloud_lighting_ack_version) == 0) {
+                    id(cloud_lighting_ack_error) = "Unable to parse configuration";
+                  }
+              - if:
+                  condition:
+                    lambda: "return id(cloud_lighting_ack_version) > 0;"
+                  then:
+                    - script.execute: cloud_ack_lighting_configuration
+          on_error:
+            then:
+              - lambda: "id(cloud_lighting_syncing) = false;"
+
+  - id: cloud_ack_lighting_configuration
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return !network::is_connected()
+                || !id(cloud_is_registered)
+                || id(cloud_device_token).empty()
+                || id(cloud_lighting_ack_version) == 0;
+          then:
+            - script.stop: cloud_ack_lighting_configuration
+      - http_request.post:
+          url: "${cloud_api_url}/api/${cloud_api_version}/devices/configuration/acknowledge"
+          request_headers:
+            Content-Type: "application/json"
+            Authorization: !lambda |-
+              static std::string auth;
+              auth = "Bearer ";
+              auth += id(cloud_device_token);
+              return auth.c_str();
+            User-Agent: "UltimateSensorMini/${project_version}"
+            Accept: "application/json"
+          json: |-
+            root["type"] = "configuration_applied";
+            root["device_id"] = id(cloud_device_id);
+            root["configuration_version"] = id(cloud_lighting_ack_version);
+            root["applied"] = id(cloud_lighting_ack_applied);
+
+            JsonObject configuration = root["configuration"].to<JsonObject>();
+            configuration["led_enabled"] = id(local_led_enabled).state;
+            configuration["motion_light_enabled"] = id(local_motion_light_enabled).state;
+            configuration["motion_light_brightness"] =
+              (int) id(local_motion_light_brightness).state;
+            configuration["night_light_enabled"] = id(local_night_light_enabled).state;
+            configuration["night_light_brightness"] =
+              (int) id(local_night_light_brightness).state;
+            configuration["night_light_start_hour"] =
+              (int) id(local_night_light_start_hour).state;
+            configuration["night_light_end_hour"] =
+              (int) id(local_night_light_end_hour).state;
+            configuration["co2_alert_enabled"] = id(local_co2_alert_enabled).state;
+            configuration["co2_warning_ppm"] = (int) id(local_co2_warning_ppm).state;
+            configuration["co2_critical_ppm"] = (int) id(local_co2_critical_ppm).state;
+            configuration["co2_alert_cooldown_minutes"] =
+              (int) id(local_co2_alert_cooldown_minutes).state;
+
+            if (!id(cloud_lighting_ack_error).empty()) {
+              root["error"] = id(cloud_lighting_ack_error);
+            }
+          capture_response: true
+          max_response_buffer_size: 256
+
+interval:
+  - interval: 75s
+    then:
+      - script.execute: cloud_sync_lighting_configuration
