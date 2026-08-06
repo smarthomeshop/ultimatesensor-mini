@@ -1,0 +1,41 @@
+# Applies optional SmartHomeShop cloud quiet-hour settings to Complete firmware.
+
+globals:
+  - id: cloud_sps30_quiet_applied_revision
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
+
+script:
+  - id: cloud_apply_sps30_quiet_hours
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: "return id(cloud_sps30_quiet_hours_enabled);"
+          then:
+            - switch.turn_on: sps30_quiet_hours_enabled
+          else:
+            - switch.turn_off: sps30_quiet_hours_enabled
+      - number.set:
+          id: sps30_quiet_start_hour
+          value: !lambda "return id(cloud_sps30_quiet_start_hour);"
+      - number.set:
+          id: sps30_quiet_end_hour
+          value: !lambda "return id(cloud_sps30_quiet_end_hour);"
+      - lambda: |-
+          id(cloud_sps30_quiet_applied_revision) =
+            id(cloud_sps30_quiet_settings_revision);
+      - script.execute: sps30_evaluate_quiet_hours
+
+interval:
+  - interval: 2s
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return id(cloud_sps30_quiet_settings_present)
+                && id(cloud_sps30_quiet_applied_revision)
+                  != id(cloud_sps30_quiet_settings_revision);
+          then:
+            - script.execute: cloud_apply_sps30_quiet_hours

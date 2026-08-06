@@ -1,6 +1,7 @@
 # UltimateSensor Mini V2 WiFi Complete Cloud Configuration
 
 substitutions:
+  sps30_time_id: sntp_cloud_time
   device_name: ultimatesensor-mini-v2
   friendly_name: "UltimateSensor Mini V2"
   ultimatesensor_mini_hardware_version: "V2-Complete"
@@ -32,6 +33,7 @@ packages:
   net: !include wifi.yaml
   variant: !include complete.yaml
   cloud: !include cloud.yaml
+  cloud_sps30_quiet: !include cloud-sps30-quiet-hours.yaml
   cloud_lighting_entities: !include cloud-lighting-entities.yaml
   zones: !include cloud-zones.yaml
   cloud_pm: !include cloud-pm.yaml

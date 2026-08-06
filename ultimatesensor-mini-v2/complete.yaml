@@ -1,15 +1,21 @@
 # Complete variant configuration.
 # Adds the SPS30 particulate matter sensor and PM idle controls.
 
+substitutions:
+  sps30_time_id: local_led_sntp_time
+
 esphome:
   on_boot:
     - priority: -100
       then:
-        - if:
-            condition:
-              switch.is_on: pm_sensor_switch
-            then:
-              - script.execute: sps30_idle_cycle
+        - delay: 10s
+        - script.execute: sps30_evaluate_quiet_hours
+
+globals:
+  - id: sps30_quiet_hours_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
 
 sensor:
   - platform: sps30
@@ -77,13 +83,19 @@ script:
     then:
       - if:
           condition:
-            lambda: 'return id(pm_sensor_switch).state && id(sps30_idle_interval).state <= 0;'
+            lambda: |-
+              return id(pm_sensor_switch).state
+                && !id(sps30_quiet_hours_active)
+                && id(sps30_idle_interval).state <= 0;
           then:
             - sps30.start_measurement: sps30_sensor
           else:
             - while:
                 condition:
-                  lambda: 'return id(pm_sensor_switch).state && id(sps30_idle_interval).state > 0;'
+                  lambda: |-
+                    return id(pm_sensor_switch).state
+                      && !id(sps30_quiet_hours_active)
+                      && id(sps30_idle_interval).state > 0;
                 then:
                   - sps30.start_measurement: sps30_sensor
                   - delay: !lambda |-
@@ -91,6 +103,37 @@ script:
                   - sps30.stop_measurement: sps30_sensor
                   - delay: !lambda |-
                       return (uint32_t)(id(sps30_idle_interval).state * 60000);
+
+  - id: sps30_apply_operating_mode
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: |-
+              return !id(pm_sensor_switch).state
+                || id(sps30_quiet_hours_active);
+          then:
+            - script.stop: sps30_idle_cycle
+            - sps30.stop_measurement: sps30_sensor
+          else:
+            - script.execute: sps30_idle_cycle
+
+  - id: sps30_evaluate_quiet_hours
+    mode: restart
+    then:
+      - lambda: |-
+          bool quiet = false;
+          const auto now = id(${sps30_time_id}).now();
+          if (id(sps30_quiet_hours_enabled).state && now.is_valid()) {
+            const int hour = now.hour;
+            const int start = (int) id(sps30_quiet_start_hour).state;
+            const int end = (int) id(sps30_quiet_end_hour).state;
+            quiet = start == end
+              || (start < end && hour >= start && hour < end)
+              || (start > end && (hour >= start || hour < end));
+          }
+          id(sps30_quiet_hours_active) = quiet;
+      - script.execute: sps30_apply_operating_mode
 
 number:
   - platform: template
@@ -124,7 +167,39 @@ number:
     restore_value: true
     on_value:
       then:
-        - script.execute: sps30_idle_cycle
+        - script.execute: sps30_apply_operating_mode
+
+  - platform: template
+    name: "SPS30 Quiet Start Hour"
+    id: sps30_quiet_start_hour
+    min_value: 0
+    max_value: 23
+    step: 1
+    initial_value: 22
+    unit_of_measurement: "h"
+    icon: mdi:clock-start
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    mode: box
+    on_value:
+      - script.execute: sps30_evaluate_quiet_hours
+
+  - platform: template
+    name: "SPS30 Quiet End Hour"
+    id: sps30_quiet_end_hour
+    min_value: 0
+    max_value: 23
+    step: 1
+    initial_value: 7
+    unit_of_measurement: "h"
+    icon: mdi:clock-end
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    mode: box
+    on_value:
+      - script.execute: sps30_evaluate_quiet_hours
 
 switch:
   - platform: template
@@ -134,7 +209,31 @@ switch:
     restore_mode: RESTORE_DEFAULT_ON
     optimistic: true
     turn_on_action:
-      - script.execute: sps30_idle_cycle
+      - script.execute: sps30_apply_operating_mode
     turn_off_action:
-      - script.stop: sps30_idle_cycle
-      - sps30.stop_measurement: sps30_sensor
+      - script.execute: sps30_apply_operating_mode
+
+  - platform: template
+    name: "SPS30 Quiet Hours"
+    id: sps30_quiet_hours_enabled
+    icon: mdi:weather-night
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    turn_on_action:
+      - script.execute: sps30_evaluate_quiet_hours
+    turn_off_action:
+      - script.execute: sps30_evaluate_quiet_hours
+
+binary_sensor:
+  - platform: template
+    name: "SPS30 Quiet Hours Active"
+    id: sps30_quiet_hours_active_sensor
+    icon: mdi:fan-off
+    entity_category: diagnostic
+    lambda: "return id(sps30_quiet_hours_active);"
+
+interval:
+  - interval: 30s
+    then:
+      - script.execute: sps30_evaluate_quiet_hours

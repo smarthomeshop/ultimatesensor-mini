@@ -21,6 +21,26 @@ globals:
     type: std::string
     restore_value: false
     initial_value: '""'
+  - id: cloud_sps30_quiet_settings_present
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: cloud_sps30_quiet_hours_enabled
+    type: bool
+    restore_value: true
+    initial_value: "false"
+  - id: cloud_sps30_quiet_start_hour
+    type: int
+    restore_value: true
+    initial_value: "22"
+  - id: cloud_sps30_quiet_end_hour
+    type: int
+    restore_value: true
+    initial_value: "7"
+  - id: cloud_sps30_quiet_settings_revision
+    type: uint32_t
+    restore_value: false
+    initial_value: "0"
 
 esphome:
   on_boot:
@@ -84,6 +104,16 @@ script:
 
                     id(cloud_lighting_ack_version) = version;
 
+                    const bool quiet_settings_present =
+                      !configuration["sps30_quiet_hours_enabled"].isNull()
+                      || !configuration["sps30_quiet_start_hour"].isNull()
+                      || !configuration["sps30_quiet_end_hour"].isNull();
+                    const bool valid_quiet_types = !quiet_settings_present || (
+                      configuration["sps30_quiet_hours_enabled"].is<bool>()
+                      && configuration["sps30_quiet_start_hour"].is<int>()
+                      && configuration["sps30_quiet_end_hour"].is<int>()
+                    );
+
                     const bool valid_types =
                       configuration["led_enabled"].is<bool>()
                       && configuration["motion_light_enabled"].is<bool>()
@@ -97,7 +127,7 @@ script:
                       && configuration["co2_critical_ppm"].is<int>()
                       && configuration["co2_alert_cooldown_minutes"].is<int>();
 
-                    if (!valid_types) {
+                    if (!valid_types || !valid_quiet_types) {
                       id(cloud_lighting_ack_error) =
                         "Missing or invalid LED configuration setting";
                       return false;
@@ -117,6 +147,12 @@ script:
                       configuration["co2_critical_ppm"].as<int>();
                     const int co2_cooldown =
                       configuration["co2_alert_cooldown_minutes"].as<int>();
+                    const int quiet_start = quiet_settings_present
+                      ? configuration["sps30_quiet_start_hour"].as<int>()
+                      : id(cloud_sps30_quiet_start_hour);
+                    const int quiet_end = quiet_settings_present
+                      ? configuration["sps30_quiet_end_hour"].as<int>()
+                      : id(cloud_sps30_quiet_end_hour);
 
                     const bool valid_values =
                       motion_brightness >= 1 && motion_brightness <= 100
@@ -126,7 +162,11 @@ script:
                       && co2_warning >= 400 && co2_warning <= 5000
                       && co2_critical >= 500 && co2_critical <= 10000
                       && co2_critical > co2_warning
-                      && co2_cooldown >= 1 && co2_cooldown <= 1440;
+                      && co2_cooldown >= 1 && co2_cooldown <= 1440
+                      && (!quiet_settings_present || (
+                        quiet_start >= 0 && quiet_start <= 23
+                        && quiet_end >= 0 && quiet_end <= 23
+                      ));
 
                     if (!valid_values) {
                       id(cloud_lighting_ack_error) =
@@ -172,6 +212,15 @@ script:
                     auto cooldown_call = id(local_co2_alert_cooldown_minutes).make_call();
                     cooldown_call.set_value(co2_cooldown);
                     cooldown_call.perform();
+
+                    if (quiet_settings_present) {
+                      id(cloud_sps30_quiet_settings_present) = true;
+                      id(cloud_sps30_quiet_hours_enabled) =
+                        configuration["sps30_quiet_hours_enabled"].as<bool>();
+                      id(cloud_sps30_quiet_start_hour) = quiet_start;
+                      id(cloud_sps30_quiet_end_hour) = quiet_end;
+                      id(cloud_sps30_quiet_settings_revision)++;
+                    }
 
                     id(cloud_lighting_configuration_version) = version;
                     id(cloud_lighting_ack_applied) = true;
@@ -240,6 +289,14 @@ script:
             configuration["co2_critical_ppm"] = (int) id(local_co2_critical_ppm).state;
             configuration["co2_alert_cooldown_minutes"] =
               (int) id(local_co2_alert_cooldown_minutes).state;
+            if (id(cloud_sps30_quiet_settings_present)) {
+              configuration["sps30_quiet_hours_enabled"] =
+                id(cloud_sps30_quiet_hours_enabled);
+              configuration["sps30_quiet_start_hour"] =
+                id(cloud_sps30_quiet_start_hour);
+              configuration["sps30_quiet_end_hour"] =
+                id(cloud_sps30_quiet_end_hour);
+            }
 
             if (!id(cloud_lighting_ack_error).empty()) {
               root["error"] = id(cloud_lighting_ack_error);
