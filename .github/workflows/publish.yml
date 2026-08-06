@@ -293,7 +293,10 @@ jobs:
           echo "V2 version: $V2_VERSION"
 
       - name: Commit version updates and create tags
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: >-
+          (github.event_name == 'push' ||
+           (github.event_name == 'workflow_dispatch' && inputs.force_v2 == true)) &&
+          github.ref == 'refs/heads/main'
         shell: bash
         run: |
           set -euo pipefail
@@ -918,7 +921,8 @@ jobs:
     needs: [detect-changes, deploy-pages]
     if: >-
       always() &&
-      github.event_name == 'push' &&
+      (github.event_name == 'push' ||
+       (github.event_name == 'workflow_dispatch' && inputs.force_v2 == true)) &&
       github.ref == 'refs/heads/main' &&
       needs.detect-changes.result == 'success' &&
       needs.deploy-pages.result == 'success'
