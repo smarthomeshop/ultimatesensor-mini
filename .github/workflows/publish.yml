@@ -9,6 +9,11 @@ on:
         required: false
         type: boolean
         default: false
+      force_v2:
+        description: 'Build and release only UltimateSensor Mini V2 variants'
+        required: false
+        type: boolean
+        default: false
   # Scheduled build: rebuild all firmware monthly with latest ESPHome.
   # ESPHome releases new versions around the 15th; the 20th gives early bugfixes time to land.
   schedule:
@@ -111,6 +116,17 @@ jobs:
             echo "v1_build=true" >> "$GITHUB_OUTPUT"
             echo "beta=true" >> "$GITHUB_OUTPUT"
             echo "beta_build=true" >> "$GITHUB_OUTPUT"
+            echo "v2=true" >> "$GITHUB_OUTPUT"
+            echo "v2_build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.force_v2 }}" == "true" ]]; then
+            echo "Force building UltimateSensor Mini V2 variants only"
+            echo "v1=false" >> "$GITHUB_OUTPUT"
+            echo "v1_build=false" >> "$GITHUB_OUTPUT"
+            echo "beta=false" >> "$GITHUB_OUTPUT"
+            echo "beta_build=false" >> "$GITHUB_OUTPUT"
             echo "v2=true" >> "$GITHUB_OUTPUT"
             echo "v2_build=true" >> "$GITHUB_OUTPUT"
             exit 0
