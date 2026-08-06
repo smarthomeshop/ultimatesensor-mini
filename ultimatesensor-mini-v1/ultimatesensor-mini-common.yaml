@@ -6,7 +6,7 @@
 substitutions:
   project_name: "smarthomeshop.ultimatesensor_mini"
   project_main_version: "3"
-  project_version: "3.6"
+  project_version: "3.7"
   log_level: "INFO"
   wifi_fast_connect: "true"
   basic_manifest_url: ${update_manifest_url}
