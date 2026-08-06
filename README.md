@@ -122,6 +122,9 @@ WiFi/Ethernet and LD2450/LD2460 firmware variants.
 5. Add the device to Home Assistant through the ESPHome integration.
 6. For V2 LD2460 upgrades, physically replace/remove the LD2450 module first, leave LD2412 installed, and flash one of the `*-ld2460` firmware files.
 
+For LD2460 module orientation and wall calibration, follow the
+[Mini V2 LD2460 upgrade guide](ultimatesensor-mini-v2/LD2460-UPGRADE.md).
+
 Web flasher: https://smarthomeshop.io/firmware
 Product page: https://ultimatesensor.nl/en/mini
 

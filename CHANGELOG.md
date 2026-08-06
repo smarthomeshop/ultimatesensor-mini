@@ -6,7 +6,17 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+### UltimateSensor Mini V2 LD2460
+
+- Fixed LD2460 startup configuration being skipped once target reports had
+  already started, which left the installation-mode entity `unknown` after a
+  reboot.
+- LD2460 upgrade firmware now verifies and enforces wall/side mode without
+  unnecessarily rewriting a correct saved mode at every startup.
+- Added saved LD2460 installation-height and installation-angle controls. The
+  values are written to the radar and read back for confirmation after reboot.
+- Added a dedicated orientation and calibration guide, including Hi-Link's
+  mounting recommendations and troubleshooting for reflective ghost targets.
 
 ## [UltimateSensor Mini V1 3.7] - 2026-08-06
 

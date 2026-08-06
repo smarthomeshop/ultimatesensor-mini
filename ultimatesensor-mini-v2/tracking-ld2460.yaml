@@ -5,13 +5,16 @@
 substitutions:
   ld2460_tx_pin: GPIO4
   ld2460_rx_pin: GPIO5
+  # Mini V2 is a wall-mounted product. The component enforces and verifies this
+  # mode on every boot while preserving the radar's configured height and angle.
+  ld2460_startup_installation_mode: side
   # LD2460 reports target presence but does not classify moving/still targets.
   tracking_motion_sensor_id: tracking_presence
 
 packages:
   ld2460:
     url: https://github.com/smarthomeshop/ld2460
-    ref: main
+    ref: v0.3.0
     files:
       - tracking-ld2460.yaml
       - packages/ld2460-polygon-zones.yaml
