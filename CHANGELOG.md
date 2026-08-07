@@ -6,7 +6,10 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Fixed Complete firmware particulate matter measurements remaining unavailable
+  after the SPS30 quiet-hours update.
+- SPS30 quiet hours now start or stop the sensor only when the configured mode
+  actually changes.
 
 ## [UltimateSensor Mini V2 1.15] - 2026-08-07
 

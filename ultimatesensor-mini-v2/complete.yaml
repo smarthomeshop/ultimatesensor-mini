@@ -9,9 +9,22 @@ esphome:
     - priority: -100
       then:
         - delay: 10s
+        - lambda: "id(sps30_controller_ready) = true;"
         - script.execute: sps30_evaluate_quiet_hours
 
 globals:
+  - id: sps30_controller_ready
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: sps30_operating_mode_initialized
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: sps30_applied_quiet_hours_active
+    type: bool
+    restore_value: false
+    initial_value: "false"
   - id: sps30_quiet_hours_active
     type: bool
     restore_value: false
@@ -109,14 +122,18 @@ script:
     then:
       - if:
           condition:
-            lambda: |-
-              return !id(pm_sensor_switch).state
-                || id(sps30_quiet_hours_active);
+            lambda: "return id(sps30_controller_ready);"
           then:
-            - script.stop: sps30_idle_cycle
-            - sps30.stop_measurement: sps30_sensor
-          else:
-            - script.execute: sps30_idle_cycle
+            - if:
+                condition:
+                  lambda: |-
+                    return !id(pm_sensor_switch).state
+                      || id(sps30_quiet_hours_active);
+                then:
+                  - script.stop: sps30_idle_cycle
+                  - sps30.stop_measurement: sps30_sensor
+                else:
+                  - script.execute: sps30_idle_cycle
 
   - id: sps30_evaluate_quiet_hours
     mode: restart
@@ -133,7 +150,19 @@ script:
               || (start > end && (hour >= start || hour < end));
           }
           id(sps30_quiet_hours_active) = quiet;
-      - script.execute: sps30_apply_operating_mode
+      - if:
+          condition:
+            lambda: |-
+              return id(sps30_controller_ready)
+                && (!id(sps30_operating_mode_initialized)
+                  || id(sps30_quiet_hours_active)
+                    != id(sps30_applied_quiet_hours_active));
+          then:
+            - lambda: |-
+                id(sps30_applied_quiet_hours_active) =
+                  id(sps30_quiet_hours_active);
+                id(sps30_operating_mode_initialized) = true;
+            - script.execute: sps30_apply_operating_mode
 
 number:
   - platform: template
