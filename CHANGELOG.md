@@ -6,10 +6,16 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini V1 3.9] - 2026-08-10
+
+
 ### UltimateSensor Mini V1
 
 - Fixed the front light switching on and remaining on when Home Assistant
   restarted or temporarily disconnected from the device.
+
 
 ## [UltimateSensor Mini V1 3.8] - 2026-08-07
 
