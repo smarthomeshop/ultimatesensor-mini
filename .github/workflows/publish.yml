@@ -39,6 +39,9 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Verify immutable radar dependency versions
+        run: python3 .github/scripts/check-radar-dependency-pins.py ultimatesensor-mini-v1 ultimatesensor-mini-v2
+
       - name: Require changelog update for firmware changes
         shell: bash
         run: |
@@ -208,8 +211,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "info@dwain.nl"
+          git config --local user.name "dwainscheeren"
 
           IS_SCHEDULED="${{ github.event_name == 'schedule' }}"
           VERSION_FILE="ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml"
@@ -405,8 +408,8 @@ jobs:
           fi
 
           if [[ "${{ steps.changes.outputs.v1 }}" == "true" || "${{ steps.changes.outputs.beta }}" == "true" || "${{ steps.changes.outputs.v2 }}" == "true" ]] && ! git diff --quiet; then
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
+            git config --local user.email "info@dwain.nl"
+            git config --local user.name "dwainscheeren"
             git add CHANGELOG.md ultimatesensor-mini-v1/ultimatesensor-mini-common.yaml ultimatesensor-mini-v1/beta-ultimatesensor-mini-common.yaml ultimatesensor-mini-v2/base.yaml
 
             MSG="chore: update versions"

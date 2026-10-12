@@ -6,7 +6,16 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+### UltimateSensor Mini V1
+
+- Pinned the shared LD2450 radar packages to stable release `v1.0.0`, making
+  firmware builds reproducible while including mirror-reflection protection.
+
+### UltimateSensor Mini V2
+
+- Pinned the standard LD2450 firmware to stable package release `v1.0.0`.
+- Updated optional LD2460 upgrade firmware to `v0.4.0`, with reliable setting
+  readback, detection-sector controls and reflection-safe people counting.
 
 ## [UltimateSensor Mini V1 3.9] - 2026-08-10
 

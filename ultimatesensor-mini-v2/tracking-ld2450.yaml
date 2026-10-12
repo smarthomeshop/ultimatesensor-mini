@@ -13,7 +13,7 @@ substitutions:
 packages:
   ld2450:
     url: https://github.com/smarthomeshop/ld2450
-    ref: main
+    ref: v1.0.0
     files:
       - packages/ld2450-base.yaml
       - packages/ld2450-polygon-zones.yaml
