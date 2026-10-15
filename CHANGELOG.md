@@ -6,7 +6,8 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Bound V1 cloud HTTP waits and protect requests from task watchdog resets, retaining the existing registration and telemetry protocol.
+
 
 ## [UltimateSensor Mini V1 3.10] - 2026-10-12
 

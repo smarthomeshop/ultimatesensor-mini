@@ -570,3 +570,8 @@ interval:
 # so disable the no-client reboot on cloud firmware.
 api:
   reboot_timeout: 0s
+
+# Bound cloud network waits and protect synchronous HTTP from task watchdog resets.
+http_request:
+  timeout: 3s
+  watchdog_timeout: 15s
