@@ -9,6 +9,7 @@ script:
           if (id(poly_zone_1_count).has_state() && !isnan(id(poly_zone_1_count).state)) id(cloud_zone1_count) = (int) id(poly_zone_1_count).state;
           if (id(poly_zone_2_count).has_state() && !isnan(id(poly_zone_2_count).state)) id(cloud_zone2_count) = (int) id(poly_zone_2_count).state;
           if (id(poly_zone_3_count).has_state() && !isnan(id(poly_zone_3_count).state)) id(cloud_zone3_count) = (int) id(poly_zone_3_count).state;
+          if (id(poly_zone_4_count).has_state() && !isnan(id(poly_zone_4_count).state)) id(cloud_zone4_count) = (int) id(poly_zone_4_count).state;
 
 interval:
   - interval: 10s

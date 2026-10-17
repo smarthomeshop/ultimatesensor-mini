@@ -6,7 +6,9 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
+- Keep humidity between 0 and 100% in cloud uploads, so a humidity offset no longer makes the cloud reject the whole reading.
+- Stop reporting the last particulate matter values as fresh while the PM sensor is off or in quiet hours.
+- V2: send presence zone 4 to the cloud, and send zone counts on LD2460 variants.
 
 ## [UltimateSensor Mini V1 3.11] - 2026-10-15
 

@@ -6,6 +6,13 @@ script:
     mode: single
     then:
       - lambda: |-
+          // The SPS30 keeps its last values while it is switched off or paused
+          // for quiet hours; do not report them to the cloud as fresh readings.
+          if (!id(pm_sensor_switch).state || id(sps30_quiet_hours_active)) {
+            id(cloud_has_pm) = false;
+            return;
+          }
+
           bool has_data = false;
           if (id(PM_2_5).has_state() && !isnan(id(PM_2_5).state)) has_data = true;
           if (id(PM_10_0).has_state() && !isnan(id(PM_10_0).state)) has_data = true;

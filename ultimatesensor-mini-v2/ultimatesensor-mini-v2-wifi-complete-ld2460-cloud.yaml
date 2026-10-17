@@ -35,6 +35,7 @@ packages:
   cloud: !include cloud.yaml
   cloud_sps30_quiet: !include cloud-sps30-quiet-hours.yaml
   cloud_lighting_entities: !include cloud-lighting-entities.yaml
+  zones: !include cloud-zones.yaml
   cloud_pm: !include cloud-pm.yaml
   firmware: !include firmware-selector.yaml
   setup_portal: github://smarthomeshop/setup-portal/packages/setup-portal.yaml@main

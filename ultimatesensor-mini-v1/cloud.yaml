@@ -359,7 +359,9 @@ script:
               root["temperature_c"] = id(scd41_temperature).state;
             }
             if (id(scd41_humidity).has_state() && !isnan(id(scd41_humidity).state)) {
-              root["humidity_pct"] = id(scd41_humidity).state;
+              // Humidity offsets can push the value outside 0-100 %, which the API
+              // rejects together with the rest of the payload (HTTP 422).
+              root["humidity_pct"] = std::max(0.0f, std::min(100.0f, id(scd41_humidity).state));
             }
             if (id(voc_index).has_state() && !isnan(id(voc_index).state)) {
               root["voc_index"] = id(voc_index).state;
