@@ -155,6 +155,18 @@ class WakeWordRecoveryTest(unittest.TestCase):
         self.assertTrue(clock.voice_running)
         self.assertFalse(clock.wake_running)
 
+    def test_mute_cancels_pending_microphone_handoff(self):
+        clock = AutomationClock()
+        clock.wake_running = True
+        clock.stop_latency = 1500
+        clock.fire(CONFIG["micro_wake_word"]["on_wake_word_detected"])
+        clock.advance(100)
+        clock.mute()
+        clock.advance(2000)
+        self.assertFalse(clock.voice_running)
+        self.assertFalse(clock.wake_running)
+        self.assertEqual(clock.phase, "muted")
+
     def test_repeated_commands_wait_for_long_response(self):
         clock = AutomationClock()
         for duration in (4000, 20000, 70000, 1000):

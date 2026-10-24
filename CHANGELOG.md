@@ -6,18 +6,14 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
-- Add customer-facing firmware notes here before merging a PR.
-
-## [UltimateSensor Mini V1 3.13] - 2026-10-24
-
-
 - Mini V1: Align local voice control with UltimateSensor V2, including reliable
   wake-word restart after spoken responses, errors and Home Assistant reconnects.
 - Mini V1: Add voice phase, manual voice start and microphone level diagnostics,
   improved audio settings and an embedded prompt when the voice pipeline is unavailable.
 - Mini V1: Keep Okay Nabu and Hey Jarvis available, and turn the front light off
   when voice control returns to idle.
-
+- Mini V1: Cancel pending voice requests when voice control is disabled during
+  the microphone handoff.
 
 ## [UltimateSensor Mini V1 3.12] - 2026-10-17
 

@@ -62,9 +62,13 @@ micro_wake_word:
         not:
           micro_wake_word.is_running:
     - delay: 250ms
-    - voice_assistant.start:
-        wake_word: !lambda return wake_word;
-    - script.execute: recover_wake_word
+    - if:
+        condition:
+          switch.is_on: use_wake_word
+        then:
+          - voice_assistant.start:
+              wake_word: !lambda return wake_word;
+          - script.execute: recover_wake_word
 
 voice_assistant:
   id: va
