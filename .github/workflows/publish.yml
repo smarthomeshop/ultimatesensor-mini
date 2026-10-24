@@ -42,6 +42,11 @@ jobs:
       - name: Verify immutable radar dependency versions
         run: python3 .github/scripts/check-radar-dependency-pins.py ultimatesensor-mini-v1 ultimatesensor-mini-v2
 
+      - name: Test voice assistant recovery
+        run: |
+          python3 -m pip install PyYAML==6.0.3
+          python3 -m unittest discover -s tests -v
+
       - name: Require changelog update for firmware changes
         shell: bash
         run: |
@@ -180,7 +185,7 @@ jobs:
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
-          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/(ultimatesensor-mini-(basic|complete)(-cloud)?|ultimatesensor-mini-common|sps30|cloud|cloud-pm)\.ya?ml$' && echo "true" || echo "false")
+          V1_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/((ultimatesensor-mini-(basic|complete)(-cloud)?|ultimatesensor-mini-common|voice-assistant|sps30|cloud|cloud-pm)\.ya?ml|audio/.*)$' && echo "true" || echo "false")
           BETA_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v1/beta-ultimatesensor-mini-(basic|complete|common)\.ya?ml$' && echo "true" || echo "false")
           V2_CHANGED=$(echo "$CHANGED_FILES" | grep -Eq '^ultimatesensor-mini-v2/.*\.ya?ml$' && echo "true" || echo "false")
           WORKFLOW_CHANGED=$(echo "$CHANGED_FILES" | grep -q '^.github/workflows/' && echo "true" || echo "false")
