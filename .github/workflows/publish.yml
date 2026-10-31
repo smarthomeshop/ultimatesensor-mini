@@ -47,6 +47,9 @@ jobs:
           python3 -m pip install PyYAML==6.0.3
           python3 -m unittest discover -s tests -v
 
+      - name: Check firmware update routing and URL lifetime
+        run: python3 -m unittest discover -s tests -p test_firmware_selector.py -v
+
       - name: Require changelog update for firmware changes
         shell: bash
         run: |

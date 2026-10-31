@@ -8,6 +8,11 @@ substitutions:
   project_name: "smarthomeshop.ultimatesensor_mini_beta"
   log_level: "DEBUG"
   cloud_enabled: "false"
+  # Beta images are local-only; cloud selections intentionally use stable V1 builds.
+  basic_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/beta-ultimatesensor-mini-basic-manifest.json"
+  complete_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/beta-ultimatesensor-mini-complete-manifest.json"
+  basic_cloud_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-basic-cloud-manifest.json"
+  complete_cloud_manifest_url: "https://smarthomeshop.github.io/ultimatesensor-mini/ultimatesensor-mini-complete-cloud-manifest.json"
 
 packages:
   production_common: !include ultimatesensor-mini-common.yaml
