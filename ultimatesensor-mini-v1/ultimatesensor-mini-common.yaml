@@ -119,9 +119,10 @@ update:
 
 wifi:
   power_save_mode: light
+  # Keep setup credentials independent of hardware versions and node names.
   ap:
-    ssid: ${device_name}
-    password: ${device_name}
+    ssid: "ultimatesensor-mini"
+    password: "ultimatesensor-mini"
 
 captive_portal:
 improv_serial:
