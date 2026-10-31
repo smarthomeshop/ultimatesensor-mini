@@ -6,8 +6,22 @@ This changelog starts on 2026-04-21. Earlier firmware versions existed before th
 
 ## [Unreleased]
 
+- Add customer-facing firmware notes here before merging a PR.
+
+## [UltimateSensor Mini Beta V1 2.42-beta.112] - 2026-10-31
+
+
 - Keep Mini V2 firmware update URLs valid after a variant is selected, including ESPHome 2026.10 compatibility. WiFi/Ethernet, Basic/Complete, cloud mode and radar family remain matched.
 - Route Mini V1 beta Basic and Complete selections to their corresponding beta images. Cloud selections use the corresponding stable V1 cloud images because beta cloud builds do not exist.
+
+
+
+## [UltimateSensor Mini V2 1.20] - 2026-10-31
+
+
+- Keep Mini V2 firmware update URLs valid after a variant is selected, including ESPHome 2026.10 compatibility. WiFi/Ethernet, Basic/Complete, cloud mode and radar family remain matched.
+- Route Mini V1 beta Basic and Complete selections to their corresponding beta images. Cloud selections use the corresponding stable V1 cloud images because beta cloud builds do not exist.
+
 
 
 ## [UltimateSensor Mini V1 3.15] - 2026-10-31
