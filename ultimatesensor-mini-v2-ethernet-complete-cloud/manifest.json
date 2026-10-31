@@ -2,7 +2,7 @@
   "chipFamily": "ESP32-C6",
   "ota": {
     "path": "ultimatesensor-mini-v2-esp32c6.ota.bin",
-    "md5": "273d4e3359103270afe2361eed03509d"
+    "md5": "5486d98adbb2c7ce9c06a32184533887"
   },
   "parts": [
     {
