@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import textwrap
 import unittest
@@ -52,11 +53,16 @@ int main(int argc, char **argv){
         source = Path(folder) / "routes.cpp"
         binary = Path(folder) / "routes"
         source.write_text(program)
-        compiled = subprocess.run([compiler, "-std=c++17", "-O0", "-fsanitize=address", "-fno-omit-frame-pointer", str(source), "-o", str(binary)], capture_output=True, text=True)
+        command = [compiler, "-std=c++17", "-O0"]
+        # Exercise AddressSanitizer on Linux/CI and keep native macOS checks usable.
+        if sys.platform.startswith("linux"):
+            command += ["-fsanitize=address", "-fno-omit-frame-pointer"]
+        command += [str(source), "-o", str(binary)]
+        compiled = subprocess.run(command, capture_output=True, text=True, timeout=60)
         if compiled.returncode:
             raise AssertionError(compiled.stderr)
         env = {**os.environ, "ASAN_OPTIONS": "detect_leaks=0:detect_stack_use_after_return=1"}
-        result = subprocess.run([str(binary), *options], capture_output=True, text=True, env=env)
+        result = subprocess.run([str(binary), *options], capture_output=True, text=True, env=env, timeout=20)
         if result.returncode:
             raise AssertionError(result.stderr)
         return result.stdout.splitlines()
