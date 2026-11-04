@@ -357,11 +357,9 @@ sensor:
     update_interval: 120s
 
   - platform: sgp4x
-    voc:
-      id: voc_index
+    voc_index:
       name: "VOC Index"
-    nox:
-      id: nox_index
+    nox_index:
       name: "NOx Index"
     compensation:
       humidity_source: scd41_humidity
